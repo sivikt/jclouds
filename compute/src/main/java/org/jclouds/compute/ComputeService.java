@@ -299,7 +299,7 @@ public interface ComputeService {
     *           Predicate-based filter to define on which nodes the script is to be executed
     * @param runScript
     *           statement containing the script to run
-    * @param options
+    * @param optAdaptingComputeServiceStrategiesions
     *           nullable options to how to run the script, whether to override credentials
     * @return map with node identifiers and corresponding responses
     * @throws NoSuchElementException
