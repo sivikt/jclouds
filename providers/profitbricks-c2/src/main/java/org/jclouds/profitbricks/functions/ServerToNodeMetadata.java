@@ -82,6 +82,7 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
       return nodeMetadataBuilder.build();
    }
 
+   // TODO move to configuration module
    private OperatingSystem mapOS(Server.OSType osType) {
       switch (osType) {
          case WINDOWS: return OperatingSystem.builder().description(OsFamily.WINDOWS.name()).family(OsFamily.WINDOWS).build();
@@ -90,6 +91,7 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
       }
    }
 
+   // TODO move to configuration module
    private NodeMetadata.Status mapStatus(Server.VirtualMachineState state) {
       switch (state) {
          case SHUTDOWN:
