@@ -18,7 +18,7 @@ package org.jclouds.profitbricks.compute.features;
 
 import org.jclouds.Fallbacks;
 import org.jclouds.http.functions.ParseSax;
-import org.jclouds.profitbricks.features.ServersApi;
+import org.jclouds.profitbricks.features.ServerApi;
 import org.jclouds.profitbricks.xml.GetAllServersResponseHandler;
 import org.jclouds.reflect.Invocation;
 import org.jclouds.rest.internal.GeneratedHttpRequest;
@@ -29,16 +29,16 @@ import java.io.IOException;
 import static org.jclouds.reflect.Reflection2.method;
 
 /**
- * Test for {@link ServersApi}
+ * Test for {@link org.jclouds.profitbricks.features.ServerApi}
  * 
  * @author Serj Sintsov
  */
 @Test(groups = "unit", testName = "ServersApiTest")
-public class ServersApiTest extends BasePBApiTest<ServersApi> {
+public class ServersApiTest extends BasePBApiTest<ServerApi> {
 
    @Test
    public void getAllServers() throws SecurityException, NoSuchMethodException, IOException {
-      Invocation invocation = Invocation.create(method(ServersApi.class, "getAllServers"));
+      Invocation invocation = Invocation.create(method(ServerApi.class, "getAllServers"));
 
       GeneratedHttpRequest request = processor.apply(invocation);
 

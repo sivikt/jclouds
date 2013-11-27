@@ -37,7 +37,7 @@ import javax.ws.rs.POST;
 @SinceApiVersion("1.2")
 @RequestFilters({BasicAuthentication.class, PBSoapMessageEnvelope.class})
 @VirtualHost
-public interface ServersApi {
+public interface ServerApi {
 
    /**
     * Returns information about all virtual server, such as
