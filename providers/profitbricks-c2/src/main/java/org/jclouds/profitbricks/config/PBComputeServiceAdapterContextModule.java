@@ -24,6 +24,7 @@ import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.domain.Location;
+import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.functions.ServerToNodeMetadata;
@@ -44,6 +45,15 @@ public class PBComputeServiceAdapterContextModule
 
       bind(new TypeLiteral<Function<Server, NodeMetadata>>() {
       }).to(Class.class.cast(ServerToNodeMetadata.class));
+
+      bind(new TypeLiteral<Function<Image, Image>>() {
+      }).to(Class.class.cast(IdentityFunction.class));
+
+      bind(new TypeLiteral<Function<Hardware, Hardware>>() {
+      }).to(Class.class.cast(IdentityFunction.class));
+
+      bind(new TypeLiteral<Function<Location, Location>>() {
+      }).to(Class.class.cast(IdentityFunction.class));
 
       super.configure();
    }
