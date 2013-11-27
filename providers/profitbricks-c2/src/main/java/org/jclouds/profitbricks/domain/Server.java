@@ -16,6 +16,7 @@
  */
 package org.jclouds.profitbricks.domain;
 
+import com.google.common.base.Objects;
 import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
@@ -282,6 +283,22 @@ public class Server {
     */
    public AvailabilityZone getAvailabilityZone() {
       return availabilityZone;
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(serverId);
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null || getClass() != obj.getClass())
+         return false;
+      Server that = Server.class.cast(obj);
+
+      return Objects.equal(this.serverId, that.serverId);
    }
 
    @Override
