@@ -19,16 +19,21 @@ package org.jclouds.profitbricks.functions;
 import com.google.common.base.Function;
 import org.jclouds.compute.domain.*;
 import org.jclouds.compute.reference.ComputeServiceConstants;
+import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationBuilder;
+import org.jclouds.domain.LocationScope;
 import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.domain.Server;
 
 import javax.annotation.Resource;
 import javax.inject.Named;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * A function for transforming a ProfitBricks {@link Server} into a generic
  * NodeMetadata object.
- * 
+ *
  * @author Serj Sintsov
  */
 public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
@@ -39,8 +44,62 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
 
    @Override
    public NodeMetadata apply(Server server) {
-      // todo impl
-      return null;
+      checkNotNull(server, "server");
+
+      Location region = new LocationBuilder()
+         .id(server.getDataCenterId())
+         .description(server.getDataCenterId())
+         .scope(LocationScope.REGION)
+         .build();
+
+      /**
+       * ProfitBricks locate servers in several availability zones
+       * {@link org.jclouds.profitbricks.domain.Server.AvailabilityZone}.
+       * For the moment we don't know iso codes for this zones.
+       */
+      LocationBuilder zoneBuilder = new LocationBuilder()
+         .id(server.getAvailabilityZone().name())
+         .description(server.getAvailabilityZone().name())
+         .scope(LocationScope.ZONE)
+         .parent(region);
+
+      HardwareBuilder hardwareBuilder = new HardwareBuilder()
+         .id(server.getAvailabilityZone().name() + "/" + server.getServerId())
+         .processor(new Processor(server.getCores(), 0))
+         .ram(server.getRam())
+         .location(zoneBuilder.build());
+
+      NodeMetadataBuilder nodeMetadataBuilder = new NodeMetadataBuilder()
+         .id(server.getDataCenterId() + "/" + server.getServerId())
+         .providerId(server.getServerId())
+         .name(server.getServerName())
+         .hostname(server.getServerName())
+         .status(mapStatus(server.getVirtualMachineState()))
+         .operatingSystem(mapOS(server.getOsType()))
+         .hardware(hardwareBuilder.build())
+         .location(region);
+
+      return nodeMetadataBuilder.build();
+   }
+
+   private OperatingSystem mapOS(Server.OSType osType) {
+      switch (osType) {
+         case WINDOWS: return OperatingSystem.builder().description(OsFamily.WINDOWS.name()).family(OsFamily.WINDOWS).build();
+         case LINUX:   return OperatingSystem.builder().description(OsFamily.LINUX.name()).family(OsFamily.LINUX).build();
+         default:      return OperatingSystem.builder().description(OsFamily.UNRECOGNIZED.name()).family(OsFamily.UNRECOGNIZED).build();
+      }
+   }
+
+   private NodeMetadata.Status mapStatus(Server.VirtualMachineState state) {
+      switch (state) {
+         case SHUTDOWN:
+         case SHUTOFF:
+         case PAUSED:  return NodeMetadata.Status.SUSPENDED;
+         case RUNNING: return NodeMetadata.Status.RUNNING;
+         case BLOCKED: return NodeMetadata.Status.PENDING;
+         case CRASHED: return NodeMetadata.Status.ERROR;
+         default:      return NodeMetadata.Status.UNRECOGNIZED;
+      }
    }
 
 }

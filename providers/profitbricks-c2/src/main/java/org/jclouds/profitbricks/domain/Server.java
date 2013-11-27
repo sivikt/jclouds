@@ -21,6 +21,7 @@ import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
@@ -31,11 +32,11 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class Server {
 
-   public static Builder<?> newServerBuilder() {
+   public static NewServerBuilder newInstance() {
       return new NewServerBuilder();
    }
 
-   public static Builder<?> existingServerBuilder() {
+   public static ExistingServerBuilder describeInstance() {
       return new ExistingServerBuilder();
    }
 
@@ -75,7 +76,7 @@ public class Server {
        * @see Server#getCores()
        */
       public T cores(int cores) {
-         checkState(cores > 0, "Number of core must be >0");
+         checkState(cores > 0, "Number of core must be >=1");
          this.cores = cores;
          return self();
       }
@@ -128,7 +129,54 @@ public class Server {
       }
    }
 
-   private static class ExistingServerBuilder extends Builder<ExistingServerBuilder> {
+   public static class ExistingServerBuilder extends Builder<ExistingServerBuilder> {
+
+      protected String serverId;
+      protected Date creationTime;
+      protected Date lastModificationTime;
+      protected ProvisioningState provisioningState;
+      protected VirtualMachineState virtualMachineState;
+
+      /**
+       * @see Server#getServerId()
+       */
+      public ExistingServerBuilder serverId(String serverId) {
+         this.serverId = checkNotNull(serverId, "serverId");
+         return self();
+      }
+
+      /**
+       * @see Server#getCreationTime()
+       */
+      public ExistingServerBuilder creationTime(Date creationTime) {
+         this.creationTime = creationTime;
+         return self();
+      }
+
+      /**
+       * @see Server#getLastModificationTime()
+       */
+      public ExistingServerBuilder lastModificationTime(Date lastModificationTime) {
+         this.lastModificationTime = lastModificationTime;
+         return self();
+      }
+
+      /**
+       * @see Server#getProvisioningState()
+       */
+      public ExistingServerBuilder provisioningState(ProvisioningState provisioningState) {
+         this.provisioningState = checkNotNull(provisioningState);
+         return self();
+      }
+
+      /**
+       * @see Server#getVirtualMachineState()
+       */
+      public ExistingServerBuilder virtualMachineState(VirtualMachineState virtualMachineState) {
+         this.virtualMachineState = checkNotNull(virtualMachineState);
+         return self();
+      }
+
       @Override
       protected ExistingServerBuilder self() {
          return this;
@@ -136,11 +184,12 @@ public class Server {
 
       @Override
       public Server build() {
-         return null;
+         return new Server(dataCenterId, serverId, serverName, cores, ram, internetAccess, osType, availabilityZone,
+                           creationTime, lastModificationTime, provisioningState, virtualMachineState);
       }
    }
 
-   private static class NewServerBuilder extends Builder<NewServerBuilder> {
+   public static class NewServerBuilder extends Builder<NewServerBuilder> {
       @Override
       protected NewServerBuilder self() {
          return this;
@@ -154,13 +203,24 @@ public class Server {
 
    protected Server(String dataCenterId, String serverName, int cores, int ram, boolean internetAccess, OSType osType,
                     AvailabilityZone availabilityZone) {
+      this(dataCenterId, null, serverName, cores, ram, internetAccess, osType, availabilityZone, null, null, null, null);
+   }
+
+   protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, boolean internetAccess,
+                    OSType osType, AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
+                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
       this.dataCenterId = dataCenterId;
+      this.serverId = serverId;
       this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
       this.internetAccess = internetAccess;
       this.osType = osType;
       this.availabilityZone = availabilityZone;
+      this.creationTime = creationTime;
+      this.lastModificationTime = lastModificationTime;
+      this.provisioningState = provisioningState;
+      this.virtualMachineState = virtualMachineState;
    }
 
    public enum ProvisioningState {
