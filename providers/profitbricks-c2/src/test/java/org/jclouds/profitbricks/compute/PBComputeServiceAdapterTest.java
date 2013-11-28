@@ -16,11 +16,19 @@
  */
 package org.jclouds.profitbricks.compute;
 
+import org.testng.annotations.Test;
+
 /**
  * Test for {@link PBComputeServiceAdapter}
- *
+ * TODO finish
  * @author Serj Sintsov
  */
+@Test(groups = "unit", testName = "PBComputeServiceAdapterTest")
 public class PBComputeServiceAdapterTest {
-   // TODO implement
+
+   @Test
+   public void listNodes() {
+
+   }
+
 }

@@ -17,19 +17,19 @@
             <availabilityZone>AUTO</availabilityZone>
          </return>
          <return>
-            <dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>
+            <dataCenterId>89046edb-2a50-4d0f-a153-6576ee7d22a7</dataCenterId>
             <dataCenterVersion>6</dataCenterVersion>
             <serverId>722694b6-8635-4433-8dea-012860cab5fe</serverId>
             <serverName>FirstServer</serverName>
             <cores>1</cores>
             <ram>1024</ram>
-            <internetAccess>false</internetAccess>
-            <provisioningState>AVAILABLE</provisioningState>
-            <virtualMachineState>RUNNING</virtualMachineState>
-            <creationTime>2013-11-26T11:23:47.742Z</creationTime>
-            <lastModificationTime>2013-11-26T11:23:47.742Z</lastModificationTime>
-            <osType>LINUX</osType>
-            <availabilityZone>AUTO</availabilityZone>
+            <internetAccess>true</internetAccess>
+            <provisioningState>INACTIVE</provisioningState>
+            <virtualMachineState>PAUSED</virtualMachineState>
+            <creationTime>2013-11-26T11:23:50.742Z</creationTime>
+            <lastModificationTime>2013-11-26T11:23:50.742Z</lastModificationTime>
+            <osType>WINDOWS</osType>
+            <availabilityZone>ZONE_1</availabilityZone>
          </return>
          <return>
             <dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>
@@ -37,14 +37,14 @@
             <serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId>
             <serverName>server</serverName>
             <cores>2</cores>
-            <ram>1024</ram>
+            <ram>2048</ram>
             <internetAccess>false</internetAccess>
-            <provisioningState>AVAILABLE</provisioningState>
-            <virtualMachineState>RUNNING</virtualMachineState>
+            <provisioningState>DELETED</provisioningState>
+            <virtualMachineState>SHUTOFF</virtualMachineState>
             <creationTime>2013-11-26T11:31:35.383Z</creationTime>
             <lastModificationTime>2013-11-26T11:31:35.383Z</lastModificationTime>
-            <osType>WINDOWS</osType>
-            <availabilityZone>AUTO</availabilityZone>
+            <osType>OTHER</osType>
+            <availabilityZone>ZONE_2</availabilityZone>
          </return>
       </ns2:getAllServersResponse>
    </S:Body>

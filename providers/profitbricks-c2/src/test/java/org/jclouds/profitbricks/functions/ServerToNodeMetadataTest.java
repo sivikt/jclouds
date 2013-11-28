@@ -21,6 +21,14 @@ import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.domain.LocationScope;
 import org.jclouds.profitbricks.domain.Server;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.BLOCKED;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.CRASHED;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.RUNNING;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.PAUSED;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.SHUTDOWN;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.SHUTOFF;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.NOSTATE;
+import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.UNRECOGNIZED;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -31,6 +39,7 @@ import static org.testng.Assert.assertNotNull;
  *
  * @author Serj Sintsov
  */
+@Test(groups = "unit", testName = "ServerToNodeMetadataTest")
 public class ServerToNodeMetadataTest {
 
    @Test
@@ -48,7 +57,7 @@ public class ServerToNodeMetadataTest {
 
       assertNotNull(nodeMetadata.getOperatingSystem());
       assertEquals(nodeMetadata.getOperatingSystem().getFamily(), OsFamily.LINUX);
-      assertEquals(nodeMetadata.getOperatingSystem().getDescription(), OsFamily.LINUX.name());
+      assertEquals(nodeMetadata.getOperatingSystem().getDescription(), OsFamily.LINUX.value());
 
       assertNotNull(nodeMetadata.getLocation());
       assertEquals(nodeMetadata.getLocation().getId(), actualServer.getDataCenterId());
@@ -62,14 +71,14 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getHardware().getProcessors().get(0).getSpeed(), 0.0);
       assertEquals(nodeMetadata.getHardware().getRam(), 1024);
       assertNotNull(nodeMetadata.getHardware().getLocation());
-      assertEquals(nodeMetadata.getHardware().getLocation().getId(), Server.AvailabilityZone.ZONE_1.name());
-      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), Server.AvailabilityZone.ZONE_1.name());
+      assertEquals(nodeMetadata.getHardware().getLocation().getId(), Server.AvailabilityZone.ZONE_1.value());
+      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), Server.AvailabilityZone.ZONE_1.value());
       assertEquals(nodeMetadata.getHardware().getLocation().getScope(), LocationScope.ZONE);
       assertEquals(nodeMetadata.getHardware().getLocation().getParent(), nodeMetadata.getLocation());
    }
 
    public Server actualServer() {
-      return Server.describeInstance()
+      return Server.describingBuilder()
             .dataCenterId("11111-2222-3333-4444-25195ac4515a")
             .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
             .serverName("LinuxServer")
@@ -83,6 +92,39 @@ public class ServerToNodeMetadataTest {
             .internetAccess(true)
             .availabilityZone(Server.AvailabilityZone.ZONE_1)
             .build();
+   }
+
+   @Test
+   public void testMapOS() {
+      ServerToNodeMetadata func = new ServerToNodeMetadata();
+      assertEquals(func.mapOS(Server.OSType.LINUX).getFamily(), OsFamily.LINUX);
+      assertEquals(func.mapOS(Server.OSType.LINUX).getDescription(), OsFamily.LINUX.value());
+
+      assertEquals(func.mapOS(Server.OSType.WINDOWS).getFamily(), OsFamily.WINDOWS);
+      assertEquals(func.mapOS(Server.OSType.WINDOWS).getDescription(), OsFamily.WINDOWS.value());
+
+      assertEquals(func.mapOS(Server.OSType.OTHER).getFamily(), OsFamily.UNRECOGNIZED);
+      assertEquals(func.mapOS(Server.OSType.OTHER).getDescription(), OsFamily.UNRECOGNIZED.value());
+
+      assertEquals(func.mapOS(Server.OSType.UNKNOWN).getFamily(), OsFamily.UNRECOGNIZED);
+      assertEquals(func.mapOS(Server.OSType.UNKNOWN).getDescription(), OsFamily.UNRECOGNIZED.value());
+
+      assertEquals(func.mapOS(null).getFamily(), OsFamily.UNRECOGNIZED);
+      assertEquals(func.mapOS(null).getDescription(), OsFamily.UNRECOGNIZED.value());
+   }
+
+   @Test
+   public void testMapStatus() {
+      ServerToNodeMetadata func = new ServerToNodeMetadata();
+      assertEquals(func.mapStatus(BLOCKED), NodeMetadata.Status.PENDING);
+      assertEquals(func.mapStatus(CRASHED), NodeMetadata.Status.ERROR);
+      assertEquals(func.mapStatus(NOSTATE), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(PAUSED), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(RUNNING), NodeMetadata.Status.RUNNING);
+      assertEquals(func.mapStatus(SHUTDOWN), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(SHUTOFF), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(UNRECOGNIZED), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(null), NodeMetadata.Status.UNRECOGNIZED);
    }
 
 }

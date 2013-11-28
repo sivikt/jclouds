@@ -32,12 +32,12 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class Server {
 
-   public static NewServerBuilder newInstance() {
-      return new NewServerBuilder();
+   public static ServerCreationBuilder creationBuilder() {
+      return new ServerCreationBuilder();
    }
 
-   public static ExistingServerBuilder describeInstance() {
-      return new ExistingServerBuilder();
+   public static ServerDescribingBuilder describingBuilder() {
+      return new ServerDescribingBuilder();
    }
 
    public static abstract class Builder<T extends Builder<T>> {
@@ -129,7 +129,7 @@ public class Server {
       }
    }
 
-   public static class ExistingServerBuilder extends Builder<ExistingServerBuilder> {
+   public static class ServerDescribingBuilder extends Builder<ServerDescribingBuilder> {
 
       protected String serverId;
       protected Date creationTime;
@@ -140,7 +140,7 @@ public class Server {
       /**
        * @see Server#getServerId()
        */
-      public ExistingServerBuilder serverId(String serverId) {
+      public ServerDescribingBuilder serverId(String serverId) {
          this.serverId = checkNotNull(serverId, "serverId");
          return self();
       }
@@ -148,7 +148,7 @@ public class Server {
       /**
        * @see Server#getCreationTime()
        */
-      public ExistingServerBuilder creationTime(Date creationTime) {
+      public ServerDescribingBuilder creationTime(Date creationTime) {
          this.creationTime = creationTime;
          return self();
       }
@@ -156,7 +156,7 @@ public class Server {
       /**
        * @see Server#getLastModificationTime()
        */
-      public ExistingServerBuilder lastModificationTime(Date lastModificationTime) {
+      public ServerDescribingBuilder lastModificationTime(Date lastModificationTime) {
          this.lastModificationTime = lastModificationTime;
          return self();
       }
@@ -164,7 +164,7 @@ public class Server {
       /**
        * @see Server#getProvisioningState()
        */
-      public ExistingServerBuilder provisioningState(ProvisioningState provisioningState) {
+      public ServerDescribingBuilder provisioningState(ProvisioningState provisioningState) {
          this.provisioningState = checkNotNull(provisioningState);
          return self();
       }
@@ -172,13 +172,13 @@ public class Server {
       /**
        * @see Server#getVirtualMachineState()
        */
-      public ExistingServerBuilder virtualMachineState(VirtualMachineState virtualMachineState) {
+      public ServerDescribingBuilder virtualMachineState(VirtualMachineState virtualMachineState) {
          this.virtualMachineState = checkNotNull(virtualMachineState);
          return self();
       }
 
       @Override
-      protected ExistingServerBuilder self() {
+      protected ServerDescribingBuilder self() {
          return this;
       }
 
@@ -189,9 +189,9 @@ public class Server {
       }
    }
 
-   public static class NewServerBuilder extends Builder<NewServerBuilder> {
+   public static class ServerCreationBuilder extends Builder<ServerCreationBuilder> {
       @Override
-      protected NewServerBuilder self() {
+      protected ServerCreationBuilder self() {
          return this;
       }
 
@@ -210,33 +210,81 @@ public class Server {
                     OSType osType, AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
                     ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
       this.dataCenterId = dataCenterId;
-      this.serverId = serverId;
+      this.serverId = checkNotNull(serverId, "serverId");
       this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
       this.internetAccess = internetAccess;
-      this.osType = osType;
-      this.availabilityZone = availabilityZone;
+      this.osType = osType == null ? OSType.UNKNOWN : osType;
+      this.availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone; // TODO find checkReturnDefault..or something
       this.creationTime = creationTime;
       this.lastModificationTime = lastModificationTime;
-      this.provisioningState = provisioningState;
-      this.virtualMachineState = virtualMachineState;
+      this.provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
+      this.virtualMachineState = virtualMachineState == null ? VirtualMachineState.UNRECOGNIZED : virtualMachineState;
    }
 
    public enum ProvisioningState {
-      INACTIVE, INPROCESS, AVAILABLE, DELETED, ERROR
+      INACTIVE, INPROCESS, AVAILABLE, DELETED, ERROR, UNRECOGNIZED;
+
+      public String value() {
+         return name();
+      }
+
+      public static ProvisioningState fromValue(String value) {
+         try {
+            return valueOf(value);
+         } catch (IllegalArgumentException e) {
+            return UNRECOGNIZED;
+         }
+      }
    }
 
    public enum VirtualMachineState {
-      NOSTATE, RUNNING, BLOCKED, PAUSED, SHUTDOWN, SHUTOFF, CRASHED
+      NOSTATE, RUNNING, BLOCKED, PAUSED, SHUTDOWN, SHUTOFF, CRASHED, UNRECOGNIZED;
+
+      public String value() {
+         return name();
+      }
+
+      public static VirtualMachineState fromValue(String value) {
+         try {
+            return valueOf(value);
+         } catch (IllegalArgumentException e) {
+            return UNRECOGNIZED;
+         }
+      }
    }
 
    public enum OSType {
-      WINDOWS, LINUX, OTHER, UNKOWN
+      WINDOWS, LINUX, OTHER, UNKNOWN;
+
+      public String value() {
+         return name();
+      }
+
+      public static OSType fromValue(String value) {
+         try {
+            return valueOf(value);
+         } catch (IllegalArgumentException e) {
+            return UNKNOWN;
+         }
+      }
    }
 
    public enum AvailabilityZone {
-      AUTO, ZONE_1, ZONE_2
+      AUTO, ZONE_1, ZONE_2;
+
+      public String value() {
+         return name();
+      }
+
+      public static AvailabilityZone fromValue(String value) {
+         try {
+            return valueOf(value);
+         } catch (IllegalArgumentException e) {
+            return AUTO;
+         }
+      }
    }
 
    private String dataCenterId;
@@ -366,12 +414,17 @@ public class Server {
       return getClass().getSimpleName() + "{" +
             "dataCenterId=" + dataCenterId + "," +
             "serverId=" + serverId + "," +
+            "serverName=" + serverName + "," +
+            "internetAccess=" + internetAccess + "," +
+            "creationTime=" + creationTime + "," +
+            "lastModificationTime=" + lastModificationTime + "," +
             "cores=" + cores + "," +
             "ram=" + ram + "," +
             "osType=" + osType + "," +
             "provisioningState=" + provisioningState + "," +
             "virtualMachineState=" + virtualMachineState + "," +
-            "}";
+            "availabilityZone=" + availabilityZone +
+      "}";
    }
 
 }

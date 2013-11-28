@@ -16,18 +16,22 @@
  */
 package org.jclouds.profitbricks.features;
 
-import com.google.common.collect.FluentIterable;
-
 import static org.jclouds.Fallbacks.EmptyFluentIterableOnNotFoundOr404;
 
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.GetAllServersResponseHandler;
-import org.jclouds.rest.annotations.*;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.annotations.SinceApiVersion;
+import org.jclouds.rest.annotations.VirtualHost;
+import org.jclouds.rest.annotations.XMLResponseParser;
+import org.jclouds.rest.annotations.Fallback;
+import org.jclouds.rest.annotations.Payload;
 
 import javax.inject.Named;
 import javax.ws.rs.POST;
+import java.util.Set;
 
 /**
  * Provides synchronous access to ProfitBricks's Server Operations API.
@@ -50,6 +54,6 @@ public interface ServerApi {
    @Payload("<ws:getAllServers/>")
    @XMLResponseParser(GetAllServersResponseHandler.class)
    @Fallback(EmptyFluentIterableOnNotFoundOr404.class)
-   FluentIterable<Server> getAllServers();
+   Set<Server> getAllServers();
 
 }

@@ -82,7 +82,6 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
 
    @Override
    public Iterable<Server> listNodes() {
-      logger.debug("listing nodes");
       if (!pbApi.serversApi().isPresent()) return ImmutableSet.of();
       return pbApi.serversApi().get().getAllServers();
    }

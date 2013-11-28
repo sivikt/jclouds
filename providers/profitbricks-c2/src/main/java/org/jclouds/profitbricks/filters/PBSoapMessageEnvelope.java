@@ -24,6 +24,8 @@ import org.jclouds.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.inject.Singleton;
+import javax.ws.rs.core.MediaType;
+import javax.xml.soap.MimeHeader;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -54,7 +56,7 @@ public class PBSoapMessageEnvelope implements HttpRequestFilter {
       String body = request.getPayload().getRawContent().toString();
       logger.trace("wrapping request payload [%s] into SOAP envelope", body);
       Payload soapPayload = Payloads.newStringPayload(SOAP_MSG_PREFIX + body + SOAP_MSG_SUFFIX);
-      soapPayload.getContentMetadata().setContentType("application/xml");
+      soapPayload.getContentMetadata().setContentType(MediaType.TEXT_XML);
       return request.toBuilder().payload(soapPayload).build();
    }
 

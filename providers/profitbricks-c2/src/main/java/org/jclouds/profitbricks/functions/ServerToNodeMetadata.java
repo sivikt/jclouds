@@ -17,7 +17,12 @@
 package org.jclouds.profitbricks.functions;
 
 import com.google.common.base.Function;
-import org.jclouds.compute.domain.*;
+import org.jclouds.compute.domain.HardwareBuilder;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.NodeMetadataBuilder;
+import org.jclouds.compute.domain.Processor;
+import org.jclouds.compute.domain.OperatingSystem;
+import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
@@ -58,13 +63,13 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
        * For the moment we don't know iso codes for this zones.
        */
       LocationBuilder zoneBuilder = new LocationBuilder()
-         .id(server.getAvailabilityZone().name())
-         .description(server.getAvailabilityZone().name())
+         .id(server.getAvailabilityZone().value())
+         .description(server.getAvailabilityZone().value())
          .scope(LocationScope.ZONE)
          .parent(region);
 
       HardwareBuilder hardwareBuilder = new HardwareBuilder()
-         .id(server.getAvailabilityZone().name() + "/" + server.getServerId())
+         .id(server.getAvailabilityZone().value() + "/" + server.getServerId())
          .processor(new Processor(server.getCores(), 0))
          .ram(server.getRam())
          .location(zoneBuilder.build());
@@ -83,16 +88,36 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
    }
 
    // TODO move to configuration module
-   private OperatingSystem mapOS(Server.OSType osType) {
+   protected OperatingSystem mapOS(Server.OSType osType) {
+      if (osType == null)
+         return OperatingSystem.builder()
+                  .description(OsFamily.UNRECOGNIZED.value())
+                  .family(OsFamily.UNRECOGNIZED)
+                  .build();
+
       switch (osType) {
-         case WINDOWS: return OperatingSystem.builder().description(OsFamily.WINDOWS.name()).family(OsFamily.WINDOWS).build();
-         case LINUX:   return OperatingSystem.builder().description(OsFamily.LINUX.name()).family(OsFamily.LINUX).build();
-         default:      return OperatingSystem.builder().description(OsFamily.UNRECOGNIZED.name()).family(OsFamily.UNRECOGNIZED).build();
+         case WINDOWS:
+            return OperatingSystem.builder()
+                     .description(OsFamily.WINDOWS.value())
+                     .family(OsFamily.WINDOWS)
+                     .build();
+         case LINUX:
+            return OperatingSystem.builder()
+                     .description(OsFamily.LINUX.value())
+                     .family(OsFamily.LINUX)
+                     .build();
+         default:
+            return OperatingSystem.builder()
+                     .description(OsFamily.UNRECOGNIZED.value())
+                     .family(OsFamily.UNRECOGNIZED)
+                     .build();
       }
    }
 
    // TODO move to configuration module
-   private NodeMetadata.Status mapStatus(Server.VirtualMachineState state) {
+   protected NodeMetadata.Status mapStatus(Server.VirtualMachineState state) {
+      if (state == null) return NodeMetadata.Status.UNRECOGNIZED;
+
       switch (state) {
          case SHUTDOWN:
          case SHUTOFF:
