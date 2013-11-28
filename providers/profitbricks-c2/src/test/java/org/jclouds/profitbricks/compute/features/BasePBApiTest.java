@@ -19,6 +19,7 @@ package org.jclouds.profitbricks.compute.features;
 import com.google.inject.Module;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.http.HttpRequest;
+import org.jclouds.http.HttpRequestFilter;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.PBSoapApiMetadata;
 import org.jclouds.profitbricks.config.PBHttpApiModule;
@@ -38,7 +39,7 @@ import static org.testng.Assert.assertEquals;
 @Test(groups = "unit")
 public abstract class BasePBApiTest<T> extends BaseAsyncApiTest<T> {
 
-   protected final String HTTP_HEADERS = "Authorization: Basic aWRlbnRpdHk6Y3JlZGVudGlhbA==\n" +
+   protected final String HTTP_HEADERS = "Accept: text/xml\n" +
                                          "Host: api.profitbricks.com\n";
 
    @ConfiguresHttpApi

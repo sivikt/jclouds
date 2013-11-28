@@ -87,12 +87,14 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    }
 
    @Override
-   public Iterable<Server> listNodesByIds(Iterable<String> ids) {
-      throw new UnsupportedOperationException("Isn't implemented yet");
+   public Server getNode(String id) {
+      checkNotNull(id, "id");
+      if (!pbApi.serversApi().isPresent()) return null;
+      return pbApi.serversApi().get().getServer(id);
    }
 
    @Override
-   public Server getNode(String id) {
+   public Iterable<Server> listNodesByIds(Iterable<String> ids) {
       throw new UnsupportedOperationException("Isn't implemented yet");
    }
 

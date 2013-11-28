@@ -22,11 +22,6 @@ import org.jclouds.profitbricks.domain.Server;
 
 import javax.inject.Inject;
 
-import static org.jclouds.profitbricks.domain.Server.OSType;
-import static org.jclouds.profitbricks.domain.Server.AvailabilityZone;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState;
-import static org.jclouds.profitbricks.domain.Server.ProvisioningState;
-
 import java.util.Set;
 
 /**
@@ -34,16 +29,14 @@ import java.util.Set;
  *
  * @author Serj Sintsov
  */
-public class GetAllServersResponseHandler extends BasePBResponseHandler<Set<Server>> {
+public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHandler<Set<Server>> {
 
    private Set<Server> servers;
-   private Server.ServerDescribingBuilder describingBuilder;
 
    @Inject
    public GetAllServersResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
       servers = Sets.newHashSet();
-      describingBuilder = Server.describingBuilder();
    }
 
    @Override
@@ -53,23 +46,11 @@ public class GetAllServersResponseHandler extends BasePBResponseHandler<Set<Serv
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      if (qName.equals("ram")) describingBuilder.ram(textBufferToIntValue());
-      else if (qName.equals("cores")) describingBuilder.cores(textBufferToIntValue());
-      else if (qName.equals("osType")) describingBuilder.osType(OSType.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("serverId")) describingBuilder.serverId(trimAndGetTagStrValue());
-      else if (qName.equals("serverName")) describingBuilder.serverName(trimAndGetTagStrValue());
-      else if (qName.equals("dataCenterId")) describingBuilder.dataCenterId(trimAndGetTagStrValue());
-      else if (qName.equals("creationTime")) describingBuilder.creationTime(textBufferToIso8601Date());
-      else if (qName.equals("internetAccess")) describingBuilder.internetAccess(textBufferToBoolValue());
-      else if (qName.equals("availabilityZone")) describingBuilder.availabilityZone(AvailabilityZone.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("provisioningState")) describingBuilder.provisioningState(ProvisioningState.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("virtualMachineState")) describingBuilder.virtualMachineState(VirtualMachineState.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("lastModificationTime")) describingBuilder.lastModificationTime(textBufferToIso8601Date());
-      else if (qName.equals("return")) {
+      setServerInfoOnEndElementEvent(qName);
+      if (qName.equals("return")) {
          servers.add(describingBuilder.build());
          describingBuilder = Server.describingBuilder();
       }
-
       clearTextBuffer();
    }
 

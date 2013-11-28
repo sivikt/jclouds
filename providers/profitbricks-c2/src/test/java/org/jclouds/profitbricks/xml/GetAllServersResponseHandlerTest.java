@@ -46,7 +46,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
       GetAllServersResponseHandler handler = injector.getInstance(GetAllServersResponseHandler.class);
       Set<Server> result = factory.create(handler).parse(is);
 
-      assertNotNull(expectedResult);
+      assertNotNull(result);
       assertEquals(result.size(), 3);
 
       for (Server expectedServer : expectedResult) {

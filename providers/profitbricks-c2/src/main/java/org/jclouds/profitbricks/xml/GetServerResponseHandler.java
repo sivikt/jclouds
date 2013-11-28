@@ -14,26 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.config;
+package org.jclouds.profitbricks.xml;
 
-import org.jclouds.profitbricks.PBApi;
-import org.jclouds.rest.ConfiguresHttpApi;
-import org.jclouds.rest.config.HttpApiModule;
+import org.jclouds.date.DateCodecFactory;
+import org.jclouds.profitbricks.domain.Server;
+
+import javax.inject.Inject;
 
 /**
- * Configures the {@link org.jclouds.profitbricks.PBApi} connection.
+ * Parses XML response on GetServer request.
  *
  * @author Serj Sintsov
  */
-@ConfiguresHttpApi
-public class PBHttpApiModule extends HttpApiModule<PBApi> {
+public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
+
+   private boolean findServer;
+
+   @Inject
+   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
+      super(dateCodecFactory);
+   }
 
    @Override
-   protected void bindErrorHandlers() {}
+   public Server getResult() {
+      return describingBuilder.build();
+   }
 
    @Override
-   protected void bindRetryHandlers() {
-      // TODO configure handling of client and server error
+   public void endElement(String uri, String name, String qName) {
+      if (findServer) return;
+      setServerInfoOnEndElementEvent(qName);
+      if (qName.equals("return")) findServer = true;
+      clearTextBuffer();
    }
 
 }

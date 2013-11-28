@@ -16,21 +16,27 @@
  */
 package org.jclouds.profitbricks.features;
 
-import static org.jclouds.Fallbacks.EmptyFluentIterableOnNotFoundOr404;
+import static org.jclouds.Fallbacks.EmptySetOnNotFoundOr404;
+import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
 
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.GetAllServersResponseHandler;
-import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.profitbricks.xml.GetServerResponseHandler;
+import org.jclouds.rest.annotations.Payload;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.VirtualHost;
-import org.jclouds.rest.annotations.XMLResponseParser;
+import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.Fallback;
-import org.jclouds.rest.annotations.Payload;
+import org.jclouds.rest.annotations.XMLResponseParser;
+import org.jclouds.rest.annotations.PayloadParam;
 
 import javax.inject.Named;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
 /**
@@ -49,11 +55,30 @@ public interface ServerApi {
     *
     * @return servers in your cloud data centers or empty if there are none
     */
-   @POST
+   @POST // TODO live and expect test
    @Named("GetAllServers")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getAllServers/>")
    @XMLResponseParser(GetAllServersResponseHandler.class)
-   @Fallback(EmptyFluentIterableOnNotFoundOr404.class)
+   @Fallback(EmptySetOnNotFoundOr404.class)
    Set<Server> getAllServers();
+
+
+   /**
+    * Returns information about a virtual server,
+    * such as configuration, provisioning status, power status, etc.
+    *
+    * @param serverId server identificator
+    * @return an existing {@link Server} or {@code null}
+    */
+   @POST // TODO live and expect test
+   @Named("GetServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:getServer><serverId>{id}</serverId></ws:getServer>")
+   @XMLResponseParser(GetServerResponseHandler.class)
+   @Fallback(NullOnNotFoundOr404.class)
+   Server getServer(@PayloadParam("id") String serverId);
 
 }
