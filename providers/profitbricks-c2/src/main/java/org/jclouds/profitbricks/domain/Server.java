@@ -129,6 +129,9 @@ public class Server {
       }
    }
 
+   /**
+    * Use this builder to create an existing server instance from any source.
+    */
    public static class ServerDescribingBuilder extends Builder<ServerDescribingBuilder> {
 
       protected String serverId;
@@ -189,6 +192,10 @@ public class Server {
       }
    }
 
+   /**
+    * Use this builder to correctly create an new {@link Server} entity which you want to
+    * add in your cloud.
+    */
    public static class ServerCreationBuilder extends Builder<ServerCreationBuilder> {
       @Override
       protected ServerCreationBuilder self() {
