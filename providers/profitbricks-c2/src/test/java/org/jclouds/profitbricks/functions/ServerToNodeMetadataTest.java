@@ -45,14 +45,14 @@ public class ServerToNodeMetadataTest {
    @Test
    public void testApply() {
       ServerToNodeMetadata func = new ServerToNodeMetadata();
-      Server expectedalServer = actualServer();
-      NodeMetadata nodeMetadata = func.apply(expectedalServer);
+      Server actualServer = actualServer();
+      NodeMetadata nodeMetadata = func.apply(actualServer);
 
       assertNotNull(nodeMetadata);
-      assertEquals(nodeMetadata.getId(), expectedalServer.getServerId());
-      assertEquals(nodeMetadata.getHostname(), expectedalServer.getServerName());
-      assertEquals(nodeMetadata.getName(), expectedalServer.getServerName());
-      assertEquals(nodeMetadata.getProviderId(), expectedalServer.getServerId());
+      assertEquals(nodeMetadata.getId(), actualServer.getServerId());
+      assertEquals(nodeMetadata.getHostname(), actualServer.getServerName());
+      assertEquals(nodeMetadata.getName(), actualServer.getServerName());
+      assertEquals(nodeMetadata.getProviderId(), actualServer.getServerId());
       assertEquals(nodeMetadata.getStatus(), NodeMetadata.Status.RUNNING);
 
       assertNotNull(nodeMetadata.getOperatingSystem());
@@ -60,12 +60,12 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getOperatingSystem().getDescription(), OsFamily.LINUX.value());
 
       assertNotNull(nodeMetadata.getLocation());
-      assertEquals(nodeMetadata.getLocation().getId(), expectedalServer.getDataCenterId());
+      assertEquals(nodeMetadata.getLocation().getId(), actualServer.getDataCenterId());
       assertEquals(nodeMetadata.getLocation().getScope(), LocationScope.REGION);
-      assertEquals(nodeMetadata.getLocation().getDescription(), expectedalServer.getDataCenterId());
+      assertEquals(nodeMetadata.getLocation().getDescription(), actualServer.getDataCenterId());
 
       assertNotNull(nodeMetadata.getHardware());
-      assertEquals(nodeMetadata.getHardware().getId(), expectedalServer.getServerId());
+      assertEquals(nodeMetadata.getHardware().getId(), actualServer.getServerId());
       assertNotNull(nodeMetadata.getHardware().getProcessors());
       assertEquals(nodeMetadata.getHardware().getProcessors().size(), 1);
       assertEquals(nodeMetadata.getHardware().getProcessors().get(0).getCores(), 2.0);
