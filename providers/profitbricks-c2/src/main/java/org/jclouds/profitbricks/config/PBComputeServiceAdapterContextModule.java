@@ -23,11 +23,13 @@ import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Image;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.Template;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.functions.ServerToNodeMetadata;
+import org.jclouds.profitbricks.functions.TemplateToNewServer;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link ComputeServiceAdapter}.
@@ -40,11 +42,16 @@ public class PBComputeServiceAdapterContextModule
    @SuppressWarnings("unchecked")
    @Override
    protected void configure() {
+      super.configure();
+
       bind(new TypeLiteral<ComputeServiceAdapter<Server, Hardware, Image, Location>>() {
       }).to(PBComputeServiceAdapter.class);
 
       bind(new TypeLiteral<Function<Server, NodeMetadata>>() {
       }).to(Class.class.cast(ServerToNodeMetadata.class));
+
+      bind(new TypeLiteral<Function<Template, Server>>() {
+      }).to(Class.class.cast(TemplateToNewServer.class));
 
       bind(new TypeLiteral<Function<Image, Image>>() {
       }).to(Class.class.cast(IdentityFunction.class));
@@ -54,8 +61,6 @@ public class PBComputeServiceAdapterContextModule
 
       bind(new TypeLiteral<Function<Location, Location>>() {
       }).to(Class.class.cast(IdentityFunction.class));
-
-      super.configure();
    }
 
 }

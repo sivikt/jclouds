@@ -16,36 +16,31 @@
  */
 package org.jclouds.profitbricks.xml;
 
-import org.jclouds.date.DateCodecFactory;
-import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.http.functions.BaseHandlerTest;
+import org.testng.annotations.Test;
 
-import javax.inject.Inject;
+import java.io.InputStream;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
- * XML parser to handle success response on GetServer request.
+ * Test for {@link CreateServerResponseHandler}
  *
  * @author Serj Sintsov
  */
-public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
+@Test(groups = "unit", testName = "CreateServerResponseHandlerTest")
+public class CreateServerResponseHandlerTest extends BaseHandlerTest {
 
-   private boolean isDone;
+   @Test
+   public void testHandlerResult() {
+      InputStream is = getClass().getResourceAsStream("/servers/createServerResponse.xml");
 
-   @Inject
-   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
-      super(dateCodecFactory);
-   }
+      CreateServerResponseHandler handler = injector.getInstance(CreateServerResponseHandler.class);
+      String actualServerId = factory.create(handler).parse(is);
 
-   @Override
-   public Server getResult() {
-      return describingBuilder.build();
-   }
-
-   @Override
-   public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) isDone = true;
-      clearTextBuffer();
+      assertNotNull(actualServerId);
+      assertEquals(actualServerId, "8eb5a0df-ddea-4a98-a628-8833dcc9309f");
    }
 
 }

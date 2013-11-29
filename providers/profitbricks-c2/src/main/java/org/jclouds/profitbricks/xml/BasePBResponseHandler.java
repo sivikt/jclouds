@@ -17,6 +17,8 @@
 package org.jclouds.profitbricks.xml;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.annotations.VisibleForTesting;
 import org.jclouds.date.DateCodec;
 import org.jclouds.date.DateCodecFactory;
 import org.jclouds.http.functions.ParseSax;
@@ -42,10 +44,12 @@ public abstract class BasePBResponseHandler<T> extends ParseSax.HandlerForGenera
    /**
     * Uses {@link #trimAndGetTagStrValue()}
     */
+   @VisibleForTesting
    protected final Date textBufferToIso8601Date() {
       return dateCodec.toDate(trimAndGetTagStrValue());
    }
 
+   @VisibleForTesting
    protected String textBufferValue() {
       return textBuf.toString();
    }
@@ -53,6 +57,7 @@ public abstract class BasePBResponseHandler<T> extends ParseSax.HandlerForGenera
    /**
     * Uses {@link #textBufferValue()}
     */
+   @VisibleForTesting
    protected String trimAndGetTagStrValue() {
       return textBufferValue().trim();
    }
@@ -60,6 +65,7 @@ public abstract class BasePBResponseHandler<T> extends ParseSax.HandlerForGenera
    /**
     * Uses {@link #trimAndGetTagStrValue()}
     */
+   @VisibleForTesting
    protected int textBufferToIntValue() {
       return Integer.parseInt(trimAndGetTagStrValue());
    }
@@ -67,10 +73,12 @@ public abstract class BasePBResponseHandler<T> extends ParseSax.HandlerForGenera
    /**
     * Uses {@link #trimAndGetTagStrValue()}
     */
+   @VisibleForTesting
    protected boolean textBufferToBoolValue() {
       return Boolean.parseBoolean(trimAndGetTagStrValue());
    }
 
+   @VisibleForTesting
    protected void clearTextBuffer() {
       textBuf = new StringBuilder();
    }

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.profitbricks.config.PBComputeServiceAdapterContextModule;
+import org.jclouds.profitbricks.config.PBComputeServiceContextModule;
 import org.jclouds.profitbricks.config.PBHttpApiModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 
@@ -64,6 +65,7 @@ public class PBSoapApiMetadata extends BaseHttpApiMetadata<PBApi> {
          .view(ComputeServiceContext.class)
          .defaultProperties(PBSoapApiMetadata.defaultProperties())
          .defaultModules(ImmutableSet.<Class<? extends Module>>of(
+               PBComputeServiceContextModule.class,
                PBComputeServiceAdapterContextModule.class,
                PBHttpApiModule.class
          ));

@@ -18,9 +18,10 @@ package org.jclouds.profitbricks.compute.features;
 
 import com.google.common.collect.ImmutableList;
 import org.jclouds.Fallbacks;
-import org.jclouds.http.HttpRequestFilter;
 import org.jclouds.http.functions.ParseSax;
+import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.features.ServerApi;
+import org.jclouds.profitbricks.xml.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.GetServerResponseHandler;
 import org.jclouds.reflect.Invocation;
@@ -29,7 +30,6 @@ import static org.testng.Assert.assertNotNull;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.util.List;
 
 import static org.jclouds.reflect.Reflection2.method;
 
@@ -74,6 +74,47 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
       assertPayloadEquals(request, "<ws:getServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:getServer>", "text/xml", false);
       assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
       assertSaxResponseParserClassEquals(invocation.getInvokable(), GetServerResponseHandler.class);
+      assertFallbackClassEquals(invocation.getInvokable(), Fallbacks.NullOnNotFoundOr404.class);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void createServer() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(ServerApi.class, "createServer", Server.class),
+            ImmutableList.<Object>of(Server.creationBuilder()
+                                           .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
+                                           .cores(1)
+                                           .ram(256)
+                                           .serverName("tomcatServer")
+                                           .osType(Server.OSType.OTHER)
+                                           .availabilityZone(Server.AvailabilityZone.ZONE_1)
+                                           .internetAccess(true)
+                                           .build())
+      );
+
+      String expectedPayload = "<ws:createServer>" +
+                                  "<request>" +
+                                     "<dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>" +
+                                     "<serverName>tomcatServer</serverName>" +
+                                     "<cores>1</cores>" +
+                                     "<ram>256</ram>" +
+                                     "<internetAccess>true</internetAccess>" +
+                                     "<osType>OTHER</osType>" +
+                                     "<availabilityZone>ZONE_1</availabilityZone>" +
+                                  "</request>" +
+                               "</ws:createServer>";
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+      assertNotNull(request);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, expectedPayload, "text/xml", false);
+      assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), CreateServerResponseHandler.class);
       assertFallbackClassEquals(invocation.getInvokable(), Fallbacks.NullOnNotFoundOr404.class);
 
       checkHeaders(request);

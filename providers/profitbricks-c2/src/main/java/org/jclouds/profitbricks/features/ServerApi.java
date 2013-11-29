@@ -22,8 +22,11 @@ import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
+import org.jclouds.profitbricks.xml.CreateServerRequestBinder;
+import org.jclouds.profitbricks.xml.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.GetServerResponseHandler;
+import static org.jclouds.profitbricks.xml.PBApiRequestParameters.SERVER_ENTITY;
 import org.jclouds.rest.annotations.Payload;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.VirtualHost;
@@ -31,6 +34,7 @@ import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.XMLResponseParser;
 import org.jclouds.rest.annotations.PayloadParam;
+import org.jclouds.rest.annotations.MapBinder;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -41,6 +45,8 @@ import java.util.Set;
 
 /**
  * Provides synchronous access to ProfitBricks's Server Operations API.
+ *
+ * TODO handle request/response errors
  *
  * @author Serj Sintsov
  */
@@ -80,5 +86,20 @@ public interface ServerApi {
    @XMLResponseParser(GetServerResponseHandler.class)
    @Fallback(NullOnNotFoundOr404.class)
    Server getServer(@PayloadParam("id") String serverId);
+
+   /**
+    * Creates a Virtual Server.
+    *
+    * @param server server entity to create
+    * @return server identifier or {@code null} if creation is failed
+    */
+   @POST // TODO live and expect test
+   @Named("CreateServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @MapBinder(CreateServerRequestBinder.class)
+   @XMLResponseParser(CreateServerResponseHandler.class)
+   @Fallback(NullOnNotFoundOr404.class)
+   String createServer(@PayloadParam(SERVER_ENTITY) Server server);
 
 }

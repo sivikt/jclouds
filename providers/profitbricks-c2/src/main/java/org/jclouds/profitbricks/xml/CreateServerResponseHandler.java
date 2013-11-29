@@ -16,40 +16,36 @@
  */
 package org.jclouds.profitbricks.xml;
 
-import com.google.common.collect.Sets;
 import org.jclouds.date.DateCodecFactory;
-import org.jclouds.profitbricks.domain.Server;
 
 import javax.inject.Inject;
 
-import java.util.Set;
-
 /**
- * XML parser to handle success response on GetAllServers request.
+ * XML parser to handle CreateServer success response.
  *
  * @author Serj Sintsov
  */
-public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHandler<Set<Server>> {
+public class CreateServerResponseHandler extends BasePBResponseHandler<String> {
 
-   private Set<Server> servers;
+   private boolean isDone;
+   private String serverId;
 
    @Inject
-   public GetAllServersResponseHandler(DateCodecFactory dateCodecFactory) {
+   public CreateServerResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
-      servers = Sets.newHashSet();
    }
 
    @Override
-   public Set<Server> getResult() {
-      return servers;
+   public String getResult() {
+      return serverId;
    }
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) {
-         servers.add(describingBuilder.build());
-         describingBuilder = Server.describingBuilder();
+      if (isDone) return;
+      if (qName.equals("serverId")) {
+         serverId = trimAndGetTagStrValue();
+         isDone = true;
       }
       clearTextBuffer();
    }

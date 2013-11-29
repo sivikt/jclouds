@@ -31,7 +31,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Test for {@link BasePBResponseHandlerTest}
+ * Test for {@link BasePBResponseHandler}
  *
  * @author Serj Sintsov
  */

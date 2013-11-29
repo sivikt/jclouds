@@ -1,0 +1,12 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <ns2:createServerReturn xmlns:ns2="http://ws.api.profitbricks.com/">
+         <return>
+            <requestId>1264396</requestId>
+            <dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>
+            <dataCenterVersion>11</dataCenterVersion>
+            <serverId>8eb5a0df-ddea-4a98-a628-8833dcc9309f</serverId>
+         </return>
+      </ns2:createServerReturn>
+   </S:Body>
+</S:Envelope>

@@ -23,15 +23,10 @@ import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
-import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
-import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.domain.Server;
-
-import javax.annotation.Resource;
-import javax.inject.Named;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,10 +37,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Serj Sintsov
  */
 public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
-
-   @Resource
-   @Named(ComputeServiceConstants.COMPUTE_LOGGER)
-   protected Logger logger = Logger.NULL;
 
    @Override
    public NodeMetadata apply(Server server) {
@@ -62,20 +53,16 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
        * {@link org.jclouds.profitbricks.domain.Server.AvailabilityZone}.
        * For the moment we don't know iso codes for this zones.
        */
-      LocationBuilder zoneBuilder = new LocationBuilder()
-         .id(server.getAvailabilityZone().value())
-         .description(server.getAvailabilityZone().value())
-         .scope(LocationScope.ZONE)
-         .parent(region);
+      Location serverZone = server.getAvailabilityZone().toLocation(region);
 
       HardwareBuilder hardwareBuilder = new HardwareBuilder()
-         .id(server.getAvailabilityZone().value() + "/" + server.getServerId())
+         .id(server.getServerId())
          .processor(new Processor(server.getCores(), 0))
          .ram(server.getRam())
-         .location(zoneBuilder.build());
+         .location(serverZone);
 
       NodeMetadataBuilder nodeMetadataBuilder = new NodeMetadataBuilder()
-         .id(server.getDataCenterId() + "/" + server.getServerId())
+         .id(server.getServerId())
          .providerId(server.getServerId())
          .name(server.getServerName())
          .hostname(server.getServerName())

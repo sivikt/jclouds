@@ -17,6 +17,9 @@
 package org.jclouds.profitbricks.domain;
 
 import com.google.common.base.Objects;
+import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationBuilder;
+import org.jclouds.domain.LocationScope;
 import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
@@ -27,6 +30,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * Represents information about Virtual Server, such as configuration,
  * provisioning status, power status, etc.
+ *
+ * TODO move builders to separate files. Revise fields rules
  *
  * @author Serj Sintsov
  */
@@ -52,7 +57,12 @@ public class Server {
 
       protected abstract T self();
 
-      public abstract Server build();
+      public Server build() {
+         checkFields();
+         return buildInstance();
+      }
+
+      protected abstract Server buildInstance();
 
       /**
        * If left empty, the server will be created in a new data center.
@@ -76,9 +86,13 @@ public class Server {
        * @see Server#getCores()
        */
       public T cores(int cores) {
-         checkState(cores > 0, "Number of core must be >=1");
          this.cores = cores;
+         checkCores();
          return self();
+      }
+
+      private void checkCores() {
+         checkState(cores > 0, "Number of core must be >=1");
       }
 
       /**
@@ -87,9 +101,13 @@ public class Server {
        * @see Server#getRam()
        */
       public T ram(int ram) {
-         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
          this.ram = ram;
+         checkRam();
          return self();
+      }
+
+      private void checkRam() {
+         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
       }
 
       /**
@@ -126,6 +144,27 @@ public class Server {
       public T osType(OSType osType) {
          this.osType = osType;
          return self();
+      }
+
+      protected void checkFields() {
+         checkCores();
+         checkRam();
+      }
+   }
+
+   /**
+    * Use this builder to correctly create an new {@link Server} entity which you want to
+    * add in your cloud.
+    */
+   public static class ServerCreationBuilder extends Builder<ServerCreationBuilder> {
+      @Override
+      protected ServerCreationBuilder self() {
+         return this;
+      }
+
+      @Override
+      protected Server buildInstance() {
+         return new Server(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone);
       }
    }
 
@@ -186,25 +225,19 @@ public class Server {
       }
 
       @Override
-      public Server build() {
+      protected void checkFields() {
+         super.checkFields();
+         checkNotNull(serverId, "serverId");
+         availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
+         osType = osType == null ? OSType.UNKNOWN : osType;
+         provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
+         virtualMachineState = virtualMachineState == null ? VirtualMachineState.UNRECOGNIZED : virtualMachineState;
+      }
+
+      @Override
+      protected Server buildInstance() {
          return new Server(dataCenterId, serverId, serverName, cores, ram, internetAccess, osType, availabilityZone,
                            creationTime, lastModificationTime, provisioningState, virtualMachineState);
-      }
-   }
-
-   /**
-    * Use this builder to correctly create an new {@link Server} entity which you want to
-    * add in your cloud.
-    */
-   public static class ServerCreationBuilder extends Builder<ServerCreationBuilder> {
-      @Override
-      protected ServerCreationBuilder self() {
-         return this;
-      }
-
-      @Override
-      public Server build() {
-         return new Server(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone);
       }
    }
 
@@ -217,17 +250,17 @@ public class Server {
                     OSType osType, AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
                     ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
       this.dataCenterId = dataCenterId;
-      this.serverId = checkNotNull(serverId, "serverId");
+      this.serverId = serverId;
       this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
       this.internetAccess = internetAccess;
-      this.osType = osType == null ? OSType.UNKNOWN : osType;
-      this.availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone; // TODO find checkReturnDefault..or something
+      this.osType = osType;
+      this.availabilityZone = availabilityZone;
       this.creationTime = creationTime;
       this.lastModificationTime = lastModificationTime;
-      this.provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
-      this.virtualMachineState = virtualMachineState == null ? VirtualMachineState.UNRECOGNIZED : virtualMachineState;
+      this.provisioningState = provisioningState;
+      this.virtualMachineState = virtualMachineState;
    }
 
    public enum ProvisioningState {
@@ -291,6 +324,19 @@ public class Server {
          } catch (IllegalArgumentException e) {
             return AUTO;
          }
+      }
+
+      public Location toLocation() {
+         return toLocation(null);
+      }
+
+      public Location toLocation(Location parent) {
+         return new LocationBuilder()
+               .id(value())
+               .description(value())
+               .scope(LocationScope.ZONE)
+               .parent(parent)
+               .build();
       }
    }
 

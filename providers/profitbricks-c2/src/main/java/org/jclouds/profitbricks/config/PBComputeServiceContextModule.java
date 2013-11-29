@@ -14,38 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.config;
 
-import org.jclouds.date.DateCodecFactory;
-import org.jclouds.profitbricks.domain.Server;
-
-import javax.inject.Inject;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.jclouds.compute.domain.*;
+import org.jclouds.profitbricks.compute.domain.internal.PBTemplateBuilderImpl;
 
 /**
- * XML parser to handle success response on GetServer request.
+ * Configuration module with bindings to setup ProfitBricks {@link org.jclouds.compute.ComputeService}.
+ *
+ * TODO investigate and leave/remove
  *
  * @author Serj Sintsov
  */
-public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
-
-   private boolean isDone;
-
-   @Inject
-   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
-      super(dateCodecFactory);
-   }
+public class PBComputeServiceContextModule implements Module {
 
    @Override
-   public Server getResult() {
-      return describingBuilder.build();
-   }
-
-   @Override
-   public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) isDone = true;
-      clearTextBuffer();
+   public void configure(Binder binder) {
+      binder.bind(TemplateBuilder.class).to(PBTemplateBuilderImpl.class);
    }
 
 }

@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Test for {@link org.jclouds.profitbricks.xml.GetServerResponseHandler}
+ * Test for {@link GetServerResponseHandler}
  *
  * @author Serj Sintsov
  */

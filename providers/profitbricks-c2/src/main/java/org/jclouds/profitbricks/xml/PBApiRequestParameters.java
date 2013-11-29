@@ -16,36 +16,18 @@
  */
 package org.jclouds.profitbricks.xml;
 
-import org.jclouds.date.DateCodecFactory;
-import org.jclouds.profitbricks.domain.Server;
-
-import javax.inject.Inject;
-
 /**
- * XML parser to handle success response on GetServer request.
+ * Contains ProfitBricks requests parameters values.
  *
  * @author Serj Sintsov
  */
-public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
+public final class PBApiRequestParameters {
 
-   private boolean isDone;
+   /**
+    * Used to pass {@link org.jclouds.profitbricks.domain.Server} entity into payload
+    */
+   public static final String SERVER_ENTITY = "server";
 
-   @Inject
-   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
-      super(dateCodecFactory);
-   }
-
-   @Override
-   public Server getResult() {
-      return describingBuilder.build();
-   }
-
-   @Override
-   public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) isDone = true;
-      clearTextBuffer();
-   }
+   private PBApiRequestParameters() { }
 
 }

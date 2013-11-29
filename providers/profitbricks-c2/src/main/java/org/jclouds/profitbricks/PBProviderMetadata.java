@@ -25,6 +25,8 @@ import java.net.URI;
  * Implementation of {@link ProviderMetadata} for
  * ProfitBricks's Cloud Compute provider.
  *
+ * TODO live test
+ *
  * @author Serj Sintsov
  */
 public class PBProviderMetadata extends BaseProviderMetadata {
