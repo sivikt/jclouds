@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import com.google.common.collect.Lists;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Test for {@link GetAllServersResponseHandler}
+ * Test for {@link org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler}
  *
  * @author Serj Sintsov
  */

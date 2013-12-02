@@ -14,11 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import com.google.common.base.Strings;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.xml.PBApiRequestParameters;
 import org.jclouds.rest.MapBinder;
 
 import javax.inject.Inject;

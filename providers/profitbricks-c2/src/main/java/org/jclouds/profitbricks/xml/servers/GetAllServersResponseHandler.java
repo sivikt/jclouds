@@ -14,37 +14,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
+import com.google.common.collect.Sets;
 import org.jclouds.date.DateCodecFactory;
 import org.jclouds.profitbricks.domain.Server;
 
 import javax.inject.Inject;
 
+import java.util.Set;
+
 /**
- * XML parser to handle success response on GetServer request.
+ * XML parser to handle success response on GetAllServers request.
  *
  * @author Serj Sintsov
  */
-public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
+public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHandler<Set<Server>> {
 
-   private boolean isDone;
+   private Set<Server> servers;
 
    @Inject
-   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
+   public GetAllServersResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
+      servers = Sets.newHashSet();
    }
 
    @Override
-   public Server getResult() {
-      return describingBuilder.build();
+   public Set<Server> getResult() {
+      return servers;
    }
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
       setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) isDone = true;
+      if (qName.equals("return")) {
+         servers.add(describingBuilder.build());
+         describingBuilder = Server.describingBuilder();
+      }
       clearTextBuffer();
    }
 

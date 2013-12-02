@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.http.functions.BaseHandlerTest;
+import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -25,7 +26,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Test for {@link CreateServerResponseHandler}
+ * Test for {@link org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler}
  *
  * @author Serj Sintsov
  */

@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.xml.servers.ServerEnumsToStringMapper;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;

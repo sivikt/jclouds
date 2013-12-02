@@ -14,17 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.date.DateCodecFactory;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.xml.BasePBResponseHandler;
 
 import javax.inject.Inject;
 
 import static org.jclouds.profitbricks.domain.Server.*;
 
 /**
- * Parses XML response on GetAllServers request.
+ * Parses XML response which fully describes {@link Server} entity.
  *
  * @author Serj Sintsov
  */

@@ -56,6 +56,7 @@ public class PBProviderMetadata extends BaseProviderMetadata {
          .homepage(URI.create("http://www.profitbricks.com"))
          .console(URI.create("https://my.profitbricks.com/dashboard/en/index.xhtml"))
          .linkedServices("profitbricks-c2")
+         .iso3166Codes("DE", "US")
          .apiMetadata(new PBSoapApiMetadata());
       }
 

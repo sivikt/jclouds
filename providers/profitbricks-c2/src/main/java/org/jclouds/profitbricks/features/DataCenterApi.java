@@ -16,11 +16,19 @@
  */
 package org.jclouds.profitbricks.features;
 
+import org.jclouds.Fallbacks;
 import org.jclouds.http.filters.BasicAuthentication;
+import org.jclouds.profitbricks.domain.DataCenter;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
-import org.jclouds.rest.annotations.RequestFilters;
-import org.jclouds.rest.annotations.SinceApiVersion;
-import org.jclouds.rest.annotations.VirtualHost;
+import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
+import org.jclouds.rest.annotations.*;
+
+import javax.inject.Named;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 /**
  * Provides synchronous access to ProfitBricks's Virtual Data Center Operations API.
@@ -32,6 +40,17 @@ import org.jclouds.rest.annotations.VirtualHost;
 @VirtualHost
 public interface DataCenterApi {
 
-   // TODO coming soon
+   /**
+    * Returns information about all available data centers.
+    * @return set of {@link DataCenter} instances or empty set if there are none
+    */
+   @POST // TODO live and expect test
+   @Named("GetAllDataCenters")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:getAllDataCenters/>")
+   @XMLResponseParser(GetAllServersResponseHandler.class)
+   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
+   Set<DataCenter> getAllDataCenters();
 
 }

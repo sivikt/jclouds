@@ -263,22 +263,6 @@ public class Server {
       this.virtualMachineState = virtualMachineState;
    }
 
-   public enum ProvisioningState {
-      INACTIVE, INPROCESS, AVAILABLE, DELETED, ERROR, UNRECOGNIZED;
-
-      public String value() {
-         return name();
-      }
-
-      public static ProvisioningState fromValue(String value) {
-         try {
-            return valueOf(value);
-         } catch (IllegalArgumentException e) {
-            return UNRECOGNIZED;
-         }
-      }
-   }
-
    public enum VirtualMachineState {
       NOSTATE, RUNNING, BLOCKED, PAUSED, SHUTDOWN, SHUTOFF, CRASHED, UNRECOGNIZED;
 

@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.date.DateCodecFactory;
+import org.jclouds.profitbricks.xml.BasePBResponseHandler;
 
 import javax.inject.Inject;
 

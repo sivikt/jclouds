@@ -14,26 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
+import org.jclouds.date.DateCodecFactory;
 import org.jclouds.profitbricks.domain.Server;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
 
 /**
- * Maps {@link Server} specific enums to strings. Useful in the requests binders.
+ * XML parser to handle success response on GetServer request.
  *
  * @author Serj Sintsov
  */
-@Singleton
-public class ServerEnumsToStringMapper {
+public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
 
-   public String mapOSType(Server.OSType osType) {
-      return osType == null ? "" : osType.value();
+   private boolean isDone;
+
+   @Inject
+   public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
+      super(dateCodecFactory);
    }
 
-   public String mapAvailabilityZone(Server.AvailabilityZone zone) {
-      return zone == null ? "" : zone.value();
+   @Override
+   public Server getResult() {
+      return describingBuilder.build();
+   }
+
+   @Override
+   public void endElement(String uri, String name, String qName) {
+      if (isDone) return;
+      setServerInfoOnEndElementEvent(qName);
+      if (qName.equals("return")) isDone = true;
+      clearTextBuffer();
    }
 
 }

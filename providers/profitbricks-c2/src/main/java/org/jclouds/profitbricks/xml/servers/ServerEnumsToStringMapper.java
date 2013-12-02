@@ -14,44 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
-import com.google.common.collect.Sets;
-import org.jclouds.date.DateCodecFactory;
 import org.jclouds.profitbricks.domain.Server;
 
-import javax.inject.Inject;
-
-import java.util.Set;
+import javax.inject.Singleton;
 
 /**
- * XML parser to handle success response on GetAllServers request.
+ * Maps {@link Server} specific enums to strings. Useful in the requests binders.
  *
  * @author Serj Sintsov
  */
-public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHandler<Set<Server>> {
+@Singleton
+public class ServerEnumsToStringMapper {
 
-   private Set<Server> servers;
-
-   @Inject
-   public GetAllServersResponseHandler(DateCodecFactory dateCodecFactory) {
-      super(dateCodecFactory);
-      servers = Sets.newHashSet();
+   public String mapOSType(Server.OSType osType) {
+      return osType == null ? "" : osType.value();
    }
 
-   @Override
-   public Set<Server> getResult() {
-      return servers;
-   }
-
-   @Override
-   public void endElement(String uri, String name, String qName) {
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) {
-         servers.add(describingBuilder.build());
-         describingBuilder = Server.describingBuilder();
-      }
-      clearTextBuffer();
+   public String mapAvailabilityZone(Server.AvailabilityZone zone) {
+      return zone == null ? "" : zone.value();
    }
 
 }

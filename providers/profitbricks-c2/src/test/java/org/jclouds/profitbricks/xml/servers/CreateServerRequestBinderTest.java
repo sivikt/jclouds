@@ -14,11 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.xml.servers;
 
 import com.google.common.collect.Maps;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.xml.PBApiRequestParameters;
+import org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder;
+import org.jclouds.profitbricks.xml.servers.ServerEnumsToStringMapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -29,7 +32,7 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Test for {@link CreateServerRequestBinder}
+ * Test for {@link org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder}
  *
  * @author Serj Sintsov
  */
