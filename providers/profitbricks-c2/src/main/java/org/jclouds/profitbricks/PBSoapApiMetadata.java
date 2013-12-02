@@ -19,8 +19,8 @@ package org.jclouds.profitbricks;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.profitbricks.config.PBComputeServiceAdapterContextModule;
-import org.jclouds.profitbricks.config.PBComputeServiceContextModule;
+import org.jclouds.profitbricks.compute.config.PBComputeServiceAdapterContextModule;
+import org.jclouds.profitbricks.compute.config.PBComputeServiceContextModule;
 import org.jclouds.profitbricks.config.PBHttpApiModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 

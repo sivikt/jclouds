@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.config;
+package org.jclouds.profitbricks.compute.config;
 
 import com.google.common.base.Function;
 import com.google.inject.TypeLiteral;
@@ -28,8 +28,8 @@ import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.functions.ServerToNodeMetadata;
-import org.jclouds.profitbricks.functions.TemplateToNewServer;
+import org.jclouds.profitbricks.compute.functions.ServerToNodeMetadata;
+import org.jclouds.profitbricks.compute.functions.TemplateToNewServer;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link ComputeServiceAdapter}.
