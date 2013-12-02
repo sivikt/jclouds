@@ -18,8 +18,8 @@ package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -72,7 +72,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
                    .ram(1024)
                    .creationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
                    .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
-                   .provisioningState(Server.ProvisioningState.AVAILABLE)
+                   .provisioningState(ProvisioningState.AVAILABLE)
                    .virtualMachineState(Server.VirtualMachineState.RUNNING)
                    .osType(Server.OSType.WINDOWS)
                    .internetAccess(false)

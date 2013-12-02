@@ -19,8 +19,8 @@ package org.jclouds.profitbricks.xml.servers;
 import com.google.common.collect.Lists;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -91,7 +91,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .ram(1024)
                   .creationTime(dateService.iso8601DateParse("2013-11-26T11:23:47.742Z"))
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:23:47.742Z"))
-                  .provisioningState(Server.ProvisioningState.AVAILABLE)
+                  .provisioningState(ProvisioningState.AVAILABLE)
                   .virtualMachineState(Server.VirtualMachineState.RUNNING)
                   .osType(Server.OSType.LINUX)
                   .internetAccess(false)
@@ -106,7 +106,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .ram(1024)
                   .creationTime(dateService.iso8601DateParse("2013-11-26T11:23:50.742Z"))
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:23:50.742Z"))
-                  .provisioningState(Server.ProvisioningState.INACTIVE)
+                  .provisioningState(ProvisioningState.INACTIVE)
                   .virtualMachineState(Server.VirtualMachineState.PAUSED)
                   .osType(Server.OSType.WINDOWS)
                   .internetAccess(true)
@@ -121,7 +121,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .ram(2048)
                   .creationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
-                  .provisioningState(Server.ProvisioningState.DELETED)
+                  .provisioningState(ProvisioningState.DELETED)
                   .virtualMachineState(Server.VirtualMachineState.SHUTOFF)
                   .osType(Server.OSType.OTHER)
                   .internetAccess(false)

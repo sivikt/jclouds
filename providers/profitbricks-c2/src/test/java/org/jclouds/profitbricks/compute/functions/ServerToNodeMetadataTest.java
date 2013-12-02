@@ -20,6 +20,7 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.domain.LocationScope;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.BLOCKED;
 import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.CRASHED;
@@ -87,7 +88,7 @@ public class ServerToNodeMetadataTest {
             .ram(1024)
             .creationTime(new SimpleDateFormatDateService().iso8601SecondsDateParse("2013-11-26T06:21:13Z"))
             .lastModificationTime(new SimpleDateFormatDateService().iso8601SecondsDateParse("2013-11-27T21:43:15Z"))
-            .provisioningState(Server.ProvisioningState.AVAILABLE)
+            .provisioningState(ProvisioningState.AVAILABLE)
             .virtualMachineState(Server.VirtualMachineState.RUNNING)
             .osType(Server.OSType.LINUX)
             .internetAccess(true)
