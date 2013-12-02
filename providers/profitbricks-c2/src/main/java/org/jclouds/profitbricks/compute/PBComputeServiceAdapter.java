@@ -145,17 +145,23 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
 
    @Override
    public void rebootNode(String id) {
-      throw new UnsupportedOperationException("Isn't implemented yet");
+      checkNotNull(id, "id");
+      if (!pbApi.serversApi().isPresent()) return;
+      pbApi.serversApi().get().resetServer(id);
    }
 
    @Override
    public void resumeNode(String id) {
-      throw new UnsupportedOperationException("Isn't implemented yet");
+      checkNotNull(id, "id");
+      if (!pbApi.serversApi().isPresent()) return;
+      pbApi.serversApi().get().startServer(id);
    }
 
    @Override
    public void suspendNode(String id) {
-      throw new UnsupportedOperationException("Isn't implemented yet");
+      checkNotNull(id, "id");
+      if (!pbApi.serversApi().isPresent()) return;
+      pbApi.serversApi().get().stopServer(id);
    }
 
 }

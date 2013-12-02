@@ -14,13 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.compute.features;
+package org.jclouds.profitbricks.features;
 
 import com.google.common.collect.ImmutableList;
-import org.jclouds.Fallbacks;
 import org.jclouds.http.functions.ParseSax;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.features.ServerApi;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;
@@ -53,7 +51,7 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
       assertPayloadEquals(request, "<ws:getAllServers/>", "text/xml", false);
       assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
       assertSaxResponseParserClassEquals(invocation.getInvokable(), GetAllServersResponseHandler.class);
-      assertFallbackClassEquals(invocation.getInvokable(), Fallbacks.EmptySetOnNotFoundOr404.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
 
       checkHeaders(request);
    }
@@ -74,7 +72,7 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
       assertPayloadEquals(request, "<ws:getServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:getServer>", "text/xml", false);
       assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
       assertSaxResponseParserClassEquals(invocation.getInvokable(), GetServerResponseHandler.class);
-      assertFallbackClassEquals(invocation.getInvokable(), Fallbacks.NullOnNotFoundOr404.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
 
       checkHeaders(request);
    }
@@ -115,7 +113,64 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
       assertPayloadEquals(request, expectedPayload, "text/xml", false);
       assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
       assertSaxResponseParserClassEquals(invocation.getInvokable(), CreateServerResponseHandler.class);
-      assertFallbackClassEquals(invocation.getInvokable(), Fallbacks.NullOnNotFoundOr404.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void resetServer() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(ServerApi.class, "resetServer", String.class),
+            ImmutableList.<Object>of("93981076-2511-4aa7-82c0-1e4df0d1737f")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:resetServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:resetServer>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void startServer() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(ServerApi.class, "startServer", String.class),
+            ImmutableList.<Object>of("93981076-2511-4aa7-82c0-1e4df0d1737f")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:startServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:startServer>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void stopServer() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(ServerApi.class, "stopServer", String.class),
+            ImmutableList.<Object>of("93981076-2511-4aa7-82c0-1e4df0d1737f")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:stopServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:stopServer>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
 
       checkHeaders(request);
    }

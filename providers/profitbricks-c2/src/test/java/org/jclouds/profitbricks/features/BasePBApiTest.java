@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.compute.features;
+package org.jclouds.profitbricks.features;
 
 import com.google.inject.Module;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.http.HttpRequest;
-import org.jclouds.http.HttpRequestFilter;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.PBSoapApiMetadata;
 import org.jclouds.profitbricks.config.PBHttpApiModule;

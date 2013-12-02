@@ -16,9 +16,6 @@
  */
 package org.jclouds.profitbricks.features;
 
-import static org.jclouds.Fallbacks.EmptySetOnNotFoundOr404;
-import static org.jclouds.Fallbacks.NullOnNotFoundOr404;
-
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
@@ -31,7 +28,6 @@ import org.jclouds.rest.annotations.Payload;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.VirtualHost;
 import org.jclouds.rest.annotations.RequestFilters;
-import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.XMLResponseParser;
 import org.jclouds.rest.annotations.PayloadParam;
 import org.jclouds.rest.annotations.MapBinder;
@@ -65,9 +61,8 @@ public interface ServerApi {
    @Named("GetAllServers")
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
-   @Payload("<ws:getAllServers/>")
+   @Payload("<ws:getAllServers/>") // TODO add Fallback?
    @XMLResponseParser(GetAllServersResponseHandler.class)
-   @Fallback(EmptySetOnNotFoundOr404.class)
    Set<Server> getAllServers();
 
 
@@ -82,9 +77,8 @@ public interface ServerApi {
    @Named("GetServer")
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
-   @Payload("<ws:getServer><serverId>{id}</serverId></ws:getServer>")
+   @Payload("<ws:getServer><serverId>{id}</serverId></ws:getServer>") // TODO add Fallback?
    @XMLResponseParser(GetServerResponseHandler.class)
-   @Fallback(NullOnNotFoundOr404.class)
    Server getServer(@PayloadParam("id") String serverId);
 
    /**
@@ -97,9 +91,44 @@ public interface ServerApi {
    @Named("CreateServer")
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
-   @MapBinder(CreateServerRequestBinder.class)
+   @MapBinder(CreateServerRequestBinder.class) // TODO add Fallback?
    @XMLResponseParser(CreateServerResponseHandler.class)
-   @Fallback(NullOnNotFoundOr404.class)
    String createServer(@PayloadParam(SERVER_ENTITY) Server server);
+
+   /**
+    * Resets an existing virtual server (POWER CYCLE).
+    *
+    * @param serverId server entity identificator to reset
+    */
+   @POST // TODO live and expect test
+   @Named("ResetServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:resetServer><serverId>{id}</serverId></ws:resetServer>") // TODO add Fallback?
+   void resetServer(@PayloadParam("id") String serverId);
+
+   /**
+    * Starts an existing virtual server.
+    *
+    * @param serverId server entity identificator to reset
+    */
+   @POST // TODO live and expect test
+   @Named("StartServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:startServer><serverId>{id}</serverId></ws:startServer>") // TODO add Fallback?
+   void startServer(@PayloadParam("id") String serverId);
+
+   /**
+    * Stops an existing virtual server forcefully (HARD stop).
+    *
+    * @param serverId server entity identificator to reset
+    */
+   @POST // TODO live and expect test
+   @Named("StopServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:stopServer><serverId>{id}</serverId></ws:stopServer>") // TODO add Fallback?
+   void stopServer(@PayloadParam("id") String serverId);
 
 }
