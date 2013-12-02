@@ -16,6 +16,8 @@
  */
 package org.jclouds.profitbricks.config;
 
+import org.jclouds.http.HttpRetryHandler;
+import org.jclouds.http.annotation.ServerError;
 import org.jclouds.profitbricks.PBApi;
 import org.jclouds.rest.ConfiguresHttpApi;
 import org.jclouds.rest.config.HttpApiModule;
@@ -33,7 +35,7 @@ public class PBHttpApiModule extends HttpApiModule<PBApi> {
 
    @Override
    protected void bindRetryHandlers() {
-      // TODO configure handling of client and server error
+      bind(HttpRetryHandler.class).annotatedWith(ServerError.class).toInstance(HttpRetryHandler.NEVER_RETRY);
    }
 
 }
