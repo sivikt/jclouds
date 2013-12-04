@@ -62,7 +62,7 @@ public class ServerToNodeMetadataTest {
 
       assertNotNull(nodeMetadata.getLocation());
       assertEquals(nodeMetadata.getLocation().getId(), actualServer.getDataCenterId());
-      assertEquals(nodeMetadata.getLocation().getScope(), LocationScope.REGION);
+      assertEquals(nodeMetadata.getLocation().getScope(), LocationScope.ZONE);
       assertEquals(nodeMetadata.getLocation().getDescription(), actualServer.getDataCenterId());
 
       assertNotNull(nodeMetadata.getHardware());
@@ -118,15 +118,32 @@ public class ServerToNodeMetadataTest {
    @Test
    public void testMapStatus() {
       ServerToNodeMetadata func = new ServerToNodeMetadata();
-      assertEquals(func.mapStatus(BLOCKED), NodeMetadata.Status.PENDING);
-      assertEquals(func.mapStatus(CRASHED), NodeMetadata.Status.ERROR);
-      assertEquals(func.mapStatus(NOSTATE), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(PAUSED), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(RUNNING), NodeMetadata.Status.RUNNING);
-      assertEquals(func.mapStatus(SHUTDOWN), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(SHUTOFF), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(UNRECOGNIZED), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(null), NodeMetadata.Status.UNRECOGNIZED);
+
+      assertEquals(func.mapStatus(RUNNING, null), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.UNRECOGNIZED), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.DELETED), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.ERROR), NodeMetadata.Status.ERROR);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.INPROCESS), NodeMetadata.Status.PENDING);
+
+      assertEquals(func.mapStatus(BLOCKED, ProvisioningState.INACTIVE), NodeMetadata.Status.PENDING);
+      assertEquals(func.mapStatus(CRASHED, ProvisioningState.INACTIVE), NodeMetadata.Status.ERROR);
+      assertEquals(func.mapStatus(NOSTATE, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(PAUSED, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.INACTIVE), NodeMetadata.Status.RUNNING);
+      assertEquals(func.mapStatus(SHUTDOWN, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(SHUTOFF, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(UNRECOGNIZED, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(null, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
+
+      assertEquals(func.mapStatus(BLOCKED, ProvisioningState.AVAILABLE), NodeMetadata.Status.PENDING);
+      assertEquals(func.mapStatus(CRASHED, ProvisioningState.AVAILABLE), NodeMetadata.Status.ERROR);
+      assertEquals(func.mapStatus(NOSTATE, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(PAUSED, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(RUNNING, ProvisioningState.AVAILABLE), NodeMetadata.Status.RUNNING);
+      assertEquals(func.mapStatus(SHUTDOWN, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(SHUTOFF, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
+      assertEquals(func.mapStatus(UNRECOGNIZED, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
+      assertEquals(func.mapStatus(null, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
    }
 
 }

@@ -129,7 +129,8 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
 
    @Override
    public void destroyNode(String id) {
-      throw new UnsupportedOperationException("Isn't implemented yet");
+      checkNotNull(id, "id");
+      pbApi.serversApi().deleteServer(id);
    }
 
    @Override

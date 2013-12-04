@@ -26,6 +26,7 @@ import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -66,7 +67,7 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
          .providerId(server.getServerId())
          .name(server.getServerName())
          .hostname(server.getServerName())
-         .status(mapStatus(server.getVirtualMachineState()))
+         .status(mapStatus(server.getVirtualMachineState(), server.getProvisioningState()))
          .operatingSystem(mapOS(server.getOsType()))
          .hardware(hardwareBuilder.build())
          .location(region);
@@ -101,19 +102,35 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
       }
    }
 
-   // TODO move to configuration module
-   protected NodeMetadata.Status mapStatus(Server.VirtualMachineState state) {
-      if (state == null) return NodeMetadata.Status.UNRECOGNIZED;
-
-      switch (state) {
-         case SHUTDOWN:
-         case SHUTOFF:
-         case PAUSED:  return NodeMetadata.Status.SUSPENDED;
-         case RUNNING: return NodeMetadata.Status.RUNNING;
-         case BLOCKED: return NodeMetadata.Status.PENDING;
-         case CRASHED: return NodeMetadata.Status.ERROR;
-         default:      return NodeMetadata.Status.UNRECOGNIZED;
+   // TODO move to configuration module or function
+   protected NodeMetadata.Status mapStatus(Server.VirtualMachineState vmState, ProvisioningState provisioningState) {
+      if (provisioningState == null) {
+         return NodeMetadata.Status.UNRECOGNIZED;
       }
+
+      switch (provisioningState) {
+         case INPROCESS:  return NodeMetadata.Status.PENDING;
+         case ERROR: return NodeMetadata.Status.ERROR;
+         case DELETED: return NodeMetadata.Status.UNRECOGNIZED;
+      }
+
+      if (provisioningState == ProvisioningState.AVAILABLE || provisioningState == ProvisioningState.INACTIVE) {
+         if (vmState == null) {
+            return NodeMetadata.Status.UNRECOGNIZED;
+         }
+
+         switch (vmState) {
+            case SHUTDOWN:
+            case SHUTOFF:
+            case PAUSED:  return NodeMetadata.Status.SUSPENDED;
+            case RUNNING: return NodeMetadata.Status.RUNNING;
+            case BLOCKED: return NodeMetadata.Status.PENDING;
+            case CRASHED: return NodeMetadata.Status.ERROR;
+            default:      return NodeMetadata.Status.UNRECOGNIZED;
+         }
+      }
+
+      return NodeMetadata.Status.UNRECOGNIZED;
    }
 
 }

@@ -20,6 +20,11 @@ import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.internal.BaseProviderMetadata;
 
 import java.net.URI;
+import java.util.Properties;
+
+import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
 
 /**
  * Implementation of {@link ProviderMetadata} for
@@ -48,6 +53,17 @@ public class PBProviderMetadata extends BaseProviderMetadata {
       return new Builder();
    }
 
+   public static Properties defaultProperties() {
+      Properties properties = new Properties();
+      // ProfitBricks takes takes a very long time to stop the server
+      properties.setProperty(TIMEOUT_NODE_SUSPENDED, 120 * 1000 + "");
+
+      // ProfitBricks takes takes a very long time to start the server
+      properties.setProperty(TIMEOUT_NODE_RUNNING, 120 * 1000 + "");
+
+      return properties;
+   }
+
    public static class Builder extends BaseProviderMetadata.Builder {
 
       protected Builder() {
@@ -57,6 +73,7 @@ public class PBProviderMetadata extends BaseProviderMetadata {
          .console(URI.create("https://my.profitbricks.com/dashboard/en/index.xhtml"))
          .linkedServices("profitbricks-c2")
          .iso3166Codes("DE", "US")
+         .defaultProperties(PBProviderMetadata.defaultProperties())
          .apiMetadata(new PBSoapApiMetadata());
       }
 

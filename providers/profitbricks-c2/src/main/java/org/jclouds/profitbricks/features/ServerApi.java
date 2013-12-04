@@ -130,4 +130,16 @@ public interface ServerApi {
    @Payload("<ws:stopServer><serverId>{id}</serverId></ws:stopServer>") // TODO add Fallback?
    void stopServer(@PayloadParam("id") String serverId);
 
+   /**
+    * Stops an existing virtual server forcefully (HARD stop).
+    *
+    * @param serverId server entity identificator to reset
+    */
+   @POST // TODO live and expect test
+   @Named("DeleteServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:deleteServer><serverId>{id}</serverId></ws:deleteServer>") // TODO add Fallback?
+   void deleteServer(@PayloadParam("id") String serverId);
+
 }

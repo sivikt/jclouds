@@ -175,4 +175,23 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
       checkHeaders(request);
    }
 
+   @Test
+   public void deleteServer() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(ServerApi.class, "deleteServer", String.class),
+            ImmutableList.<Object>of("93981076-2511-4aa7-82c0-1e4df0d1737f")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:deleteServer><serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId></ws:deleteServer>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
 }
