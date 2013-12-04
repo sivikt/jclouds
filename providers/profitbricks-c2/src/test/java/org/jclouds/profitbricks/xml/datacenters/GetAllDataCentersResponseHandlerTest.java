@@ -18,8 +18,6 @@ package org.jclouds.profitbricks.xml.datacenters;
 
 import com.google.common.collect.Lists;
 import org.jclouds.http.functions.BaseHandlerTest;
-import org.jclouds.profitbricks.domain.DataCenter;
-import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -28,6 +26,7 @@ import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
 
 /**
  * Test for {@link GetAllDataCentersResponseHandler}
@@ -41,58 +40,29 @@ public class GetAllDataCentersResponseHandlerTest extends BaseHandlerTest {
    public void testHandlerResult() {
       InputStream is = getClass().getResourceAsStream("/datacenters/getAllDataCentersResponse.xml");
 
-      List<DataCenter> expectedResult = expectedResult();
+      List<String> expectedResult = expectedResult();
 
       GetAllDataCentersResponseHandler handler = injector.getInstance(GetAllDataCentersResponseHandler.class);
-      Set<DataCenter> result = factory.create(handler).parse(is);
+      Set<String> result = factory.create(handler).parse(is);
 
       assertNotNull(result);
-      assertEquals(result.size(), 3);
+      assertEquals(result.size(), 2);
 
-      for (DataCenter expectedDC : expectedResult) {
-         DataCenter actualDC = findInSet(result, expectedDC.getDataCenterId());
-
-         assertNotNull(actualDC, errForDC(expectedDC));
-         assertEquals(actualDC.getDataCenterName(), expectedDC.getDataCenterName(), errForDC(expectedDC));
-         assertEquals(actualDC.getProvisioningState(), expectedDC.getProvisioningState(), errForDC(expectedDC));
-         assertEquals(actualDC.getRegion(), expectedDC.getRegion(), errForDC(expectedDC));
-      }
+      for (String expectedId : expectedResult)
+         findInSet(result, expectedId);
    }
 
-   private String errForDC(DataCenter dc) {
-      return "dataCenterId=" + dc.getDataCenterId();
+   private void findInSet(Set<String> src, String dataCenterId) {
+      for (String dcId : src)
+         if (dcId.equals(dataCenterId)) return;
+
+      fail("dataCenterId=" + dataCenterId + " not found");
    }
 
-   private DataCenter findInSet(Set<DataCenter> src, String dataCenterId) {
-      for (DataCenter dc : src)
-         if (dc.getDataCenterId().equals(dataCenterId)) return dc;
-
-      return null;
-   }
-
-   private List<DataCenter> expectedResult() {
+   private List<String> expectedResult() {
       return Lists.newArrayList(
-            DataCenter.describingBuilder()
-                  .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
-                  .dataCenterName("DC_1")
-                  .provisioningState(ProvisioningState.AVAILABLE)
-                  .region(DataCenter.DataCenterRegion.NORTH_AMERICA)
-                  .build(),
-
-            DataCenter.describingBuilder()
-                  .dataCenterId("89046edb-2a50-4d0f-a153-6576ee7d22a7")
-                  .dataCenterName("DC_2")
-                  .provisioningState(ProvisioningState.INACTIVE)
-                  .region(DataCenter.DataCenterRegion.EUROPE)
-                  .build(),
-
-            DataCenter.describingBuilder()
-                  .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
-                  .dataCenterName("DC_3")
-                  .provisioningState(ProvisioningState.AVAILABLE)
-                  .region(DataCenter.DataCenterRegion.NORTH_AMERICA)
-                  .build()
-
+         "a2de7e7a-fb70-4eaf-95ce-70f3bc061121",
+         "22222222-fb70-4eaf-95ce-20f3bc061222"
       );
    }
 

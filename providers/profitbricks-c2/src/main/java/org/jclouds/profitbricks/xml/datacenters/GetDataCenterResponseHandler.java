@@ -16,37 +16,45 @@
  */
 package org.jclouds.profitbricks.xml.datacenters;
 
-import com.google.common.collect.Sets;
 import org.jclouds.date.DateCodecFactory;
+import org.jclouds.profitbricks.domain.DataCenter;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.xml.BasePBResponseHandler;
 
 import javax.inject.Inject;
-import java.util.Set;
 
 /**
- * XML parser to handle success response on GetAllDataCenters request.
+ * XML parser to handle success response on GetDataCenter request.
  *
  * @author Serj Sintsov
  */
-public class GetAllDataCentersResponseHandler extends BasePBResponseHandler<Set<String>> {
+public class GetDataCenterResponseHandler extends BasePBResponseHandler<DataCenter> {
 
-   private Set<String> dataCenters;
+   private boolean isDone;
+   private DataCenter.DataCenterDescribingBuilder dataCenterBuilder;
 
    @Inject
-   public GetAllDataCentersResponseHandler(DateCodecFactory dateCodecFactory) {
+   public GetDataCenterResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
-      dataCenters = Sets.newHashSet();
+      isDone = false;
+      dataCenterBuilder = DataCenter.describingBuilder();
    }
 
    @Override
-   public Set<String> getResult() {
-      return dataCenters;
+   public DataCenter getResult() {
+      return dataCenterBuilder.build();
    }
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      if (qName.equals("dataCenterId")) {
-         dataCenters.add(trimAndGetTagStrValue());
+      if (isDone) return;
+
+      if (qName.equals("region")) dataCenterBuilder.region(DataCenter.DataCenterRegion.fromValue(trimAndGetTagStrValue()));
+      else if (qName.equals("dataCenterId")) dataCenterBuilder.dataCenterId(trimAndGetTagStrValue());
+      else if (qName.equals("dataCenterName")) dataCenterBuilder.dataCenterName(trimAndGetTagStrValue());
+      else if (qName.equals("provisioningState")) dataCenterBuilder.provisioningState(ProvisioningState.fromValue(trimAndGetTagStrValue()));
+      else if (qName.equals("return")) {
+         isDone = true;
       }
       clearTextBuffer();
    }

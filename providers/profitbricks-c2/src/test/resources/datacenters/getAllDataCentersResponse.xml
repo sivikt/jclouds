@@ -1,5 +1,16 @@
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
    <S:Body>
-
+      <ns2:getAllDataCentersResponse xmlns:ns2="http://ws.api.profitbricks.com/">
+         <return>
+            <dataCenterId>a2de7e7a-fb70-4eaf-95ce-70f3bc061121</dataCenterId>
+            <dataCenterName>Unnamed Data Center a2de7e7a-fb70-4eaf-95ce-70f3bc061121</dataCenterName>
+            <dataCenterVersion>2</dataCenterVersion>
+         </return>
+         <return>
+            <dataCenterId>22222222-fb70-4eaf-95ce-20f3bc061222</dataCenterId>
+            <dataCenterName>Data_Center_1</dataCenterName>
+            <dataCenterVersion>1</dataCenterVersion>
+         </return>
+      </ns2:getAllDataCentersResponse>
    </S:Body>
 </S:Envelope>

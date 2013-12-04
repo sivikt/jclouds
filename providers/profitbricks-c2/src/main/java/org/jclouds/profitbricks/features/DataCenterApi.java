@@ -16,7 +16,6 @@
  */
 package org.jclouds.profitbricks.features;
 
-import org.jclouds.Fallbacks;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.DataCenter;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
@@ -42,15 +41,26 @@ public interface DataCenterApi {
 
    /**
     * Returns information about all available data centers.
-    * @return set of {@link DataCenter} instances or empty set if there are none
+    * @return set of {@link String} data centers identifiers or empty set if there are none
     */
    @POST // TODO live and expect test
    @Named("GetAllDataCenters")
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getAllDataCenters/>")
-   @XMLResponseParser(GetAllServersResponseHandler.class)
-   @Fallback(Fallbacks.EmptySetOnNotFoundOr404.class)
-   Set<DataCenter> getAllDataCenters();
+   @XMLResponseParser(GetAllServersResponseHandler.class) // TODO add Fallback?
+   Set<String> getAllDataCenters();
+
+   /**
+    * Returns information about an existing virtual data center’s state and configuration.
+    * @return an instance of {@link DataCenter} or {@code null} if there are none such data center
+    */
+   @POST // TODO live and expect test
+   @Named("GetDataCenter")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:getDataCenter><dataCenterId>{id}</dataCenterId></ws:getDataCenter>")
+   @XMLResponseParser(GetAllServersResponseHandler.class) // TODO add Fallback?
+   DataCenter getDataCenter(@PayloadParam("id") String dataCenterId);
 
 }
