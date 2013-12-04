@@ -25,7 +25,7 @@ import org.jclouds.profitbricks.domain.Server;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Function for transforming user general node Template to ProfitBricks
+ * Function for transforming user general node {@link Template} to ProfitBricks
  * {@link org.jclouds.profitbricks.domain.Server} spec to create new virtual server.
  *
  * TODO test

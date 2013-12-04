@@ -19,6 +19,7 @@ package org.jclouds.profitbricks.xml.datacenters;
 import org.jclouds.date.DateCodecFactory;
 import org.jclouds.profitbricks.domain.DataCenter;
 import org.jclouds.profitbricks.domain.ProvisioningState;
+import org.jclouds.profitbricks.domain.Regions;
 import org.jclouds.profitbricks.xml.BasePBResponseHandler;
 
 import javax.inject.Inject;
@@ -49,7 +50,7 @@ public class GetDataCenterResponseHandler extends BasePBResponseHandler<DataCent
    public void endElement(String uri, String name, String qName) {
       if (isDone) return;
 
-      if (qName.equals("region")) dataCenterBuilder.region(DataCenter.DataCenterRegion.fromValue(trimAndGetTagStrValue()));
+      if (qName.equals("region")) dataCenterBuilder.region(Regions.fromValue(trimAndGetTagStrValue()));
       else if (qName.equals("dataCenterId")) dataCenterBuilder.dataCenterId(trimAndGetTagStrValue());
       else if (qName.equals("dataCenterName")) dataCenterBuilder.dataCenterName(trimAndGetTagStrValue());
       else if (qName.equals("provisioningState")) dataCenterBuilder.provisioningState(ProvisioningState.fromValue(trimAndGetTagStrValue()));

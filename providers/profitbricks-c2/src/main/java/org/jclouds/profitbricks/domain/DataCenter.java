@@ -38,7 +38,7 @@ public class DataCenter {
    public static abstract class Builder<T extends Builder<T>> {
 
       protected String dataCenterName;
-      protected DataCenterRegion region;
+      protected Regions region;
 
       protected abstract T self();
 
@@ -60,7 +60,7 @@ public class DataCenter {
       /**
        * @see DataCenter#getRegion()
        */
-      public T region(DataCenterRegion region) {
+      public T region(Regions region) {
          this.region = region;
          return self();
       }
@@ -126,38 +126,22 @@ public class DataCenter {
       }
    }
 
-   protected DataCenter(String dataCenterName, DataCenterRegion region) {
+   protected DataCenter(String dataCenterName, Regions region) {
       this(null, dataCenterName, null, region);
    }
 
    protected DataCenter(String dataCenterId, String dataCenterName, ProvisioningState provisioningState,
-                        DataCenterRegion region) {
+                        Regions region) {
       this.dataCenterId = dataCenterId;
       this.dataCenterName = dataCenterName;
       this.provisioningState = provisioningState;
       this.region = region;
    }
 
-   public enum DataCenterRegion {
-      NORTH_AMERICA, EUROPE, DEFAULT;
-
-      public String value() {
-         return name();
-      }
-
-      public static DataCenterRegion fromValue(String value) {
-         try {
-            return valueOf(value);
-         } catch (IllegalArgumentException e) {
-            return DEFAULT;
-         }
-      }
-   }
-
    private String dataCenterId;
    private String dataCenterName;
    private ProvisioningState provisioningState;
-   private DataCenterRegion region;
+   private Regions region;
 
    /**
     * Identifier of the virtual data center
@@ -176,7 +160,7 @@ public class DataCenter {
    /**
     * Region where the data center has been created
     */
-   public DataCenterRegion getRegion() {
+   public Regions getRegion() {
       return region;
    }
 

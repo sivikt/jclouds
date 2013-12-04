@@ -19,6 +19,7 @@ package org.jclouds.profitbricks.xml.datacenters;
 import org.jclouds.http.functions.BaseHandlerTest;
 import org.jclouds.profitbricks.domain.DataCenter;
 import org.jclouds.profitbricks.domain.ProvisioningState;
+import org.jclouds.profitbricks.domain.Regions;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -42,7 +43,7 @@ public class GetDataCenterResponseHandlerTest extends BaseHandlerTest {
             .dataCenterId("a2de7e7a-fb70-4eaf-95ce-70f3bc061121")
             .dataCenterName("Unnamed Data Center")
             .provisioningState(ProvisioningState.AVAILABLE)
-            .region(DataCenter.DataCenterRegion.EUROPE)
+            .region(Regions.EUROPE)
             .build();
 
       GetDataCenterResponseHandler handler = injector.getInstance(GetDataCenterResponseHandler.class);

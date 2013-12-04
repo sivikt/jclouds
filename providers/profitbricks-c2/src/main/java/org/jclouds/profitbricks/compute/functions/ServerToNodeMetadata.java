@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A function for transforming a ProfitBricks {@link Server} into a generic
- * NodeMetadata object.
+ * {@link NodeMetadata} object.
  *
  * @author Serj Sintsov
  */

@@ -16,15 +16,17 @@
  */
 package org.jclouds.profitbricks;
 
+import com.google.common.base.Joiner;
+import org.jclouds.profitbricks.domain.Regions;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.internal.BaseProviderMetadata;
 
 import java.net.URI;
 import java.util.Properties;
 
-import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
+import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGIONS;
 
 /**
  * Implementation of {@link ProviderMetadata} for
@@ -60,6 +62,8 @@ public class PBProviderMetadata extends BaseProviderMetadata {
 
       // ProfitBricks takes takes a very long time to start the server
       properties.setProperty(TIMEOUT_NODE_RUNNING, 240 * 1000 + "");
+
+      //properties.setProperty(PROPERTY_REGIONS, Joiner.on(',').join(Regions.profitBricksC2Regions));
 
       return properties;
    }
