@@ -51,6 +51,7 @@ public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHand
          servers.add(describingBuilder.build());
          describingBuilder = Server.describingBuilder();
       }
+      clearTextBuffer();
    }
 
 }

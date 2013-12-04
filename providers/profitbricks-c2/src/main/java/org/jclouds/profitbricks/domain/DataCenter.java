@@ -203,13 +203,17 @@ public class DataCenter {
       return Objects.equal(this.dataCenterId, that.dataCenterId);
    }
 
+   protected Objects.ToStringHelper string() {
+      return Objects.toStringHelper(this)
+            .add("dataCenterId", dataCenterId)
+            .add("dataCenterName", dataCenterName)
+            .add("region", region)
+            .add("provisioningState", provisioningState);
+   }
+
    @Override
    public String toString() {
-      return getClass().getSimpleName() + "{" +
-            "dataCenterId=" + dataCenterId + "," +
-            "dataCenterName=" + dataCenterName + "," +
-            "region=" + region +
-      "}";
+      return string().toString();
    }
 
 }

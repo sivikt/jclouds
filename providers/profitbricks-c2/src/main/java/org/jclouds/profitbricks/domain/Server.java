@@ -465,22 +465,25 @@ public class Server {
       return Objects.equal(this.serverId, that.serverId);
    }
 
+   protected Objects.ToStringHelper string() {
+      return Objects.toStringHelper(this)
+            .add("dataCenterId", dataCenterId)
+            .add("serverId", serverId)
+            .add("serverName", serverName)
+            .add("internetAccess", internetAccess)
+            .add("creationTime", creationTime)
+            .add("lastModificationTime", lastModificationTime)
+            .add("cores", cores)
+            .add("ram", ram)
+            .add("osType", osType)
+            .add("provisioningState", provisioningState)
+            .add("virtualMachineState", virtualMachineState)
+            .add("availabilityZone", availabilityZone);
+   }
+
    @Override
    public String toString() {
-      return getClass().getSimpleName() + "{" +
-            "dataCenterId=" + dataCenterId + "," +
-            "serverId=" + serverId + "," +
-            "serverName=" + serverName + "," +
-            "internetAccess=" + internetAccess + "," +
-            "creationTime=" + creationTime + "," +
-            "lastModificationTime=" + lastModificationTime + "," +
-            "cores=" + cores + "," +
-            "ram=" + ram + "," +
-            "osType=" + osType + "," +
-            "provisioningState=" + provisioningState + "," +
-            "virtualMachineState=" + virtualMachineState + "," +
-            "availabilityZone=" + availabilityZone +
-      "}";
+      return string().toString();
    }
 
 }
