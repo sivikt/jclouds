@@ -65,7 +65,6 @@ public interface ServerApi {
    @XMLResponseParser(GetAllServersResponseHandler.class)
    Set<Server> getAllServers();
 
-
    /**
     * Returns information about a virtual server,
     * such as configuration, provisioning status, power status, etc.

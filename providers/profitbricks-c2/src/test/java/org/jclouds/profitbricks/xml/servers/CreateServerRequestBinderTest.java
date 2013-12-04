@@ -63,6 +63,7 @@ public class CreateServerRequestBinderTest {
                                      "<cores>2</cores>" +
                                      "<ram>1024</ram>" +
                                      "<internetAccess>true</internetAccess>" +
+                                     "<bootFromImageId>836acb2c-66f9-11e2-9478-0025901dfe2a</bootFromImageId>" +
                                      "<osType>OS_TYPE</osType>" +
                                      "<availabilityZone>ZONE</availabilityZone>" +
                                   "</request>" +
@@ -119,6 +120,7 @@ public class CreateServerRequestBinderTest {
             .ram(1024)
             .osType(Server.OSType.LINUX)
             .internetAccess(true)
+            .bootFromImageId("836acb2c-66f9-11e2-9478-0025901dfe2a")
             .availabilityZone(Server.AvailabilityZone.ZONE_1)
             .build();
    }

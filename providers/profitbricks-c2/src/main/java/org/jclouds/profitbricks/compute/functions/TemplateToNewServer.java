@@ -18,6 +18,8 @@ package org.jclouds.profitbricks.compute.functions;
 
 import com.google.common.base.Function;
 import org.jclouds.compute.domain.Template;
+import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationScope;
 import org.jclouds.profitbricks.domain.Server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,14 +38,35 @@ public class TemplateToNewServer implements Function<Template, Server> {
    public Server apply(Template template) {
       checkNotNull(template, "template");
 
-      return Server.creationBuilder()
-                  // .dataCenterId(template.getLocation().getId()) // todo DC is an Optional param according to the API
+      Server.ServerCreationBuilder creationBuilder = Server.creationBuilder();
+
+      chooseDC(creationBuilder, template);
+      chooseAvailabilityZone(creationBuilder, template);
+
+      return creationBuilder
                    .serverName(template.getHardware().getName())
                    .cores((int) template.getHardware().getProcessors().get(0).getCores())
                    .ram(template.getHardware().getRam())
-                   .availabilityZone(Server.AvailabilityZone.ZONE_1)
+                   .bootFromImageId(template.getImage().getId())
                    .osType(Server.OSType.fromValue(template.getImage().getOperatingSystem().getFamily().name()))
                    .build();
+   }
+
+   private void chooseDC(Server.ServerCreationBuilder builder, Template template) {
+      Location dcLocation = findLocation(template.getLocation(), LocationScope.ZONE);
+      if (dcLocation != null)
+         builder.dataCenterId(dcLocation.getId());
+   }
+
+   private void chooseAvailabilityZone(Server.ServerCreationBuilder builder, Template template) {
+      if (template.getLocation().getScope() == LocationScope.HOST)
+         builder.availabilityZone(Server.AvailabilityZone.fromValue(template.getLocation().getId()));
+   }
+
+   private Location findLocation(Location location, LocationScope scope) {
+      if (location.getScope() == scope) return location;
+      else if (location.getParent() == null) return null;
+      else return findLocation(location.getParent(), scope);
    }
 
 }

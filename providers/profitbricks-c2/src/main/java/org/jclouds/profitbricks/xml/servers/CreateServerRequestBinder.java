@@ -61,6 +61,7 @@ public class CreateServerRequestBinder implements MapBinder {
                    justAdd("<cores>%s</cores>", server.getCores()) +
                    justAdd("<ram>%s</ram>", server.getRam()) +
                    justAdd("<internetAccess>%s</internetAccess>", server.isInternetAccess()) +
+                   addIfNotEmpty("<bootFromImageId>%s</bootFromImageId>", server.getBootFromImageId()) +
                    addIfNotEmpty("<osType>%s</osType>", serverEnumsMapper.mapOSType(server.getOsType())) +
                    addIfNotEmpty("<availabilityZone>%s</availabilityZone>", serverEnumsMapper.mapAvailabilityZone(server.getAvailabilityZone())) +
                 "</request>" +

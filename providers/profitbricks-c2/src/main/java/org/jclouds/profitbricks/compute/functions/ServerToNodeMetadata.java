@@ -45,7 +45,7 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
       Location region = new LocationBuilder()
          .id(server.getDataCenterId())
          .description(server.getDataCenterId())
-         .scope(LocationScope.REGION)
+         .scope(LocationScope.ZONE)
          .build();
 
       /**

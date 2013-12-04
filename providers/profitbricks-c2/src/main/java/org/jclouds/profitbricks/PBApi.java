@@ -16,9 +16,7 @@
  */
 package org.jclouds.profitbricks;
 
-import com.google.common.base.Optional;
 import org.jclouds.profitbricks.features.DataCenterApi;
-import org.jclouds.profitbricks.features.FirewallApi;
 import org.jclouds.profitbricks.features.ServerApi;
 import org.jclouds.rest.annotations.*;
 
@@ -39,12 +37,9 @@ import java.io.Closeable;
 public interface PBApi extends Closeable {
 
    @Delegate
-   Optional<? extends DataCenterApi> dataCenterApi();
+   DataCenterApi dataCenterApi();
 
    @Delegate
-   Optional<? extends ServerApi> serversApi();
-
-   @Delegate
-   Optional<? extends FirewallApi> firewallApi();
+   ServerApi serversApi();
 
 }

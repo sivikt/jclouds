@@ -22,7 +22,6 @@ import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.*;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
-import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.PBApi;
@@ -62,10 +61,9 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    @Override
    public NodeAndInitialCredentials<Server> createNodeWithGroupEncodedIntoName(String group, String name, Template template) {
       Server serverToCreate = templateToServer.apply(template);
-      if (!pbApi.serversApi().isPresent()) return null; // TODO return exception when ComputeServiceAdapter will allow
 
       logger.trace(">> creating new server from template [%s]", serverToCreate);
-      String createdServerId = pbApi.serversApi().get().createServer(serverToCreate);
+      String createdServerId = pbApi.serversApi().createServer(serverToCreate);
       if (createdServerId == null) {
          logger.trace("<< server creation failed. template [%s]", serverToCreate);
          return null; // TODO return exception when ComputeServiceAdapter will allow
@@ -73,7 +71,7 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
       logger.trace("<< server created with id=%s", createdServerId);
 
       logger.trace(">> getting server with id=%s", createdServerId);
-      Server createdServer = pbApi.serversApi().get().getServer(createdServerId);
+      Server createdServer = pbApi.serversApi().getServer(createdServerId);
       logger.trace("<< got server [%s]", createdServer);
 
       return new NodeAndInitialCredentials<Server>(
@@ -104,33 +102,24 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    @Override
    public Iterable<Hardware> listHardwareProfiles() {
       logger.trace("listing of Hardware Profiles doesn't implemented yet. Return empty iterable collection");
-      return ImmutableSet.of(new HardwareBuilder()
-            .id("fake")
-            .processor(new Processor(2, 0))
-            .ram(1024)
-            .build()); // todo tmp workaround. PB doesn't provide predefined hardware profiles
+      return ImmutableSet.of(); // TODO clarify does it really need; how to provide hardware profiles
    }
 
    @Override
    public Iterable<Location> listLocations() {
       logger.trace("listing of Locations doesn't implemented yet. Return empty iterable collection");
-      return ImmutableSet.of(new LocationBuilder()
-            .id("ZONE_1")
-            .description("fake")
-            .build()); // todo tmp workaround. You can create server without specifying its data center
+      return ImmutableSet.of(); // TODO clarify does it really need; how to provide locations
    }
 
    @Override
    public Iterable<Server> listNodes() {
-      if (!pbApi.serversApi().isPresent()) return ImmutableSet.of();
-      return pbApi.serversApi().get().getAllServers();
+      return pbApi.serversApi().getAllServers();
    }
 
    @Override
    public Server getNode(String id) {
       checkNotNull(id, "id");
-      if (!pbApi.serversApi().isPresent()) return null;
-      return pbApi.serversApi().get().getServer(id);
+      return pbApi.serversApi().getServer(id);
    }
 
    @Override
@@ -146,22 +135,19 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    @Override
    public void rebootNode(String id) {
       checkNotNull(id, "id");
-      if (!pbApi.serversApi().isPresent()) return;
-      pbApi.serversApi().get().resetServer(id);
+      pbApi.serversApi().resetServer(id);
    }
 
    @Override
    public void resumeNode(String id) {
       checkNotNull(id, "id");
-      if (!pbApi.serversApi().isPresent()) return;
-      pbApi.serversApi().get().startServer(id);
+      pbApi.serversApi().startServer(id);
    }
 
    @Override
    public void suspendNode(String id) {
       checkNotNull(id, "id");
-      if (!pbApi.serversApi().isPresent()) return;
-      pbApi.serversApi().get().stopServer(id);
+      pbApi.serversApi().stopServer(id);
    }
 
 }

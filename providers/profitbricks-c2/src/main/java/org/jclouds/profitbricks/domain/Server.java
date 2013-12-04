@@ -17,10 +17,10 @@
 package org.jclouds.profitbricks.domain;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Strings;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
-import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
 
@@ -49,6 +49,7 @@ public class Server {
 
       protected String dataCenterId;
       protected String serverName;
+      protected String bootFromImageId;
       protected int cores;
       protected int ram;
       protected boolean internetAccess;
@@ -79,6 +80,14 @@ public class Server {
        */
       public T serverName(String serverName) {
          this.serverName = serverName;
+         return self();
+      }
+
+      /**
+       * @see Server#getBootFromImageId()
+       */
+      public T bootFromImageId(String bootFromImageId) {
+         this.bootFromImageId = bootFromImageId;
          return self();
       }
 
@@ -164,7 +173,7 @@ public class Server {
 
       @Override
       protected Server buildInstance() {
-         return new Server(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone);
+         return new Server(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone, bootFromImageId);
       }
    }
 
@@ -228,6 +237,7 @@ public class Server {
       protected void checkFields() {
          super.checkFields();
          checkNotNull(serverId, "serverId");
+         checkNotNull(dataCenterId, "dataCenterId");
          availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
          osType = osType == null ? OSType.UNKNOWN : osType;
          provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
@@ -237,21 +247,22 @@ public class Server {
       @Override
       protected Server buildInstance() {
          return new Server(dataCenterId, serverId, serverName, cores, ram, internetAccess, osType, availabilityZone,
-                           creationTime, lastModificationTime, provisioningState, virtualMachineState);
+                           creationTime, lastModificationTime, provisioningState, virtualMachineState, bootFromImageId);
       }
    }
 
    protected Server(String dataCenterId, String serverName, int cores, int ram, boolean internetAccess, OSType osType,
-                    AvailabilityZone availabilityZone) {
-      this(dataCenterId, null, serverName, cores, ram, internetAccess, osType, availabilityZone, null, null, null, null);
+                    AvailabilityZone availabilityZone, String bootFromImageId) {
+      this(dataCenterId, null, serverName, cores, ram, internetAccess, osType, availabilityZone, null, null, null, null,
+           bootFromImageId);
    }
 
    protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, boolean internetAccess,
                     OSType osType, AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
-                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
-      this.dataCenterId = dataCenterId;
+                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState, String bootFromImageId) {
+      this.dataCenterId = Strings.emptyToNull(dataCenterId);
       this.serverId = serverId;
-      this.serverName = serverName;
+      this.serverName = Strings.emptyToNull(serverName);
       this.cores = cores;
       this.ram = ram;
       this.internetAccess = internetAccess;
@@ -261,6 +272,7 @@ public class Server {
       this.lastModificationTime = lastModificationTime;
       this.provisioningState = provisioningState;
       this.virtualMachineState = virtualMachineState;
+      this.bootFromImageId = Strings.emptyToNull(bootFromImageId);
    }
 
    public enum VirtualMachineState {
@@ -326,17 +338,15 @@ public class Server {
 
    private String dataCenterId;
    private String serverId;
-
-   @Nullable
    private String serverName;
+   private String bootFromImageId;
 
    private int cores;
    private int ram;
+
    private boolean internetAccess;
 
-   @Nullable
    private Date creationTime;
-   @Nullable
    private Date lastModificationTime;
 
    private ProvisioningState provisioningState;
@@ -364,6 +374,15 @@ public class Server {
     */
    public String getServerName() {
       return serverName;
+   }
+
+   /**
+    * TODO investigate should we use it here or not. As for now this field is for only server creation
+    * Defines an existing CD-ROM/DVD image ID to be set as boot device of the server.
+    * A virtual CD-ROM/DVD drive with the mounted image will be connected to the server.
+    */
+   public String getBootFromImageId() {
+      return bootFromImageId;
    }
 
    /**
