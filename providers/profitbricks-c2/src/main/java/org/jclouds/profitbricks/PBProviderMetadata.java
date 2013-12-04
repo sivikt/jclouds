@@ -56,10 +56,10 @@ public class PBProviderMetadata extends BaseProviderMetadata {
    public static Properties defaultProperties() {
       Properties properties = new Properties();
       // ProfitBricks takes takes a very long time to stop the server
-      properties.setProperty(TIMEOUT_NODE_SUSPENDED, 120 * 1000 + "");
+      properties.setProperty(TIMEOUT_NODE_SUSPENDED, 240 * 1000 + "");
 
       // ProfitBricks takes takes a very long time to start the server
-      properties.setProperty(TIMEOUT_NODE_RUNNING, 120 * 1000 + "");
+      properties.setProperty(TIMEOUT_NODE_RUNNING, 240 * 1000 + "");
 
       return properties;
    }
