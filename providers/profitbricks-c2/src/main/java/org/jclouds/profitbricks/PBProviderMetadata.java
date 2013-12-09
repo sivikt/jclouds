@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
 import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGIONS;
 
 /**
@@ -58,10 +59,13 @@ public class PBProviderMetadata extends BaseProviderMetadata {
    public static Properties defaultProperties() {
       Properties properties = new Properties();
       // ProfitBricks takes takes a very long time to stop the server
-      properties.setProperty(TIMEOUT_NODE_SUSPENDED, 240 * 1000 + "");
+      properties.setProperty(TIMEOUT_NODE_SUSPENDED, 5*60*1000 + "");
 
       // ProfitBricks takes takes a very long time to start the server
-      properties.setProperty(TIMEOUT_NODE_RUNNING, 240 * 1000 + "");
+      properties.setProperty(TIMEOUT_NODE_RUNNING, 5*60*1000 + "");
+
+      // ProfitBricks takes takes a very long time to destroy the server
+      properties.setProperty(TIMEOUT_NODE_TERMINATED, 5*60*1000 + "");
 
       //properties.setProperty(PROPERTY_REGIONS, Joiner.on(',').join(Regions.profitBricksC2Regions));
 
