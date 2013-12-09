@@ -162,10 +162,10 @@ public class Server {
          checkRam();
          checkNotNull(serverId, "serverId");
          checkNotNull(dataCenterId, "dataCenterId");
+         checkNotNull(provisioningState, "provisioningState");
+         checkNotNull(virtualMachineState, "virtualMachineState");
          availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
          osType = osType == null ? OSType.UNKNOWN : osType;
-         provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
-         virtualMachineState = virtualMachineState == null ? VirtualMachineState.UNRECOGNIZED : virtualMachineState;
       }
    }
 
@@ -199,18 +199,14 @@ public class Server {
    }
 
    public enum VirtualMachineState {
-      NOSTATE, RUNNING, BLOCKED, PAUSED, SHUTDOWN, SHUTOFF, CRASHED, UNRECOGNIZED;
+      NOSTATE, RUNNING, BLOCKED, PAUSED, SHUTDOWN, SHUTOFF, CRASHED;
 
       public String value() {
          return name();
       }
 
       public static VirtualMachineState fromValue(String value) {
-         try {
-            return valueOf(value);
-         } catch (IllegalArgumentException e) {
-            return UNRECOGNIZED;
-         }
+         return valueOf(value);
       }
    }
 

@@ -117,7 +117,7 @@ public class DataCenter {
       protected void checkFields() {
          super.checkFields();
          checkNotNull(dataCenterId, "dataCenterId");
-         provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
+         checkNotNull(provisioningState, "provisioningState");
       }
 
       @Override

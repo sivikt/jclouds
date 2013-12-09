@@ -22,13 +22,13 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.domain.Processor;
 import org.jclouds.compute.domain.OperatingSystem;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,6 +39,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Serj Sintsov
  */
 public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
+
+   private Function<OSType, OperatingSystem> osTypeToOperatingSystem;
+   private Function<Server, NodeMetadata.Status> serverStateToNodeStatus;
+
+   @Inject
+   public ServerToNodeMetadata(Function<OSType, OperatingSystem> osTypeToOperatingSystem,
+                               Function<Server, NodeMetadata.Status> serverStateToNodeStatus) {
+      this.osTypeToOperatingSystem = checkNotNull(osTypeToOperatingSystem, "osTypeToOperatingSystem");
+      this.serverStateToNodeStatus = checkNotNull(serverStateToNodeStatus, "serverStateToNodeStatus");
+   }
 
    @Override
    public NodeMetadata apply(Server server) {
@@ -68,70 +78,12 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
          .providerId(server.getServerId())
          .name(server.getServerName())
          .hostname(server.getServerName())
-         .status(mapStatus(server.getVirtualMachineState(), server.getProvisioningState()))
-         .operatingSystem(mapOS(server.getOsType()))
+         .status(serverStateToNodeStatus.apply(server))
+         .operatingSystem(osTypeToOperatingSystem.apply(server.getOsType()))
          .hardware(hardwareBuilder.build())
          .location(region);
 
       return nodeMetadataBuilder.build();
-   }
-
-   // TODO move to configuration module
-   protected OperatingSystem mapOS(OSType osType) {
-      if (osType == null)
-         return OperatingSystem.builder()
-                  .description(OsFamily.UNRECOGNIZED.value())
-                  .family(OsFamily.UNRECOGNIZED)
-                  .build();
-
-      switch (osType) {
-         case WINDOWS:
-            return OperatingSystem.builder()
-                     .description(OsFamily.WINDOWS.value())
-                     .family(OsFamily.WINDOWS)
-                     .build();
-         case LINUX:
-            return OperatingSystem.builder()
-                     .description(OsFamily.LINUX.value())
-                     .family(OsFamily.LINUX)
-                     .build();
-         default:
-            return OperatingSystem.builder()
-                     .description(OsFamily.UNRECOGNIZED.value())
-                     .family(OsFamily.UNRECOGNIZED)
-                     .build();
-      }
-   }
-
-   // TODO move to configuration module or function
-   protected NodeMetadata.Status mapStatus(Server.VirtualMachineState vmState, ProvisioningState provisioningState) {
-      if (provisioningState == null) {
-         return NodeMetadata.Status.UNRECOGNIZED;
-      }
-
-      switch (provisioningState) {
-         case INPROCESS:  return NodeMetadata.Status.PENDING;
-         case ERROR: return NodeMetadata.Status.ERROR;
-         case DELETED: return NodeMetadata.Status.UNRECOGNIZED;
-      }
-
-      if (provisioningState == ProvisioningState.AVAILABLE || provisioningState == ProvisioningState.INACTIVE) {
-         if (vmState == null) {
-            return NodeMetadata.Status.UNRECOGNIZED;
-         }
-
-         switch (vmState) {
-            case SHUTDOWN:
-            case SHUTOFF:
-            case PAUSED:  return NodeMetadata.Status.SUSPENDED;
-            case RUNNING: return NodeMetadata.Status.RUNNING;
-            case BLOCKED: return NodeMetadata.Status.PENDING;
-            case CRASHED: return NodeMetadata.Status.ERROR;
-            default:      return NodeMetadata.Status.UNRECOGNIZED;
-         }
-      }
-
-      return NodeMetadata.Status.UNRECOGNIZED;
    }
 
 }

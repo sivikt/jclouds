@@ -22,17 +22,13 @@ package org.jclouds.profitbricks.domain;
  * @author Serj Sintsov
  */
 public enum ProvisioningState {
-   INACTIVE, INPROCESS, AVAILABLE, DELETED, ERROR, UNRECOGNIZED;
+   INACTIVE, INPROCESS, AVAILABLE, DELETED, ERROR;
 
    public String value() {
       return name();
    }
 
    public static ProvisioningState fromValue(String value) {
-      try {
-         return valueOf(value);
-      } catch (IllegalArgumentException e) {
-         return UNRECOGNIZED;
-      }
+      return valueOf(value);
    }
 }

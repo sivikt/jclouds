@@ -19,13 +19,19 @@ package org.jclouds.profitbricks.compute;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
 import org.jclouds.compute.ComputeServiceAdapter;
-import org.jclouds.compute.domain.*;
+import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.ImageBuilder;
+import org.jclouds.compute.domain.OperatingSystem;
+import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.PBApi;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -50,22 +56,22 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    protected Logger logger = Logger.NULL;
 
    protected PBApi pbApi;
-   protected Function<Template, Server> templateToServer;
+   protected Function<Template, ServerCreationSpec> templateToServerSpec;
 
    @Inject
-   public PBComputeServiceAdapter(PBApi pbApi, Function<Template, Server> templateToServer) {
+   public PBComputeServiceAdapter(PBApi pbApi, Function<Template, ServerCreationSpec> templateToServerSpec) {
       this.pbApi = checkNotNull(pbApi, "pbApi");
-      this.templateToServer = checkNotNull(templateToServer, "templateToServer");
+      this.templateToServerSpec = checkNotNull(templateToServerSpec, "templateToServerSpec");
    }
 
    @Override
    public NodeAndInitialCredentials<Server> createNodeWithGroupEncodedIntoName(String group, String name, Template template) {
-      Server serverToCreate = templateToServer.apply(template);
+      ServerCreationSpec serverSpec = templateToServerSpec.apply(template);
 
-      logger.trace(">> creating new server from template [%s]", serverToCreate);
-      String createdServerId = pbApi.serversApi().createServer(serverToCreate);
+      logger.trace(">> creating new server from template [%s]", serverSpec);
+      String createdServerId = pbApi.serversApi().createServer(serverSpec);
       if (createdServerId == null) {
-         logger.trace("<< server creation failed. template [%s]", serverToCreate);
+         logger.trace("<< server creation failed. template [%s]", serverSpec);
          return null; // TODO return exception when ComputeServiceAdapter will allow
       }
       logger.trace("<< server created with id=%s", createdServerId);

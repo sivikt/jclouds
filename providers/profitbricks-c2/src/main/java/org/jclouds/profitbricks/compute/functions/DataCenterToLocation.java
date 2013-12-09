@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Transforms a ProfitBricks {@link DataCenter} into a generic {@code Location} object.
- *
+ *    todo test
  * @author Serj Sintsov
  */
 public class DataCenterToLocation implements Function<DataCenter, Location> {

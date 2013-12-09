@@ -16,7 +16,9 @@
  */
 package org.jclouds.profitbricks.compute.functions;
 
+import com.google.common.base.Function;
 import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.domain.LocationScope;
@@ -24,14 +26,11 @@ import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.BLOCKED;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.CRASHED;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.RUNNING;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.PAUSED;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.SHUTDOWN;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.SHUTOFF;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.NOSTATE;
-import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.UNRECOGNIZED;
+
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.replay;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -46,8 +45,24 @@ import static org.testng.Assert.assertNotNull;
 public class ServerToNodeMetadataTest {
 
    @Test
+   @SuppressWarnings("unchecked")
    public void testApply() {
-      ServerToNodeMetadata func = new ServerToNodeMetadata();
+      OperatingSystem stubOs = OperatingSystem.builder()
+            .description(OsFamily.LINUX.value())
+            .family(OsFamily.LINUX)
+            .build();
+
+      Function<OSType, OperatingSystem> osTypeToOperatingSystemMock = createMock(Function.class);
+      Function<Server, NodeMetadata.Status> serverStateToNodeStatusMock = createMock(Function.class);
+
+      expect(osTypeToOperatingSystemMock.apply(anyObject(OSType.class))).andStubReturn(stubOs);
+      expect(serverStateToNodeStatusMock.apply(anyObject(Server.class))).andStubReturn(NodeMetadata.Status.RUNNING);
+
+      replay(osTypeToOperatingSystemMock);
+      replay(serverStateToNodeStatusMock);
+
+      ServerToNodeMetadata func = new ServerToNodeMetadata(osTypeToOperatingSystemMock, serverStateToNodeStatusMock);
+
       Server actualServer = actualServer();
       NodeMetadata nodeMetadata = func.apply(actualServer);
 
@@ -95,56 +110,6 @@ public class ServerToNodeMetadataTest {
             .osType(OSType.LINUX)
             .availabilityZone(AvailabilityZone.ZONE_1)
             .build();
-   }
-
-   @Test
-   public void testMapOS() {
-      ServerToNodeMetadata func = new ServerToNodeMetadata();
-      assertEquals(func.mapOS(OSType.LINUX).getFamily(), OsFamily.LINUX);
-      assertEquals(func.mapOS(OSType.LINUX).getDescription(), OsFamily.LINUX.value());
-
-      assertEquals(func.mapOS(OSType.WINDOWS).getFamily(), OsFamily.WINDOWS);
-      assertEquals(func.mapOS(OSType.WINDOWS).getDescription(), OsFamily.WINDOWS.value());
-
-      assertEquals(func.mapOS(OSType.OTHER).getFamily(), OsFamily.UNRECOGNIZED);
-      assertEquals(func.mapOS(OSType.OTHER).getDescription(), OsFamily.UNRECOGNIZED.value());
-
-      assertEquals(func.mapOS(OSType.UNKNOWN).getFamily(), OsFamily.UNRECOGNIZED);
-      assertEquals(func.mapOS(OSType.UNKNOWN).getDescription(), OsFamily.UNRECOGNIZED.value());
-
-      assertEquals(func.mapOS(null).getFamily(), OsFamily.UNRECOGNIZED);
-      assertEquals(func.mapOS(null).getDescription(), OsFamily.UNRECOGNIZED.value());
-   }
-
-   @Test
-   public void testMapStatus() {
-      ServerToNodeMetadata func = new ServerToNodeMetadata();
-
-      assertEquals(func.mapStatus(RUNNING, null), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.UNRECOGNIZED), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.DELETED), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.ERROR), NodeMetadata.Status.ERROR);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.INPROCESS), NodeMetadata.Status.PENDING);
-
-      assertEquals(func.mapStatus(BLOCKED, ProvisioningState.INACTIVE), NodeMetadata.Status.PENDING);
-      assertEquals(func.mapStatus(CRASHED, ProvisioningState.INACTIVE), NodeMetadata.Status.ERROR);
-      assertEquals(func.mapStatus(NOSTATE, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(PAUSED, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.INACTIVE), NodeMetadata.Status.RUNNING);
-      assertEquals(func.mapStatus(SHUTDOWN, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(SHUTOFF, ProvisioningState.INACTIVE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(UNRECOGNIZED, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(null, ProvisioningState.INACTIVE), NodeMetadata.Status.UNRECOGNIZED);
-
-      assertEquals(func.mapStatus(BLOCKED, ProvisioningState.AVAILABLE), NodeMetadata.Status.PENDING);
-      assertEquals(func.mapStatus(CRASHED, ProvisioningState.AVAILABLE), NodeMetadata.Status.ERROR);
-      assertEquals(func.mapStatus(NOSTATE, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(PAUSED, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(RUNNING, ProvisioningState.AVAILABLE), NodeMetadata.Status.RUNNING);
-      assertEquals(func.mapStatus(SHUTDOWN, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(SHUTOFF, ProvisioningState.AVAILABLE), NodeMetadata.Status.SUSPENDED);
-      assertEquals(func.mapStatus(UNRECOGNIZED, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
-      assertEquals(func.mapStatus(null, ProvisioningState.AVAILABLE), NodeMetadata.Status.UNRECOGNIZED);
    }
 
 }
