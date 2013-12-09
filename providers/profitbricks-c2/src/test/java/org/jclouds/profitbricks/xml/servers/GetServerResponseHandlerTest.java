@@ -18,6 +18,8 @@ package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 import org.testng.annotations.Test;
@@ -58,13 +60,12 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
       assertEquals(actualServer.getProvisioningState(), expectedServer.getProvisioningState());
       assertEquals(actualServer.getServerName(), expectedServer.getServerName());
       assertEquals(actualServer.getVirtualMachineState(), expectedServer.getVirtualMachineState());
-      assertEquals(actualServer.isInternetAccess(), expectedServer.isInternetAccess());
    }
 
    private Server expectedServer() {
       SimpleDateFormatDateService dateService = new SimpleDateFormatDateService();
 
-      return Server.describingBuilder()
+      return Server.builder()
                    .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
                    .serverId("93981076-2511-4aa7-82c0-1e4df0d1737f")
                    .serverName("server")
@@ -74,9 +75,8 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
                    .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
                    .provisioningState(ProvisioningState.AVAILABLE)
                    .virtualMachineState(Server.VirtualMachineState.RUNNING)
-                   .osType(Server.OSType.WINDOWS)
-                   .internetAccess(false)
-                   .availabilityZone(Server.AvailabilityZone.AUTO)
+                   .osType(OSType.WINDOWS)
+                   .availabilityZone(AvailabilityZone.AUTO)
                    .build();
    }
 

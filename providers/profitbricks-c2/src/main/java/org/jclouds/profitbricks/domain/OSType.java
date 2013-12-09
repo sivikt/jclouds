@@ -14,28 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
-
-import org.jclouds.profitbricks.domain.AvailabilityZone;
-import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.Server;
-
-import javax.inject.Singleton;
+package org.jclouds.profitbricks.domain;
 
 /**
- * Maps {@link Server} specific enums to strings. Useful in the requests binders.
+ * ProfitBricks' possible operation systems types
  *
  * @author Serj Sintsov
  */
-@Singleton
-public class ServerEnumsToStringMapper {
+public enum OSType {
+   WINDOWS, LINUX, OTHER, UNKNOWN;
 
-   public String mapOSType(OSType osType) {
-      return osType == null ? "" : osType.value();
+   public String value() {
+      return name();
    }
 
-   public String mapAvailabilityZone(AvailabilityZone zone) {
-      return zone == null ? "" : zone.value();
+   public static OSType fromValue(String value) {
+      try {
+         return OSType.valueOf(value);
+      } catch (IllegalArgumentException e) {
+         return UNKNOWN;
+      }
    }
-
 }

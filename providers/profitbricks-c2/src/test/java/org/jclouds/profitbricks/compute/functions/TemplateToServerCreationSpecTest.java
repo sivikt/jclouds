@@ -14,28 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
-
-import org.jclouds.profitbricks.domain.AvailabilityZone;
-import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.Server;
-
-import javax.inject.Singleton;
+package org.jclouds.profitbricks.compute.functions;
 
 /**
- * Maps {@link Server} specific enums to strings. Useful in the requests binders.
+ * Test for {@link TemplateToServerCreationSpec}
  *
  * @author Serj Sintsov
  */
-@Singleton
-public class ServerEnumsToStringMapper {
+public class TemplateToServerCreationSpecTest {
 
-   public String mapOSType(OSType osType) {
-      return osType == null ? "" : osType.value();
-   }
 
-   public String mapAvailabilityZone(AvailabilityZone zone) {
-      return zone == null ? "" : zone.value();
-   }
 
 }

@@ -26,6 +26,7 @@ import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 
@@ -76,7 +77,7 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
    }
 
    // TODO move to configuration module
-   protected OperatingSystem mapOS(Server.OSType osType) {
+   protected OperatingSystem mapOS(OSType osType) {
       if (osType == null)
          return OperatingSystem.builder()
                   .description(OsFamily.UNRECOGNIZED.value())

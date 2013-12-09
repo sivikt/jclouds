@@ -18,7 +18,9 @@ package org.jclouds.profitbricks.features;
 
 import com.google.common.collect.ImmutableList;
 import org.jclouds.http.functions.ParseSax;
-import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.OSType;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;
@@ -80,14 +82,14 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
    @Test
    public void createServer() throws SecurityException, NoSuchMethodException, IOException {
       Invocation invocation = Invocation.create(
-            method(ServerApi.class, "createServer", Server.class),
-            ImmutableList.<Object>of(Server.creationBuilder()
+            method(ServerApi.class, "createServer", ServerCreationSpec.class),
+            ImmutableList.<Object>of(ServerCreationSpec.builder()
                                            .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
                                            .cores(1)
                                            .ram(256)
                                            .serverName("tomcatServer")
-                                           .osType(Server.OSType.OTHER)
-                                           .availabilityZone(Server.AvailabilityZone.ZONE_1)
+                                           .osType(OSType.OTHER)
+                                           .availabilityZone(AvailabilityZone.ZONE_1)
                                            .internetAccess(true)
                                            .build())
       );

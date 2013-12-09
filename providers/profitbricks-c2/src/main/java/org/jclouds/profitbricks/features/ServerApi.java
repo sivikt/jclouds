@@ -18,12 +18,13 @@ package org.jclouds.profitbricks.features;
 
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;
-import static org.jclouds.profitbricks.xml.PBApiRequestParameters.SERVER_ENTITY;
+import static org.jclouds.profitbricks.xml.PBApiRequestParameters.SERVER_SPECIFICATION;
 import org.jclouds.rest.annotations.Payload;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.VirtualHost;
@@ -83,7 +84,7 @@ public interface ServerApi {
    /**
     * Creates a Virtual Server.
     *
-    * @param server server entity to create
+    * @param serverSpec server creation specification
     * @return server identifier or {@code null} if creation is failed
     */
    @POST // TODO live and expect test
@@ -92,7 +93,7 @@ public interface ServerApi {
    @Produces(MediaType.TEXT_XML)
    @MapBinder(CreateServerRequestBinder.class) // TODO add Fallback?
    @XMLResponseParser(CreateServerResponseHandler.class)
-   String createServer(@PayloadParam(SERVER_ENTITY) Server server);
+   String createServer(@PayloadParam(SERVER_SPECIFICATION) ServerCreationSpec serverSpec);
 
    /**
     * Resets an existing virtual server (POWER CYCLE).

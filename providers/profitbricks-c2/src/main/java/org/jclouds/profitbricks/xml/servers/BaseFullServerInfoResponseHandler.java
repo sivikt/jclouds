@@ -17,6 +17,8 @@
 package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.date.DateCodecFactory;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.xml.BasePBResponseHandler;
@@ -32,12 +34,12 @@ import static org.jclouds.profitbricks.domain.Server.*;
  */
 public abstract class BaseFullServerInfoResponseHandler<T> extends BasePBResponseHandler<T> {
 
-   protected ServerDescribingBuilder describingBuilder;
+   protected DescribingBuilder describingBuilder;
 
    @Inject
    public BaseFullServerInfoResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
-      describingBuilder = Server.describingBuilder();
+      describingBuilder = Server.builder();
    }
 
    protected void setServerInfoOnEndElementEvent(String qName) {
@@ -48,7 +50,6 @@ public abstract class BaseFullServerInfoResponseHandler<T> extends BasePBRespons
       else if (qName.equals("serverName")) describingBuilder.serverName(trimAndGetTagStrValue());
       else if (qName.equals("dataCenterId")) describingBuilder.dataCenterId(trimAndGetTagStrValue());
       else if (qName.equals("creationTime")) describingBuilder.creationTime(textBufferToIso8601Date());
-      else if (qName.equals("internetAccess")) describingBuilder.internetAccess(textBufferToBoolValue());
       else if (qName.equals("availabilityZone")) describingBuilder.availabilityZone(AvailabilityZone.fromValue(trimAndGetTagStrValue()));
       else if (qName.equals("provisioningState")) describingBuilder.provisioningState(ProvisioningState.fromValue(trimAndGetTagStrValue()));
       else if (qName.equals("virtualMachineState")) describingBuilder.virtualMachineState(VirtualMachineState.fromValue(trimAndGetTagStrValue()));

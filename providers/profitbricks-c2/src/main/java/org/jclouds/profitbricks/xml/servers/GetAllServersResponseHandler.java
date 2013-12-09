@@ -49,7 +49,7 @@ public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHand
       setServerInfoOnEndElementEvent(qName);
       if (qName.equals("return")) {
          servers.add(describingBuilder.build());
-         describingBuilder = Server.describingBuilder();
+         describingBuilder = Server.builder();
       }
       clearTextBuffer();
    }

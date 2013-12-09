@@ -24,9 +24,9 @@ package org.jclouds.profitbricks.xml;
 public final class PBApiRequestParameters {
 
    /**
-    * Used to pass {@link org.jclouds.profitbricks.domain.Server} entity into payload
+    * Used to pass {@link org.jclouds.profitbricks.domain.options.ServerCreationSpec} into payload
     */
-   public static final String SERVER_ENTITY = "server";
+   public static final String SERVER_SPECIFICATION = "serverSpec";
 
    private PBApiRequestParameters() { }
 

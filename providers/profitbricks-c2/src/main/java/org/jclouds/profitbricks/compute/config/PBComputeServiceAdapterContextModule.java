@@ -27,9 +27,10 @@ import org.jclouds.compute.domain.Template;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
+import org.jclouds.profitbricks.compute.functions.TemplateToServerCreationSpec;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.compute.functions.ServerToNodeMetadata;
-import org.jclouds.profitbricks.compute.functions.TemplateToNewServer;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link ComputeServiceAdapter}.
@@ -50,8 +51,8 @@ public class PBComputeServiceAdapterContextModule
       bind(new TypeLiteral<Function<Server, NodeMetadata>>() {
       }).to(Class.class.cast(ServerToNodeMetadata.class));
 
-      bind(new TypeLiteral<Function<Template, Server>>() {
-      }).to(Class.class.cast(TemplateToNewServer.class));
+      bind(new TypeLiteral<Function<Template, ServerCreationSpec>>() {
+      }).to(Class.class.cast(TemplateToServerCreationSpec.class));
 
       bind(new TypeLiteral<Function<Image, Image>>() {
       }).to(Class.class.cast(IdentityFunction.class));

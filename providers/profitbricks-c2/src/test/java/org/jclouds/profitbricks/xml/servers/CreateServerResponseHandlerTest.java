@@ -17,7 +17,6 @@
 package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.http.functions.BaseHandlerTest;
-import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;

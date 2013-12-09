@@ -16,8 +16,8 @@
  */
 package org.jclouds.profitbricks.xml.servers;
 
-import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.xml.servers.ServerEnumsToStringMapper;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -35,18 +35,18 @@ public class ServerEnumsToStringMapperTest {
    @Test
    public void testMapOsType() {
       assertEquals(mapper.mapOSType(null), "");
-      assertEquals(mapper.mapOSType(Server.OSType.OTHER), "OTHER");
-      assertEquals(mapper.mapOSType(Server.OSType.UNKNOWN), "UNKNOWN");
-      assertEquals(mapper.mapOSType(Server.OSType.WINDOWS), "WINDOWS");
-      assertEquals(mapper.mapOSType(Server.OSType.LINUX), "LINUX");
+      assertEquals(mapper.mapOSType(OSType.OTHER), "OTHER");
+      assertEquals(mapper.mapOSType(OSType.UNKNOWN), "UNKNOWN");
+      assertEquals(mapper.mapOSType(OSType.WINDOWS), "WINDOWS");
+      assertEquals(mapper.mapOSType(OSType.LINUX), "LINUX");
    }
 
    @Test
    public void testMapAvailabilityZone() {
       assertEquals(mapper.mapAvailabilityZone(null), "");
-      assertEquals(mapper.mapAvailabilityZone(Server.AvailabilityZone.AUTO), "AUTO");
-      assertEquals(mapper.mapAvailabilityZone(Server.AvailabilityZone.ZONE_1), "ZONE_1");
-      assertEquals(mapper.mapAvailabilityZone(Server.AvailabilityZone.ZONE_2), "ZONE_2");
+      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.AUTO), "AUTO");
+      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_1), "ZONE_1");
+      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_2), "ZONE_2");
    }
 
 }

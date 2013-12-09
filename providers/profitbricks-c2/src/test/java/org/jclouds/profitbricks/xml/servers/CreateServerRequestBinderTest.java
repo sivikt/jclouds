@@ -18,10 +18,10 @@ package org.jclouds.profitbricks.xml.servers;
 
 import com.google.common.collect.Maps;
 import org.jclouds.http.HttpRequest;
-import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
-import org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder;
-import org.jclouds.profitbricks.xml.servers.ServerEnumsToStringMapper;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -45,13 +45,14 @@ public class CreateServerRequestBinderTest {
    @BeforeMethod
    public void setUp() {
       mapperMock = createMock(ServerEnumsToStringMapper.class);
-      createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
+      ServerCreationSpecToXmlMapper specToXmlMapper = new ServerCreationSpecToXmlMapper(mapperMock);
+      createServerRequestBinder = new CreateServerRequestBinder(specToXmlMapper);
    }
 
    @Test
    public void checkAllFieldsAreMapped() {
-      expect(mapperMock.mapOSType(anyObject(Server.OSType.class))).andStubReturn("OS_TYPE");
-      expect(mapperMock.mapAvailabilityZone(anyObject(Server.AvailabilityZone.class))).andStubReturn("ZONE");
+      expect(mapperMock.mapOSType(anyObject(OSType.class))).andStubReturn("OS_TYPE");
+      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andStubReturn("ZONE");
       replay(mapperMock);
 
       HttpRequest request = createRequest();
@@ -69,15 +70,15 @@ public class CreateServerRequestBinderTest {
                                   "</request>" +
                                "</ws:createServer>";
 
-      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(maxInfoServer()));
+      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(maxInfoServerSpec()));
       assertNotNull(resultRequest);
       assertEquals(resultRequest.getPayload().getRawContent(), expectedPayload);
    }
 
    @Test
    public void checkNotEmptyFieldsAreMapped() {
-      expect(mapperMock.mapOSType(anyObject(Server.OSType.class))).andStubReturn("");
-      expect(mapperMock.mapAvailabilityZone(anyObject(Server.AvailabilityZone.class))).andStubReturn("");
+      expect(mapperMock.mapOSType(anyObject(OSType.class))).andStubReturn("");
+      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andStubReturn("");
       replay(mapperMock);
 
       HttpRequest request = createRequest();
@@ -90,7 +91,7 @@ public class CreateServerRequestBinderTest {
                                   "</request>" +
                                "</ws:createServer>";
 
-      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(minInfoServer()));
+      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(minInfoServerSpec()));
       assertNotNull(resultRequest);
       assertEquals(resultRequest.getPayload().getRawContent(), expectedPayload);
    }
@@ -99,29 +100,29 @@ public class CreateServerRequestBinderTest {
       return HttpRequest.builder().method("POST").endpoint("http://home.local").build();
    }
 
-   private HashMap<String,Object> createParams(Server server) {
+   private HashMap<String,Object> createParams(ServerCreationSpec serverCreationSpec) {
       HashMap<String,Object> postParams = Maps.newHashMap();
-      postParams.put(PBApiRequestParameters.SERVER_ENTITY, server);
+      postParams.put(PBApiRequestParameters.SERVER_SPECIFICATION, serverCreationSpec);
       return postParams;
    }
 
-   public Server minInfoServer() {
-      return Server.creationBuilder()
+   public ServerCreationSpec minInfoServerSpec() {
+      return ServerCreationSpec.builder()
             .cores(2)
             .ram(1024)
             .build();
    }
 
-   public Server maxInfoServer() {
-      return Server.creationBuilder()
+   public ServerCreationSpec maxInfoServerSpec() {
+      return ServerCreationSpec.builder()
             .dataCenterId("11111-2222-3333-4444-25195ac4515a")
             .serverName("LinuxServer")
             .cores(2)
             .ram(1024)
-            .osType(Server.OSType.LINUX)
+            .osType(OSType.LINUX)
             .internetAccess(true)
             .bootFromImageId("836acb2c-66f9-11e2-9478-0025901dfe2a")
-            .availabilityZone(Server.AvailabilityZone.ZONE_1)
+            .availabilityZone(AvailabilityZone.ZONE_1)
             .build();
    }
 

@@ -18,9 +18,6 @@ package org.jclouds.profitbricks.domain;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
-import org.jclouds.domain.Location;
-import org.jclouds.domain.LocationBuilder;
-import org.jclouds.domain.LocationScope;
 
 import java.util.Date;
 
@@ -31,30 +28,27 @@ import static com.google.common.base.Preconditions.checkState;
  * Represents information about Virtual Server, such as configuration,
  * provisioning status, power status, etc.
  *
- * TODO move builders to separate files. Revise fields rules
- *
  * @author Serj Sintsov
  */
 public class Server {
 
-   public static ServerCreationBuilder creationBuilder() {
-      return new ServerCreationBuilder();
-   }
-
-   public static ServerDescribingBuilder describingBuilder() {
-      return new ServerDescribingBuilder();
+   public static DescribingBuilder builder() {
+      return new DescribingBuilder();
    }
 
    public static abstract class Builder<T extends Builder<T>> {
 
       protected String dataCenterId;
       protected String serverName;
-      protected String bootFromImageId;
       protected int cores;
       protected int ram;
-      protected boolean internetAccess;
       protected OSType osType;
       protected AvailabilityZone availabilityZone;
+      protected String serverId;
+      protected Date creationTime;
+      protected Date lastModificationTime;
+      protected ProvisioningState provisioningState;
+      protected VirtualMachineState virtualMachineState;
 
       protected abstract T self();
 
@@ -66,8 +60,6 @@ public class Server {
       protected abstract Server buildInstance();
 
       /**
-       * If left empty, the server will be created in a new data center.
-       *
        * @see Server#getDataCenterId()
        */
       public T dataCenterId(String dataCenterId) {
@@ -80,14 +72,6 @@ public class Server {
        */
       public T serverName(String serverName) {
          this.serverName = serverName;
-         return self();
-      }
-
-      /**
-       * @see Server#getBootFromImageId()
-       */
-      public T bootFromImageId(String bootFromImageId) {
-         this.bootFromImageId = bootFromImageId;
          return self();
       }
 
@@ -105,8 +89,6 @@ public class Server {
       }
 
       /**
-       * The minimum RAM size is 256 MiB.
-       *
        * @see Server#getRam()
        */
       public T ram(int ram) {
@@ -120,23 +102,6 @@ public class Server {
       }
 
       /**
-       * Set to TRUE to connect the server to the Internet via the specified
-       * LAN ID. If the LAN is not specified, it is going to be created in
-       * the next available LAN ID, starting with LAN ID 1.
-       *
-       * @see Server#isInternetAccess()
-       */
-      public T internetAccess(boolean internetAccess) {
-         this.internetAccess = internetAccess;
-         return self();
-      }
-
-      /**
-       * Sets the zone in which the server is going to be created.
-       * Servers from different zones are located in different physical locations.
-       * If set to {@link AvailabilityZone#AUTO} or left empty, servers will be
-       * created in a random zone.
-       *
        * @see Server#getAvailabilityZone()
        */
       public T availabilityZone(AvailabilityZone zone) {
@@ -145,9 +110,6 @@ public class Server {
       }
 
       /**
-       * If left empty, the server will inherit the OS Type of its selected
-       * boot image/storage.
-       *
        * @see Server#getOsType()
        */
       public T osType(OSType osType) {
@@ -155,43 +117,10 @@ public class Server {
          return self();
       }
 
-      protected void checkFields() {
-         checkCores();
-         checkRam();
-      }
-   }
-
-   /**
-    * Use this builder to correctly create an new {@link Server} entity which you want to
-    * add in your cloud.
-    */
-   public static class ServerCreationBuilder extends Builder<ServerCreationBuilder> {
-      @Override
-      protected ServerCreationBuilder self() {
-         return this;
-      }
-
-      @Override
-      protected Server buildInstance() {
-         return new Server(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone, bootFromImageId);
-      }
-   }
-
-   /**
-    * Use this builder to create an existing server instance from any source.
-    */
-   public static class ServerDescribingBuilder extends Builder<ServerDescribingBuilder> {
-
-      protected String serverId;
-      protected Date creationTime;
-      protected Date lastModificationTime;
-      protected ProvisioningState provisioningState;
-      protected VirtualMachineState virtualMachineState;
-
       /**
        * @see Server#getServerId()
        */
-      public ServerDescribingBuilder serverId(String serverId) {
+      public T serverId(String serverId) {
          this.serverId = checkNotNull(serverId, "serverId");
          return self();
       }
@@ -199,7 +128,7 @@ public class Server {
       /**
        * @see Server#getCreationTime()
        */
-      public ServerDescribingBuilder creationTime(Date creationTime) {
+      public T creationTime(Date creationTime) {
          this.creationTime = creationTime;
          return self();
       }
@@ -207,7 +136,7 @@ public class Server {
       /**
        * @see Server#getLastModificationTime()
        */
-      public ServerDescribingBuilder lastModificationTime(Date lastModificationTime) {
+      public T lastModificationTime(Date lastModificationTime) {
          this.lastModificationTime = lastModificationTime;
          return self();
       }
@@ -215,7 +144,7 @@ public class Server {
       /**
        * @see Server#getProvisioningState()
        */
-      public ServerDescribingBuilder provisioningState(ProvisioningState provisioningState) {
+      public T provisioningState(ProvisioningState provisioningState) {
          this.provisioningState = checkNotNull(provisioningState);
          return self();
       }
@@ -223,19 +152,14 @@ public class Server {
       /**
        * @see Server#getVirtualMachineState()
        */
-      public ServerDescribingBuilder virtualMachineState(VirtualMachineState virtualMachineState) {
+      public T virtualMachineState(VirtualMachineState virtualMachineState) {
          this.virtualMachineState = checkNotNull(virtualMachineState);
          return self();
       }
 
-      @Override
-      protected ServerDescribingBuilder self() {
-         return this;
-      }
-
-      @Override
       protected void checkFields() {
-         super.checkFields();
+         checkCores();
+         checkRam();
          checkNotNull(serverId, "serverId");
          checkNotNull(dataCenterId, "dataCenterId");
          availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
@@ -243,36 +167,35 @@ public class Server {
          provisioningState = provisioningState == null ? ProvisioningState.UNRECOGNIZED : provisioningState;
          virtualMachineState = virtualMachineState == null ? VirtualMachineState.UNRECOGNIZED : virtualMachineState;
       }
+   }
+
+   public static class DescribingBuilder extends Builder<DescribingBuilder> {
+      @Override
+      protected DescribingBuilder self() {
+         return this;
+      }
 
       @Override
       protected Server buildInstance() {
-         return new Server(dataCenterId, serverId, serverName, cores, ram, internetAccess, osType, availabilityZone,
-                           creationTime, lastModificationTime, provisioningState, virtualMachineState, bootFromImageId);
+         return new Server(dataCenterId, serverId, serverName, cores, ram, osType, availabilityZone, creationTime,
+                           lastModificationTime, provisioningState, virtualMachineState);
       }
    }
 
-   protected Server(String dataCenterId, String serverName, int cores, int ram, boolean internetAccess, OSType osType,
-                    AvailabilityZone availabilityZone, String bootFromImageId) {
-      this(dataCenterId, null, serverName, cores, ram, internetAccess, osType, availabilityZone, null, null, null, null,
-           bootFromImageId);
-   }
-
-   protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, boolean internetAccess,
-                    OSType osType, AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
-                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState, String bootFromImageId) {
+   protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, OSType osType,
+                    AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
+                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
       this.dataCenterId = Strings.emptyToNull(dataCenterId);
       this.serverId = serverId;
       this.serverName = Strings.emptyToNull(serverName);
       this.cores = cores;
       this.ram = ram;
-      this.internetAccess = internetAccess;
       this.osType = osType;
       this.availabilityZone = availabilityZone;
       this.creationTime = creationTime;
       this.lastModificationTime = lastModificationTime;
       this.provisioningState = provisioningState;
       this.virtualMachineState = virtualMachineState;
-      this.bootFromImageId = Strings.emptyToNull(bootFromImageId);
    }
 
    public enum VirtualMachineState {
@@ -291,67 +214,15 @@ public class Server {
       }
    }
 
-   public enum OSType {
-      WINDOWS, LINUX, OTHER, UNKNOWN;
-
-      public String value() {
-         return name();
-      }
-
-      public static OSType fromValue(String value) {
-         try {
-            return valueOf(value);
-         } catch (IllegalArgumentException e) {
-            return UNKNOWN;
-         }
-      }
-   }
-
-   public enum AvailabilityZone {
-      AUTO, ZONE_1, ZONE_2;
-
-      public String value() {
-         return name();
-      }
-
-      public static AvailabilityZone fromValue(String value) {
-         try {
-            return valueOf(value);
-         } catch (IllegalArgumentException e) {
-            return AUTO;
-         }
-      }
-
-      public Location toLocation() {
-         return toLocation(null);
-      }
-
-      public Location toLocation(Location parent) {
-         return new LocationBuilder()
-               .id(value())
-               .description(value())
-               .scope(LocationScope.ZONE)
-               .parent(parent)
-               .build();
-      }
-   }
-
    private String dataCenterId;
    private String serverId;
    private String serverName;
-   private String bootFromImageId;
-
    private int cores;
    private int ram;
-
-   private boolean internetAccess;
-
    private Date creationTime;
    private Date lastModificationTime;
-
    private ProvisioningState provisioningState;
    private VirtualMachineState virtualMachineState;
-
    private OSType osType;
    private AvailabilityZone availabilityZone;
 
@@ -376,14 +247,6 @@ public class Server {
       return serverName;
    }
 
-   /**
-    * TODO investigate should we use it here or not. As for now this field is for only server creation
-    * Defines an existing CD-ROM/DVD image ID to be set as boot device of the server.
-    * A virtual CD-ROM/DVD drive with the mounted image will be connected to the server.
-    */
-   public String getBootFromImageId() {
-      return bootFromImageId;
-   }
 
    /**
     * Number of cores to be assigned to the specified server
@@ -398,13 +261,6 @@ public class Server {
     */
    public int getRam() {
       return ram;
-   }
-
-   /**
-    * Returns {@code true} if server is connected to a public LAN
-    */
-   public boolean isInternetAccess() {
-      return internetAccess;
    }
 
    /**
@@ -470,7 +326,6 @@ public class Server {
             .add("dataCenterId", dataCenterId)
             .add("serverId", serverId)
             .add("serverName", serverName)
-            .add("internetAccess", internetAccess)
             .add("creationTime", creationTime)
             .add("lastModificationTime", lastModificationTime)
             .add("cores", cores)

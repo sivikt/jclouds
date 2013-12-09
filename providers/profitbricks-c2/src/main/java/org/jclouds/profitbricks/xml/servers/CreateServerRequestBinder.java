@@ -16,9 +16,8 @@
  */
 package org.jclouds.profitbricks.xml.servers;
 
-import com.google.common.base.Strings;
 import org.jclouds.http.HttpRequest;
-import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
 import org.jclouds.rest.MapBinder;
 
@@ -35,49 +34,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CreateServerRequestBinder implements MapBinder {
 
-   private ServerEnumsToStringMapper serverEnumsMapper;
+   private ServerCreationSpecToXmlMapper specToXmlMapper;
 
    @Inject
-   public CreateServerRequestBinder(ServerEnumsToStringMapper serverEnumsMapper) {
-      this.serverEnumsMapper = checkNotNull(serverEnumsMapper, "serverEnumsMapper");
+   public CreateServerRequestBinder(ServerCreationSpecToXmlMapper specToRequestXmlMapper) {
+      this.specToXmlMapper = checkNotNull(specToRequestXmlMapper, "specToXmlMapper");
    }
 
    @Override
    public <R extends HttpRequest> R bindToRequest(R request, Map<String, Object> postParams) {
       checkNotNull(request, "request");
 
-      Object serverObj = postParams.get(PBApiRequestParameters.SERVER_ENTITY);
-      checkNotNull(serverObj, "server");
-      Server server = Server.class.cast(serverObj);
+      Object serverSpecObj = postParams.get(PBApiRequestParameters.SERVER_SPECIFICATION);
+      checkNotNull(serverSpecObj, "server specification");
+      ServerCreationSpec serverSpec = ServerCreationSpec.class.cast(serverSpecObj);
 
-      return createRequest(request, generateRequestPayload(server));
-   }
-
-   private String generateRequestPayload(Server server) {
-      return "<ws:createServer>" +
-                "<request>" +
-                   addIfNotEmpty("<dataCenterId>%s</dataCenterId>", server.getDataCenterId()) +
-                   addIfNotEmpty("<serverName>%s</serverName>", server.getServerName()) +
-                   justAdd("<cores>%s</cores>", server.getCores()) +
-                   justAdd("<ram>%s</ram>", server.getRam()) +
-                   justAdd("<internetAccess>%s</internetAccess>", server.isInternetAccess()) +
-                   addIfNotEmpty("<bootFromImageId>%s</bootFromImageId>", server.getBootFromImageId()) +
-                   addIfNotEmpty("<osType>%s</osType>", serverEnumsMapper.mapOSType(server.getOsType())) +
-                   addIfNotEmpty("<availabilityZone>%s</availabilityZone>", serverEnumsMapper.mapAvailabilityZone(server.getAvailabilityZone())) +
-                "</request>" +
-             "</ws:createServer>";
-   }
-
-   private String addIfNotEmpty(String pattern, String param) {
-      return Strings.isNullOrEmpty(param) ? "" : String.format(pattern, param);
-   }
-
-   private String justAdd(String pattern, int param) {
-      return String.format(pattern, param);
-   }
-
-   private String justAdd(String pattern, boolean param) {
-      return String.format(pattern, param);
+      return createRequest(request, specToXmlMapper.map(serverSpec));
    }
 
    private <R extends HttpRequest> R createRequest(R fromRequest, String payload) {

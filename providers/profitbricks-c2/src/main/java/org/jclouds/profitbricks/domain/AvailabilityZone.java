@@ -14,15 +14,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.compute.functions;
+package org.jclouds.profitbricks.domain;
+
+import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationBuilder;
+import org.jclouds.domain.LocationScope;
 
 /**
- * Test for {@link TemplateToNewServer}
+ * ProfitBricks' possible server high availability zones.
  *
  * @author Serj Sintsov
  */
-public class TemplateToNewServerTest {
+public enum AvailabilityZone {
+   AUTO, ZONE_1, ZONE_2;
 
+   public String value() {
+      return name();
+   }
 
+   public static AvailabilityZone fromValue(String value) {
+      try {
+         return valueOf(value);
+      } catch (IllegalArgumentException e) {
+         return AUTO;
+      }
+   }
 
+   public Location toLocation(Location parent) {
+      return new LocationBuilder()
+            .id(value())
+            .description(value())
+            .scope(LocationScope.ZONE)
+            .parent(parent)
+            .build();
+   }
 }

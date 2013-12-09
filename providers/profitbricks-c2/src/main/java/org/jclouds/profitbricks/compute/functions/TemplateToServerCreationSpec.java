@@ -20,7 +20,9 @@ import com.google.common.base.Function;
 import org.jclouds.compute.domain.Template;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationScope;
-import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
+import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,35 +34,36 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Serj Sintsov
  */
-public class TemplateToNewServer implements Function<Template, Server> {
+public class TemplateToServerCreationSpec implements Function<Template, ServerCreationSpec> {
 
    @Override
-   public Server apply(Template template) {
+   public ServerCreationSpec apply(Template template) {
       checkNotNull(template, "template");
 
-      Server.ServerCreationBuilder creationBuilder = Server.creationBuilder();
-
-      chooseDC(creationBuilder, template);
-      chooseAvailabilityZone(creationBuilder, template);
-
-      return creationBuilder
-                   .serverName(template.getHardware().getName())
-                   .cores((int) template.getHardware().getProcessors().get(0).getCores())
-                   .ram(template.getHardware().getRam())
-                   .bootFromImageId(template.getImage().getId())
-                   .osType(Server.OSType.fromValue(template.getImage().getOperatingSystem().getFamily().name()))
-                   .build();
+      return ServerCreationSpec.builder()
+             .dataCenterId(chooseDC(template))
+             .availabilityZone(chooseAvailabilityZone(template))
+             .serverName(template.getHardware().getName())
+             .cores((int) template.getHardware().getProcessors().get(0).getCores())
+             .ram(template.getHardware().getRam())
+             .bootFromImageId(template.getImage().getId())
+             .osType(OSType.fromValue(template.getImage().getOperatingSystem().getFamily().name()))
+             .build();
    }
 
-   private void chooseDC(Server.ServerCreationBuilder builder, Template template) {
+   private String chooseDC(Template template) {
       Location dcLocation = findLocation(template.getLocation(), LocationScope.ZONE);
       if (dcLocation != null)
-         builder.dataCenterId(dcLocation.getId());
+         return dcLocation.getId();
+
+      return null;
    }
 
-   private void chooseAvailabilityZone(Server.ServerCreationBuilder builder, Template template) {
+   private AvailabilityZone chooseAvailabilityZone(Template template) {
       if (template.getLocation().getScope() == LocationScope.HOST)
-         builder.availabilityZone(Server.AvailabilityZone.fromValue(template.getLocation().getId()));
+         return AvailabilityZone.fromValue(template.getLocation().getId());
+      else
+         return null;
    }
 
    private Location findLocation(Location location, LocationScope scope) {

@@ -20,6 +20,8 @@ import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.domain.LocationScope;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 import static org.jclouds.profitbricks.domain.Server.VirtualMachineState.BLOCKED;
@@ -73,14 +75,14 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getHardware().getProcessors().get(0).getSpeed(), 0.0);
       assertEquals(nodeMetadata.getHardware().getRam(), 1024);
       assertNotNull(nodeMetadata.getHardware().getLocation());
-      assertEquals(nodeMetadata.getHardware().getLocation().getId(), Server.AvailabilityZone.ZONE_1.value());
-      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), Server.AvailabilityZone.ZONE_1.value());
+      assertEquals(nodeMetadata.getHardware().getLocation().getId(), AvailabilityZone.ZONE_1.value());
+      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), AvailabilityZone.ZONE_1.value());
       assertEquals(nodeMetadata.getHardware().getLocation().getScope(), LocationScope.ZONE);
       assertEquals(nodeMetadata.getHardware().getLocation().getParent(), nodeMetadata.getLocation());
    }
 
    public Server actualServer() {
-      return Server.describingBuilder()
+      return Server.builder()
             .dataCenterId("11111-2222-3333-4444-25195ac4515a")
             .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
             .serverName("LinuxServer")
@@ -90,26 +92,25 @@ public class ServerToNodeMetadataTest {
             .lastModificationTime(new SimpleDateFormatDateService().iso8601SecondsDateParse("2013-11-27T21:43:15Z"))
             .provisioningState(ProvisioningState.AVAILABLE)
             .virtualMachineState(Server.VirtualMachineState.RUNNING)
-            .osType(Server.OSType.LINUX)
-            .internetAccess(true)
-            .availabilityZone(Server.AvailabilityZone.ZONE_1)
+            .osType(OSType.LINUX)
+            .availabilityZone(AvailabilityZone.ZONE_1)
             .build();
    }
 
    @Test
    public void testMapOS() {
       ServerToNodeMetadata func = new ServerToNodeMetadata();
-      assertEquals(func.mapOS(Server.OSType.LINUX).getFamily(), OsFamily.LINUX);
-      assertEquals(func.mapOS(Server.OSType.LINUX).getDescription(), OsFamily.LINUX.value());
+      assertEquals(func.mapOS(OSType.LINUX).getFamily(), OsFamily.LINUX);
+      assertEquals(func.mapOS(OSType.LINUX).getDescription(), OsFamily.LINUX.value());
 
-      assertEquals(func.mapOS(Server.OSType.WINDOWS).getFamily(), OsFamily.WINDOWS);
-      assertEquals(func.mapOS(Server.OSType.WINDOWS).getDescription(), OsFamily.WINDOWS.value());
+      assertEquals(func.mapOS(OSType.WINDOWS).getFamily(), OsFamily.WINDOWS);
+      assertEquals(func.mapOS(OSType.WINDOWS).getDescription(), OsFamily.WINDOWS.value());
 
-      assertEquals(func.mapOS(Server.OSType.OTHER).getFamily(), OsFamily.UNRECOGNIZED);
-      assertEquals(func.mapOS(Server.OSType.OTHER).getDescription(), OsFamily.UNRECOGNIZED.value());
+      assertEquals(func.mapOS(OSType.OTHER).getFamily(), OsFamily.UNRECOGNIZED);
+      assertEquals(func.mapOS(OSType.OTHER).getDescription(), OsFamily.UNRECOGNIZED.value());
 
-      assertEquals(func.mapOS(Server.OSType.UNKNOWN).getFamily(), OsFamily.UNRECOGNIZED);
-      assertEquals(func.mapOS(Server.OSType.UNKNOWN).getDescription(), OsFamily.UNRECOGNIZED.value());
+      assertEquals(func.mapOS(OSType.UNKNOWN).getFamily(), OsFamily.UNRECOGNIZED);
+      assertEquals(func.mapOS(OSType.UNKNOWN).getDescription(), OsFamily.UNRECOGNIZED.value());
 
       assertEquals(func.mapOS(null).getFamily(), OsFamily.UNRECOGNIZED);
       assertEquals(func.mapOS(null).getDescription(), OsFamily.UNRECOGNIZED.value());

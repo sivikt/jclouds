@@ -19,6 +19,8 @@ package org.jclouds.profitbricks.xml.servers;
 import com.google.common.collect.Lists;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
 import org.testng.annotations.Test;
@@ -64,7 +66,6 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
          assertEquals(actualServer.getProvisioningState(), expectedServer.getProvisioningState(), errForServer(expectedServer));
          assertEquals(actualServer.getServerName(), expectedServer.getServerName(), errForServer(expectedServer));
          assertEquals(actualServer.getVirtualMachineState(), expectedServer.getVirtualMachineState(), errForServer(expectedServer));
-         assertEquals(actualServer.isInternetAccess(), expectedServer.isInternetAccess(), errForServer(expectedServer));
       }
    }
 
@@ -83,7 +84,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
       SimpleDateFormatDateService dateService = new SimpleDateFormatDateService();
 
       return Lists.newArrayList(
-            Server.describingBuilder()
+            Server.builder()
                   .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
                   .serverId("fd4ffc52-1f2e-4a82-b155-75b2d5e6dd68")
                   .serverName("server")
@@ -93,12 +94,11 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:23:47.742Z"))
                   .provisioningState(ProvisioningState.AVAILABLE)
                   .virtualMachineState(Server.VirtualMachineState.RUNNING)
-                  .osType(Server.OSType.LINUX)
-                  .internetAccess(false)
-                  .availabilityZone(Server.AvailabilityZone.AUTO)
+                  .osType(OSType.LINUX)
+                  .availabilityZone(AvailabilityZone.AUTO)
                   .build(),
 
-            Server.describingBuilder()
+            Server.builder()
                   .dataCenterId("89046edb-2a50-4d0f-a153-6576ee7d22a7")
                   .serverId("722694b6-8635-4433-8dea-012860cab5fe")
                   .serverName("FirstServer")
@@ -108,12 +108,11 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:23:50.742Z"))
                   .provisioningState(ProvisioningState.INACTIVE)
                   .virtualMachineState(Server.VirtualMachineState.PAUSED)
-                  .osType(Server.OSType.WINDOWS)
-                  .internetAccess(true)
-                  .availabilityZone(Server.AvailabilityZone.ZONE_1)
+                  .osType(OSType.WINDOWS)
+                  .availabilityZone(AvailabilityZone.ZONE_1)
                   .build(),
 
-            Server.describingBuilder()
+            Server.builder()
                   .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
                   .serverId("93981076-2511-4aa7-82c0-1e4df0d1737f")
                   .serverName("server")
@@ -123,9 +122,8 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .lastModificationTime(dateService.iso8601DateParse("2013-11-26T11:31:35.383Z"))
                   .provisioningState(ProvisioningState.DELETED)
                   .virtualMachineState(Server.VirtualMachineState.SHUTOFF)
-                  .osType(Server.OSType.OTHER)
-                  .internetAccess(false)
-                  .availabilityZone(Server.AvailabilityZone.ZONE_2)
+                  .osType(OSType.OTHER)
+                  .availabilityZone(AvailabilityZone.ZONE_2)
                   .build()
       );
    }
