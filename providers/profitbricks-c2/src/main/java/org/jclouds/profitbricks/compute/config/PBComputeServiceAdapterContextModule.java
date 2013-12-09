@@ -20,14 +20,14 @@ import com.google.common.base.Function;
 import com.google.inject.TypeLiteral;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
-import org.jclouds.compute.domain.Hardware;
-import org.jclouds.compute.domain.Image;
-import org.jclouds.compute.domain.NodeMetadata;
-import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.*;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
+import org.jclouds.profitbricks.compute.functions.OSTypeToOperatingSystem;
+import org.jclouds.profitbricks.compute.functions.ServerStateToNodeMetadataStatus;
 import org.jclouds.profitbricks.compute.functions.TemplateToServerCreationSpec;
+import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.compute.functions.ServerToNodeMetadata;
 import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
@@ -53,6 +53,12 @@ public class PBComputeServiceAdapterContextModule
 
       bind(new TypeLiteral<Function<Template, ServerCreationSpec>>() {
       }).to(Class.class.cast(TemplateToServerCreationSpec.class));
+
+      bind(new TypeLiteral<Function<OSType, OperatingSystem>>() {
+      }).to(Class.class.cast(OSTypeToOperatingSystem.class));
+
+      bind(new TypeLiteral<Function<Server, NodeMetadata.Status>>() {
+      }).to(Class.class.cast(ServerStateToNodeMetadataStatus.class));
 
       bind(new TypeLiteral<Function<Image, Image>>() {
       }).to(Class.class.cast(IdentityFunction.class));

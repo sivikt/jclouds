@@ -21,17 +21,14 @@ import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.profitbricks.domain.OSType;
 
-import javax.inject.Singleton;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A function for transforming a ProfitBricks {@link OSType} to a native
  * {@link OperatingSystem} object.
- *               todo test
+ *
  * @author Serj Sintsov
  */
-@Singleton
 public class OSTypeToOperatingSystem implements Function<OSType, OperatingSystem> {
 
    @Override
