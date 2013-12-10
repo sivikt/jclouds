@@ -22,7 +22,6 @@ import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -39,21 +38,14 @@ import static org.testng.Assert.assertNotNull;
 @Test(groups = "unit", testName = "CreateServerRequestBinderTest")
 public class CreateServerRequestBinderTest {
 
-   private CreateServerRequestBinder createServerRequestBinder;
-   private ServerEnumsToStringMapper mapperMock;
-
-   @BeforeMethod
-   public void setUp() {
-      mapperMock = createMock(ServerEnumsToStringMapper.class);
-      ServerCreationSpecToXmlMapper specToXmlMapper = new ServerCreationSpecToXmlMapper(mapperMock);
-      createServerRequestBinder = new CreateServerRequestBinder(specToXmlMapper);
-   }
-
    @Test
    public void checkAllFieldsAreMapped() {
-      expect(mapperMock.mapOSType(anyObject(OSType.class))).andStubReturn("OS_TYPE");
-      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andStubReturn("ZONE");
+      ServerEnumsToStringMapper mapperMock = createMock(ServerEnumsToStringMapper.class);
+      expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("OS_TYPE");
+      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("ZONE");
       replay(mapperMock);
+
+      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(new ServerCreationSpecToXmlMapper(mapperMock));
 
       HttpRequest request = createRequest();
 
@@ -77,9 +69,13 @@ public class CreateServerRequestBinderTest {
 
    @Test
    public void checkNotEmptyFieldsAreMapped() {
-      expect(mapperMock.mapOSType(anyObject(OSType.class))).andStubReturn("");
-      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andStubReturn("");
+      ServerEnumsToStringMapper mapperMock = createMock(ServerEnumsToStringMapper.class);
+
+      expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("");
+      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("");
       replay(mapperMock);
+
+      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(new ServerCreationSpecToXmlMapper(mapperMock));
 
       HttpRequest request = createRequest();
 
