@@ -46,12 +46,13 @@ public class GetAllServersResponseHandler extends BaseFullServerInfoResponseHand
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) {
-         servers.add(describingBuilder.build());
-         describingBuilder = Server.builder();
+      if (currentServer == null)
+         super.endElement(uri, name, qName);
+
+      if (currentServer != null) {
+         servers.add(currentServer);
+         currentServer = null;
       }
-      clearTextBuffer();
    }
 
 }

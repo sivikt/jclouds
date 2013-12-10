@@ -2,20 +2,57 @@
    <S:Body>
       <ns2:getServerResponse xmlns:ns2="http://ws.api.profitbricks.com/">
          <return>
-            <requestId>1257559</requestId>
-            <dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>
-            <dataCenterVersion>9</dataCenterVersion>
-            <serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId>
+            <dataCenterId>95d08b87-36e5-47fd-9fb5-c244f566bc62</dataCenterId>
+            <dataCenterVersion>16</dataCenterVersion>
+            <serverId>b804c14f-1d73-4204-a697-e1bd4ebd04c9</serverId>
             <serverName>server</serverName>
-            <cores>2</cores>
-            <ram>1024</ram>
-            <internetAccess>false</internetAccess>
+            <cores>3</cores>
+            <ram>2048</ram>
+            <internetAccess>true</internetAccess>
+            <ips>46.16.77.120</ips>
+            <ips>46.16.79.250</ips>
+            <ips>46.16.79.249</ips>
+            <ips>78.137.99.213</ips>
+            <romDrives>
+               <bootDevice>true</bootDevice>
+               <imageId>db2b3ab9-b0ec-11e2-a401-0025901dfe2a</imageId>
+               <imageName>ubuntu-13.04-server-amd64.iso</imageName>
+            </romDrives>
+            <nics>
+               <dataCenterId>95d08b87-36e5-47fd-9fb5-c244f566bc62</dataCenterId>
+               <dataCenterVersion>16</dataCenterVersion>
+               <nicId>f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7</nicId>
+               <lanId>1</lanId>
+               <internetAccess>true</internetAccess>
+               <serverId>b804c14f-1d73-4204-a697-e1bd4ebd04c9</serverId>
+               <ips>78.137.99.213</ips>
+               <macAddress>02:01:a4:af:c0:f8</macAddress>
+               <dhcpActive>true</dhcpActive>
+               <gatewayIp>78.137.99.1</gatewayIp>
+               <provisioningState>AVAILABLE</provisioningState>
+            </nics>
+            <nics>
+               <dataCenterId>95d08b87-36e5-47fd-9fb5-c244f566bc62</dataCenterId>
+               <dataCenterVersion>16</dataCenterVersion>
+               <nicId>db37ecd8-daec-4b00-b629-e3e54d03ea13</nicId>
+               <nicName>MainMain</nicName>
+               <lanId>1</lanId>
+               <internetAccess>false</internetAccess>
+               <serverId>b804c14f-1d73-4204-a697-e1bd4ebd04c9</serverId>
+               <ips>46.16.77.120</ips>
+               <ips>46.16.79.250</ips>
+               <ips>46.16.79.249</ips>
+               <macAddress>02:01:b2:6f:24:61</macAddress>
+               <dhcpActive>false</dhcpActive>
+               <gatewayIp>46.16.77.1</gatewayIp>
+               <provisioningState>INPROCESS</provisioningState>
+            </nics>
             <provisioningState>AVAILABLE</provisioningState>
             <virtualMachineState>RUNNING</virtualMachineState>
-            <creationTime>2013-11-26T11:31:35.383Z</creationTime>
-            <lastModificationTime>2013-11-26T11:31:35.383Z</lastModificationTime>
-            <osType>WINDOWS</osType>
-            <availabilityZone>AUTO</availabilityZone>
+            <creationTime>2013-12-09T12:11:02.314Z</creationTime>
+            <lastModificationTime>2013-12-09T13:07:33.008Z</lastModificationTime>
+            <osType>LINUX</osType>
+            <availabilityZone>ZONE_2</availabilityZone>
          </return>
       </ns2:getServerResponse>
    </S:Body>

@@ -17,6 +17,7 @@
 package org.jclouds.profitbricks.compute.functions;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
 import org.jclouds.compute.domain.HardwareBuilder;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.NodeMetadataBuilder;
@@ -25,6 +26,7 @@ import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
+import org.jclouds.location.suppliers.all.JustProvider;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.Server;
 
@@ -40,12 +42,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
 
+   private JustProvider provider;
    private Function<OSType, OperatingSystem> osTypeToOperatingSystem;
    private Function<Server, NodeMetadata.Status> serverStateToNodeStatus;
 
    @Inject
-   public ServerToNodeMetadata(Function<OSType, OperatingSystem> osTypeToOperatingSystem,
+   public ServerToNodeMetadata(JustProvider provider, Function<OSType, OperatingSystem> osTypeToOperatingSystem,
                                Function<Server, NodeMetadata.Status> serverStateToNodeStatus) {
+      this.provider = checkNotNull(provider, "provider");
       this.osTypeToOperatingSystem = checkNotNull(osTypeToOperatingSystem, "osTypeToOperatingSystem");
       this.serverStateToNodeStatus = checkNotNull(serverStateToNodeStatus, "serverStateToNodeStatus");
    }
@@ -54,10 +58,11 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
    public NodeMetadata apply(Server server) {
       checkNotNull(server, "server");
 
-      Location region = new LocationBuilder()
+      Location dc = new LocationBuilder()
          .id(server.getDataCenterId())
-         .description(server.getDataCenterId())
+         .description("data_center")
          .scope(LocationScope.ZONE)
+         .parent(Iterables.getOnlyElement(provider.get()))
          .build();
 
       /**
@@ -65,13 +70,18 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
        * {@link org.jclouds.profitbricks.domain.Server.AvailabilityZone}.
        * For the moment we don't know iso codes for this zones.
        */
-      Location serverZone = server.getAvailabilityZone().toLocation(region);
+      Location serverAvailabilityZone = new LocationBuilder()
+            .id(server.getAvailabilityZone().value())
+            .description("availability_zone")
+            .scope(LocationScope.ZONE)
+            .parent(dc)
+            .build();
 
       HardwareBuilder hardwareBuilder = new HardwareBuilder()
          .id(server.getServerId())
          .processor(new Processor(server.getCores(), 0))
          .ram(server.getRam())
-         .location(serverZone);
+         .location(serverAvailabilityZone);
 
       NodeMetadataBuilder nodeMetadataBuilder = new NodeMetadataBuilder()
          .id(server.getServerId())
@@ -81,7 +91,8 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
          .status(serverStateToNodeStatus.apply(server))
          .operatingSystem(osTypeToOperatingSystem.apply(server.getOsType()))
          .hardware(hardwareBuilder.build())
-         .location(region);
+         .publicAddresses(server.getIPs())
+         .location(dc);
 
       return nodeMetadataBuilder.build();
    }

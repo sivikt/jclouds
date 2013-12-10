@@ -31,21 +31,6 @@
             <osType>WINDOWS</osType>
             <availabilityZone>ZONE_1</availabilityZone>
          </return>
-         <return>
-            <dataCenterId>79046edb-2a50-4d0f-a153-6576ee7d22a6</dataCenterId>
-            <dataCenterVersion>6</dataCenterVersion>
-            <serverId>93981076-2511-4aa7-82c0-1e4df0d1737f</serverId>
-            <serverName>server</serverName>
-            <cores>2</cores>
-            <ram>2048</ram>
-            <internetAccess>false</internetAccess>
-            <provisioningState>DELETED</provisioningState>
-            <virtualMachineState>SHUTOFF</virtualMachineState>
-            <creationTime>2013-11-26T11:31:35.383Z</creationTime>
-            <lastModificationTime>2013-11-26T11:31:35.383Z</lastModificationTime>
-            <osType>OTHER</osType>
-            <availabilityZone>ZONE_2</availabilityZone>
-         </return>
       </ns2:getAllServersResponse>
    </S:Body>
 </S:Envelope>

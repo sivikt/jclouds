@@ -16,10 +16,6 @@
  */
 package org.jclouds.profitbricks.domain;
 
-import org.jclouds.domain.Location;
-import org.jclouds.domain.LocationBuilder;
-import org.jclouds.domain.LocationScope;
-
 /**
  * ProfitBricks' possible server high availability zones.
  *
@@ -40,12 +36,4 @@ public enum AvailabilityZone {
       }
    }
 
-   public Location toLocation(Location parent) {
-      return new LocationBuilder()
-            .id(value())
-            .description(value())
-            .scope(LocationScope.ZONE)
-            .parent(parent)
-            .build();
-   }
 }

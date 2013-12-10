@@ -17,21 +17,29 @@
 package org.jclouds.profitbricks.compute.functions;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Sets;
 import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.OperatingSystem;
 import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
+import org.jclouds.domain.Location;
+import org.jclouds.domain.LocationBuilder;
 import org.jclouds.domain.LocationScope;
-import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.location.suppliers.all.JustProvider;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
+import org.jclouds.profitbricks.domain.ProvisioningState;
+import org.jclouds.profitbricks.domain.NIC;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.replay;
 import org.testng.annotations.Test;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -54,23 +62,29 @@ public class ServerToNodeMetadataTest {
 
       Function<OSType, OperatingSystem> osTypeToOperatingSystemMock = createMock(Function.class);
       Function<Server, NodeMetadata.Status> serverStateToNodeStatusMock = createMock(Function.class);
+      JustProvider provider = createMock(JustProvider.class);
 
       expect(osTypeToOperatingSystemMock.apply(anyObject(OSType.class))).andStubReturn(stubOs);
       expect(serverStateToNodeStatusMock.apply(anyObject(Server.class))).andStubReturn(NodeMetadata.Status.RUNNING);
 
+      Location regionLoc = new LocationBuilder().id("region").description("reg").scope(LocationScope.REGION).build();
+      Set locations = Sets.newHashSet(new LocationImpl());
+      expect(provider.get()).andStubReturn(locations);
+
       replay(osTypeToOperatingSystemMock);
       replay(serverStateToNodeStatusMock);
+      replay(provider);
 
-      ServerToNodeMetadata func = new ServerToNodeMetadata(osTypeToOperatingSystemMock, serverStateToNodeStatusMock);
+      ServerToNodeMetadata func = new ServerToNodeMetadata(provider, osTypeToOperatingSystemMock, serverStateToNodeStatusMock);
 
-      Server actualServer = actualServer();
-      NodeMetadata nodeMetadata = func.apply(actualServer);
+      Server expectedServer = expectedServer();
+      NodeMetadata nodeMetadata = func.apply(expectedServer);
 
       assertNotNull(nodeMetadata);
-      assertEquals(nodeMetadata.getId(), actualServer.getServerId());
-      assertEquals(nodeMetadata.getHostname(), actualServer.getServerName());
-      assertEquals(nodeMetadata.getName(), actualServer.getServerName());
-      assertEquals(nodeMetadata.getProviderId(), actualServer.getServerId());
+      assertEquals(nodeMetadata.getId(), expectedServer.getServerId());
+      assertEquals(nodeMetadata.getHostname(), expectedServer.getServerName());
+      assertEquals(nodeMetadata.getName(), expectedServer.getServerName());
+      assertEquals(nodeMetadata.getProviderId(), expectedServer.getServerId());
       assertEquals(nodeMetadata.getStatus(), NodeMetadata.Status.RUNNING);
 
       assertNotNull(nodeMetadata.getOperatingSystem());
@@ -78,12 +92,14 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getOperatingSystem().getDescription(), OsFamily.LINUX.value());
 
       assertNotNull(nodeMetadata.getLocation());
-      assertEquals(nodeMetadata.getLocation().getId(), actualServer.getDataCenterId());
+      assertEquals(nodeMetadata.getLocation().getId(), expectedServer.getDataCenterId());
       assertEquals(nodeMetadata.getLocation().getScope(), LocationScope.ZONE);
-      assertEquals(nodeMetadata.getLocation().getDescription(), actualServer.getDataCenterId());
+      assertEquals(nodeMetadata.getLocation().getDescription(), "data_center");
+      assertEquals(nodeMetadata.getLocation().getParent().getScope(), regionLoc.getScope());
+      assertEquals(nodeMetadata.getLocation().getParent().getId(), regionLoc.getId());
 
       assertNotNull(nodeMetadata.getHardware());
-      assertEquals(nodeMetadata.getHardware().getId(), actualServer.getServerId());
+      assertEquals(nodeMetadata.getHardware().getId(), expectedServer.getServerId());
       assertNotNull(nodeMetadata.getHardware().getProcessors());
       assertEquals(nodeMetadata.getHardware().getProcessors().size(), 1);
       assertEquals(nodeMetadata.getHardware().getProcessors().get(0).getCores(), 2.0);
@@ -91,12 +107,14 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getHardware().getRam(), 1024);
       assertNotNull(nodeMetadata.getHardware().getLocation());
       assertEquals(nodeMetadata.getHardware().getLocation().getId(), AvailabilityZone.ZONE_1.value());
-      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), AvailabilityZone.ZONE_1.value());
+      assertEquals(nodeMetadata.getHardware().getLocation().getDescription(), "availability_zone");
       assertEquals(nodeMetadata.getHardware().getLocation().getScope(), LocationScope.ZONE);
       assertEquals(nodeMetadata.getHardware().getLocation().getParent(), nodeMetadata.getLocation());
+
+      assertEquals(nodeMetadata.getPublicAddresses(), expectedServer.getIPs());
    }
 
-   public Server actualServer() {
+   public Server expectedServer() {
       return Server.builder()
             .dataCenterId("11111-2222-3333-4444-25195ac4515a")
             .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
@@ -109,7 +127,54 @@ public class ServerToNodeMetadataTest {
             .virtualMachineState(Server.VirtualMachineState.RUNNING)
             .osType(OSType.LINUX)
             .availabilityZone(AvailabilityZone.ZONE_1)
+            .addNIC(NIC.builder()
+                  .nicName("MainMain")
+                  .nicId("db37ecd8-daec-4b00-b629-e3e54d03ea13")
+                  .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
+                  .addIP("46.16.77.120")
+                  .addIP("46.16.79.250")
+                  .addIP("46.16.79.249")
+                  .macAddress("02:01:b2:6f:24:61")
+                  .internetAccess(false)
+                  .dhcpActive(false)
+                  .lanId(1)
+                  .gatewayIp("46.16.77.1")
+                  .provisioningState(ProvisioningState.INPROCESS)
+                  .build())
             .build();
+   }
+
+   private class LocationImpl implements Location {
+
+      @Override
+      public LocationScope getScope() {
+         return LocationScope.REGION;
+      }
+
+      @Override
+      public String getId() {
+         return "region";
+      }
+
+      @Override
+      public String getDescription() {
+         return "reg";
+      }
+
+      @Override
+      public Location getParent() {
+         return null;
+      }
+
+      @Override
+      public Map<String, Object> getMetadata() {
+         return null;  //To change body of implemented methods use File | Settings | File Templates.
+      }
+
+      @Override
+      public Set<String> getIso3166Codes() {
+         return null;  //To change body of implemented methods use File | Settings | File Templates.
+      }
    }
 
 }

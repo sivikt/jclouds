@@ -17,9 +17,11 @@
 package org.jclouds.profitbricks.domain;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 
 import java.util.Date;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -32,8 +34,8 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class Server {
 
-   public static DescribingBuilder builder() {
-      return new DescribingBuilder();
+   public static ServerDescribingBuilder builder() {
+      return new ServerDescribingBuilder();
    }
 
    public static abstract class Builder<T extends Builder<T>> {
@@ -49,6 +51,7 @@ public class Server {
       protected Date lastModificationTime;
       protected ProvisioningState provisioningState;
       protected VirtualMachineState virtualMachineState;
+      protected Set<NIC> nics = Sets.newLinkedHashSet(); // TODO may be its better to keep here only nics ids
 
       protected abstract T self();
 
@@ -80,12 +83,7 @@ public class Server {
        */
       public T cores(int cores) {
          this.cores = cores;
-         checkCores();
          return self();
-      }
-
-      private void checkCores() {
-         checkState(cores > 0, "Number of core must be >=1");
       }
 
       /**
@@ -93,12 +91,7 @@ public class Server {
        */
       public T ram(int ram) {
          this.ram = ram;
-         checkRam();
          return self();
-      }
-
-      private void checkRam() {
-         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
       }
 
       /**
@@ -121,7 +114,7 @@ public class Server {
        * @see Server#getServerId()
        */
       public T serverId(String serverId) {
-         this.serverId = checkNotNull(serverId, "serverId");
+         this.serverId = serverId;
          return self();
       }
 
@@ -145,7 +138,7 @@ public class Server {
        * @see Server#getProvisioningState()
        */
       public T provisioningState(ProvisioningState provisioningState) {
-         this.provisioningState = checkNotNull(provisioningState);
+         this.provisioningState = provisioningState;
          return self();
       }
 
@@ -153,41 +146,55 @@ public class Server {
        * @see Server#getVirtualMachineState()
        */
       public T virtualMachineState(VirtualMachineState virtualMachineState) {
-         this.virtualMachineState = checkNotNull(virtualMachineState);
+         this.virtualMachineState = virtualMachineState;
+         return self();
+      }
+
+      /**
+       * @see Server#getNics()
+       */
+      public T addNIC(NIC nic) {
+         checkNotNull(nic, "nic");
+         nics.add(nic);
          return self();
       }
 
       protected void checkFields() {
-         checkCores();
-         checkRam();
+         checkState(cores > 0, "Number of core must be >=1");
+         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
          checkNotNull(serverId, "serverId");
          checkNotNull(dataCenterId, "dataCenterId");
          checkNotNull(provisioningState, "provisioningState");
          checkNotNull(virtualMachineState, "virtualMachineState");
+
+         for (NIC nic : nics)
+            checkState(serverId.equals(nic.getServerId()), "nic '%s' doesn't match server's id '%s'", nic.getNicId(), serverId);
+         nics = ImmutableSet.copyOf(nics);
+
          availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
          osType = osType == null ? OSType.UNKNOWN : osType;
       }
    }
 
-   public static class DescribingBuilder extends Builder<DescribingBuilder> {
+   public static class ServerDescribingBuilder extends Builder<ServerDescribingBuilder> {
       @Override
-      protected DescribingBuilder self() {
+      protected ServerDescribingBuilder self() {
          return this;
       }
 
       @Override
       protected Server buildInstance() {
          return new Server(dataCenterId, serverId, serverName, cores, ram, osType, availabilityZone, creationTime,
-                           lastModificationTime, provisioningState, virtualMachineState);
+                           lastModificationTime, provisioningState, virtualMachineState, nics);
       }
    }
 
    protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, OSType osType,
                     AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
-                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState) {
-      this.dataCenterId = Strings.emptyToNull(dataCenterId);
+                    ProvisioningState provisioningState, VirtualMachineState virtualMachineState, Set<NIC> nics) {
+      this.dataCenterId = dataCenterId;
       this.serverId = serverId;
-      this.serverName = Strings.emptyToNull(serverName);
+      this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
       this.osType = osType;
@@ -196,6 +203,7 @@ public class Server {
       this.lastModificationTime = lastModificationTime;
       this.provisioningState = provisioningState;
       this.virtualMachineState = virtualMachineState;
+      this.nics = nics;
    }
 
    public enum VirtualMachineState {
@@ -221,6 +229,7 @@ public class Server {
    private VirtualMachineState virtualMachineState;
    private OSType osType;
    private AvailabilityZone availabilityZone;
+   private Set<NIC> nics;
 
    /**
     * Defines the data center wherein the server is to be created.
@@ -301,6 +310,34 @@ public class Server {
       return availabilityZone;
    }
 
+   /**
+    * Lists all NICs assigned to the server.
+    */
+   public Set<NIC> getNics() {
+      return nics;
+   }
+
+   /**
+    * Returns {@code true} if server is connected to a public LAN
+    */
+   public boolean isInternetAccess() {
+      for (NIC nic : nics)
+         if (nic.isInternetAccess())
+            return true;
+      return false;
+   }
+
+   /**
+    * Lists all IP addresses assigned to the server
+    */
+   public Set<String> getIPs() {
+      Set<String> ips = Sets.newHashSet();
+      for (NIC nic : nics)
+         ips.addAll(nic.getIps());
+
+      return ips;
+   }
+
    @Override
    public int hashCode() {
       return Objects.hashCode(serverId);
@@ -329,7 +366,8 @@ public class Server {
             .add("osType", osType)
             .add("provisioningState", provisioningState)
             .add("virtualMachineState", virtualMachineState)
-            .add("availabilityZone", availabilityZone);
+            .add("availabilityZone", availabilityZone)
+            .add("nics", nics);
    }
 
    @Override

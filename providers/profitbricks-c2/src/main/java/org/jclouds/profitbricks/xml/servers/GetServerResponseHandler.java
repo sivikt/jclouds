@@ -28,8 +28,6 @@ import javax.inject.Inject;
  */
 public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<Server> {
 
-   private boolean isDone;
-
    @Inject
    public GetServerResponseHandler(DateCodecFactory dateCodecFactory) {
       super(dateCodecFactory);
@@ -37,15 +35,13 @@ public class GetServerResponseHandler extends BaseFullServerInfoResponseHandler<
 
    @Override
    public Server getResult() {
-      return describingBuilder.build();
+      return currentServer;
    }
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
-      setServerInfoOnEndElementEvent(qName);
-      if (qName.equals("return")) isDone = true;
-      clearTextBuffer();
+      if (currentServer == null)
+         super.endElement(uri, name, qName);
    }
 
 }
