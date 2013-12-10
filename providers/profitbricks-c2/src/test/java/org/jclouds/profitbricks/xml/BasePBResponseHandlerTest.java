@@ -19,7 +19,7 @@ package org.jclouds.profitbricks.xml;
 import org.easymock.EasyMock;
 import org.jclouds.date.DateCodec;
 import org.jclouds.date.DateCodecFactory;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -38,25 +38,26 @@ import static org.testng.Assert.assertTrue;
 @Test(groups = "unit", testName = "BasePBResponseHandlerTest")
 public class BasePBResponseHandlerTest {
 
+   private DateCodecFactory dateCodecFactory;
    private BasePBResponseHandler handler;
 
    private Date now;
 
-   @BeforeMethod
+   @BeforeTest
    public void setUp() {
-      DateCodecFactory dateCodecFactory = EasyMock.createMock(DateCodecFactory.class);
+      dateCodecFactory = EasyMock.createMock(DateCodecFactory.class);
       DateCodec dateCodec = EasyMock.createMock(DateCodec.class);
       now = new Date();
 
       expect(dateCodec.toDate("2013")).andStubReturn(now);
       expect(dateCodecFactory.iso8601()).andStubReturn(dateCodec);
       replay(dateCodec, dateCodecFactory);
-
-      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
    }
 
    @Test
    public void testTextBufferValue() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
       handler.characters(new char[] {' ', 'v', 'a', 'l', 'u', 'e', ' '}, 0, 7);
       assertEquals(handler.textBufferValue(), " value ");
 
@@ -66,18 +67,24 @@ public class BasePBResponseHandlerTest {
 
    @Test
    public void testTrimTextBufferValue() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
       handler.characters(new char[] {' ', 'v', 'a', 'l', 'u', 'e', ' '}, 0, 6);
       assertEquals(handler.trimAndGetTagStrValue(), "value");
    }
 
    @Test
    public void testTextBufferToIntValue() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
       handler.characters(new char[] {' ', '1', '2', '3', '4', '5', ' '}, 1, 2);
       assertEquals(handler.textBufferToIntValue(), 12);
    }
 
    @Test
    public void testTextBufferToBoolValue() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
       handler.characters(new char[] {' ', 't', 'r', 'u', 'e', '5', ' '}, 1, 4);
       assertTrue(handler.textBufferToBoolValue());
 
@@ -87,6 +94,8 @@ public class BasePBResponseHandlerTest {
 
    @Test
    public void testTextBufferToDate() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
       handler.characters(new char[]{' ', '2', '0', '1', '3', ' '}, 1, 4);
       assertEquals(handler.textBufferToIso8601Date(), now);
    }
