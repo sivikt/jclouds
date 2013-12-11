@@ -19,7 +19,11 @@ package org.jclouds.profitbricks.xml.servers;
 import com.google.common.collect.Lists;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
-import org.jclouds.profitbricks.domain.*;
+import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.NIC;
+import org.jclouds.profitbricks.domain.OSType;
+import org.jclouds.profitbricks.domain.ProvisioningState;
+import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;
@@ -50,7 +54,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
       assertEquals(result.size(), 2);
 
       for (Server expectedServer : expectedResult) {
-         Server actualServer = findInSet(result, expectedServer.getServerId());
+         Server actualServer = findInSet(result, expectedServer.getId());
 
          assertNotNull(actualServer, errForServer(expectedServer));
          assertEquals(actualServer.getRam(), expectedServer.getRam(), errForServer(expectedServer));
@@ -67,12 +71,12 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
    }
 
    private String errForServer(Server server) {
-      return "expected serverId=" + server.getServerId();
+      return "expected id=" + server.getId();
    }
 
    private Server findInSet(Set<Server> src, String serverId) {
       for (Server server : src)
-         if (server.getServerId().equals(serverId)) return server;
+         if (server.getId().equals(serverId)) return server;
 
       return null;
    }
@@ -83,7 +87,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
       return Lists.newArrayList(
             Server.builder()
                   .dataCenterId("79046edb-2a50-4d0f-a153-6576ee7d22a6")
-                  .serverId("fd4ffc52-1f2e-4a82-b155-75b2d5e6dd68")
+                  .id("fd4ffc52-1f2e-4a82-b155-75b2d5e6dd68")
                   .serverName("server")
                   .cores(2)
                   .ram(1024)
@@ -94,7 +98,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .osType(OSType.LINUX)
                   .availabilityZone(AvailabilityZone.AUTO)
                   .addNIC(NIC.builder()
-                        .nicId("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
+                        .id("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
                         .serverId("fd4ffc52-1f2e-4a82-b155-75b2d5e6dd68")
                         .addIP("78.137.99.213")
                         .macAddress("02:01:a4:af:c0:f8")
@@ -108,7 +112,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
 
             Server.builder()
                   .dataCenterId("89046edb-2a50-4d0f-a153-6576ee7d22a7")
-                  .serverId("722694b6-8635-4433-8dea-012860cab5fe")
+                  .id("722694b6-8635-4433-8dea-012860cab5fe")
                   .serverName("FirstServer")
                   .cores(1)
                   .ram(1024)
@@ -120,7 +124,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                   .availabilityZone(AvailabilityZone.ZONE_1)
                   .addNIC(NIC.builder()
                         .nicName("MainMain")
-                        .nicId("db37ecd8-daec-4b00-b629-e3e54d03ea13")
+                        .id("db37ecd8-daec-4b00-b629-e3e54d03ea13")
                         .serverId("722694b6-8635-4433-8dea-012860cab5fe")
                         .addIP("46.16.77.120")
                         .addIP("46.16.79.250")
@@ -133,7 +137,7 @@ public class GetAllServersResponseHandlerTest extends BaseHandlerTest {
                         .provisioningState(ProvisioningState.INPROCESS)
                         .build())
                   .addNIC(NIC.builder()
-                        .nicId("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
+                        .id("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
                         .serverId("722694b6-8635-4433-8dea-012860cab5fe")
                         .addIP("78.137.99.213")
                         .macAddress("02:01:a4:af:c0:f8")

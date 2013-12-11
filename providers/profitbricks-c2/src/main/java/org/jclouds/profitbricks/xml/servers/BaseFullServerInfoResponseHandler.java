@@ -128,7 +128,7 @@ public abstract class BaseFullServerInfoResponseHandler<T> extends BasePBRespons
    }
 
    protected void setNICInfoOnEndElementEvent(String qName) {
-      if (qName.equals("nicId")) nicBuilder.nicId(trimAndGetTagStrValue());
+      if (qName.equals("nicId")) nicBuilder.id(trimAndGetTagStrValue());
       else if (qName.equals("ips")) nicBuilder.addIP(trimAndGetTagStrValue());
       else if (qName.equals("lanId")) nicBuilder.lanId(textBufferToIntValue());
       else if (qName.equals("nicName")) nicBuilder.nicName(trimAndGetTagStrValue());
@@ -144,7 +144,7 @@ public abstract class BaseFullServerInfoResponseHandler<T> extends BasePBRespons
       if (qName.equals("ram")) serverBuilder.ram(textBufferToIntValue());
       else if (qName.equals("cores")) serverBuilder.cores(textBufferToIntValue());
       else if (qName.equals("osType")) serverBuilder.osType(OSType.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("serverId")) serverBuilder.serverId(trimAndGetTagStrValue());
+      else if (qName.equals("serverId")) serverBuilder.id(trimAndGetTagStrValue());
       else if (qName.equals("serverName")) serverBuilder.serverName(trimAndGetTagStrValue());
       else if (qName.equals("dataCenterId")) serverBuilder.dataCenterId(trimAndGetTagStrValue());
       else if (qName.equals("creationTime")) serverBuilder.creationTime(textBufferToIso8601Date());

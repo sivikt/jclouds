@@ -47,7 +47,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
       assertNotNull(actualServer);
 
       assertNotNull(actualServer);
-      assertEquals(actualServer.getServerId(), expectedServer.getServerId());
+      assertEquals(actualServer.getId(), expectedServer.getId());
       assertEquals(actualServer.getRam(), expectedServer.getRam());
       assertEquals(actualServer.getAvailabilityZone(), expectedServer.getAvailabilityZone());
       assertEquals(actualServer.getCores(), expectedServer.getCores());
@@ -61,7 +61,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
 
       assertNotNull(actualServer.getNics());
       for (NIC expectedNic : expectedServer.getNics()) {
-         NIC actualNic = findInSet(actualServer.getNics(), expectedNic.getNicId());
+         NIC actualNic = findInSet(actualServer.getNics(), expectedNic.getId());
 
          assertNotNull(actualNic, errForNic(expectedNic));
          assertEquals(actualNic.getNicName(), expectedNic.getNicName());
@@ -77,12 +77,12 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
    }
 
    private String errForNic(NIC nic) {
-      return "expected nicId=" + nic.getServerId();
+      return "expected id=" + nic.getServerId();
    }
 
    private NIC findInSet(Set<NIC> src, String nicID) {
       for (NIC nic : src)
-         if (nic.getNicId().equals(nicID)) return nic;
+         if (nic.getId().equals(nicID)) return nic;
 
       return null;
    }
@@ -92,7 +92,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
 
       return Server.builder()
                    .dataCenterId("95d08b87-36e5-47fd-9fb5-c244f566bc62")
-                   .serverId("b804c14f-1d73-4204-a697-e1bd4ebd04c9")
+                   .id("b804c14f-1d73-4204-a697-e1bd4ebd04c9")
                    .serverName("server")
                    .cores(3)
                    .ram(2048)
@@ -103,7 +103,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
                    .osType(OSType.LINUX)
                    .availabilityZone(AvailabilityZone.ZONE_2)
                    .addNIC(NIC.builder()
-                         .nicId("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
+                         .id("f25fa8e0-d35c-4520-9ff0-1dc6adf1d9a7")
                          .serverId("b804c14f-1d73-4204-a697-e1bd4ebd04c9")
                          .addIP("78.137.99.213")
                          .macAddress("02:01:a4:af:c0:f8")
@@ -115,7 +115,7 @@ public class GetServerResponseHandlerTest extends BaseHandlerTest {
                          .build())
                    .addNIC(NIC.builder()
                          .nicName("MainMain")
-                         .nicId("db37ecd8-daec-4b00-b629-e3e54d03ea13")
+                         .id("db37ecd8-daec-4b00-b629-e3e54d03ea13")
                          .serverId("b804c14f-1d73-4204-a697-e1bd4ebd04c9")
                          .addIP("46.16.77.120")
                          .addIP("46.16.79.250")

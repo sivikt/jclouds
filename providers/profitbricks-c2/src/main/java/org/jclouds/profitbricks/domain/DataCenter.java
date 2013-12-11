@@ -89,14 +89,14 @@ public class DataCenter {
     */
    public static class DataCenterDescribingBuilder extends Builder<DataCenterDescribingBuilder> {
 
-      protected String dataCenterId;
+      protected String id;
       protected ProvisioningState provisioningState;
 
       /**
-       * @see DataCenter#getDataCenterId()
+       * @see DataCenter#getId()
        */
-      public DataCenterDescribingBuilder dataCenterId(String dataCenterId) {
-         this.dataCenterId = checkNotNull(dataCenterId, "dataCenterId");
+      public DataCenterDescribingBuilder id(String id) {
+         this.id = id;
          return self();
       }
 
@@ -116,13 +116,13 @@ public class DataCenter {
       @Override
       protected void checkFields() {
          super.checkFields();
-         checkNotNull(dataCenterId, "dataCenterId");
+         checkNotNull(id, "id");
          checkNotNull(provisioningState, "provisioningState");
       }
 
       @Override
       protected DataCenter buildInstance() {
-         return new DataCenter(dataCenterId, dataCenterName, provisioningState, region);
+         return new DataCenter(id, dataCenterName, provisioningState, region);
       }
    }
 
@@ -130,15 +130,14 @@ public class DataCenter {
       this(null, dataCenterName, null, region);
    }
 
-   protected DataCenter(String dataCenterId, String dataCenterName, ProvisioningState provisioningState,
-                        Regions region) {
-      this.dataCenterId = dataCenterId;
+   protected DataCenter(String id, String dataCenterName, ProvisioningState provisioningState, Regions region) {
+      this.id = id;
       this.dataCenterName = dataCenterName;
       this.provisioningState = provisioningState;
       this.region = region;
    }
 
-   private String dataCenterId;
+   private String id;
    private String dataCenterName;
    private ProvisioningState provisioningState;
    private Regions region;
@@ -146,8 +145,8 @@ public class DataCenter {
    /**
     * Identifier of the virtual data center
     */
-   public String getDataCenterId() {
-      return dataCenterId;
+   public String getId() {
+      return id;
    }
 
    /**
@@ -173,7 +172,7 @@ public class DataCenter {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(dataCenterId);
+      return Objects.hashCode(id);
    }
 
    @Override
@@ -184,12 +183,12 @@ public class DataCenter {
          return false;
       DataCenter that = DataCenter.class.cast(obj);
 
-      return Objects.equal(this.dataCenterId, that.dataCenterId);
+      return Objects.equal(this.id, that.id);
    }
 
    protected Objects.ToStringHelper string() {
       return Objects.toStringHelper(this)
-            .add("dataCenterId", dataCenterId)
+            .add("id", id)
             .add("dataCenterName", dataCenterName)
             .add("region", region)
             .add("provisioningState", provisioningState);

@@ -45,7 +45,7 @@ public class DataCenterToLocation implements Function<DataCenter, Location> {
    @Override
    public Location apply(DataCenter dataCenter) {
       return new LocationBuilder().scope(LocationScope.ZONE)
-            .id(dataCenter.getDataCenterId())
+            .id(dataCenter.getId())
             .description(dataCenter.getDataCenterName())
             .parent(Iterables.getOnlyElement(provider.get()))
             .build();

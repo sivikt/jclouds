@@ -40,7 +40,7 @@ public class GetDataCenterResponseHandlerTest extends BaseHandlerTest {
       InputStream is = getClass().getResourceAsStream("/datacenters/getDataCenterResponse.xml");
 
       DataCenter expectedResult = DataCenter.describingBuilder()
-            .dataCenterId("a2de7e7a-fb70-4eaf-95ce-70f3bc061121")
+            .id("a2de7e7a-fb70-4eaf-95ce-70f3bc061121")
             .dataCenterName("Unnamed Data Center")
             .provisioningState(ProvisioningState.AVAILABLE)
             .region(Regions.EUROPE)
@@ -50,7 +50,7 @@ public class GetDataCenterResponseHandlerTest extends BaseHandlerTest {
       DataCenter result = factory.create(handler).parse(is);
 
       assertNotNull(result);
-      assertEquals(result.getDataCenterId(), expectedResult.getDataCenterId());
+      assertEquals(result.getId(), expectedResult.getId());
       assertEquals(result.getDataCenterName(), expectedResult.getDataCenterName());
       assertEquals(result.getProvisioningState(), expectedResult.getProvisioningState());
       assertEquals(result.getRegion(), expectedResult.getRegion());

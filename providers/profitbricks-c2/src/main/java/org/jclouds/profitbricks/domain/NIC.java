@@ -43,8 +43,8 @@ public class NIC {
 
       protected abstract T self();
 
+      protected String id;
       protected String nicName;
-      protected String nicId;
       protected String serverId;
       protected int lanId;
       protected boolean internetAccess;
@@ -53,6 +53,7 @@ public class NIC {
       protected boolean dhcpActive;
       protected String gatewayIp;
       protected ProvisioningState provisioningState;
+      protected Firewall firewall;
 
       /**
        * @see NIC#getNicName()
@@ -63,10 +64,10 @@ public class NIC {
       }
 
       /**
-       * @see NIC#getNicId()
+       * @see NIC#getId()
        */
-      public T nicId(String nicId) {
-         this.nicId = nicId;
+      public T id(String id) {
+         this.id = id;
          return self();
       }
 
@@ -135,8 +136,16 @@ public class NIC {
          return self();
       }
 
+      /**
+       * @see NIC#getProvisioningState()
+       */
+      public T provisioningState(Firewall firewall) {
+         this.firewall = firewall;
+         return self();
+      }
+
       public NIC build() {
-         checkNotNull(nicId, "nicId");
+         checkNotNull(id, "id");
          nicName= Strings.emptyToNull(nicName);
          checkNotNull(serverId, "serverId");
          checkState(lanId > 0, "lanId <1");
@@ -146,7 +155,10 @@ public class NIC {
          checkNotNull(gatewayIp, "gatewayIp");
          checkNotNull(provisioningState, "provisioningState");
 
-         return new NIC(nicId, nicName, serverId, lanId, internetAccess, ips, macAddress, dhcpActive, gatewayIp,
+         if (firewall != null)
+            checkState(id.equals(firewall.getNicId()), "firewall nicId and target nic id are different");
+
+         return new NIC(id, nicName, serverId, lanId, internetAccess, ips, macAddress, dhcpActive, gatewayIp, firewall,
                         provisioningState);
       }
 
@@ -159,8 +171,8 @@ public class NIC {
       }
    }
 
+   private String id;
    private String nicName;
-   private String nicId;
    private String serverId;
    private int lanId;
    private boolean internetAccess;
@@ -169,12 +181,13 @@ public class NIC {
    private boolean dhcpActive;
    private String gatewayIp;
    private ProvisioningState provisioningState;
+   private Firewall firewall;
 
-   protected NIC(String nicId, @Nullable String nicName, String serverId, int lanId, boolean internetAccess,
-                 Set<String> ips, String macAddress, boolean dhcpActive, String gatewayIp,
+   protected NIC(String id, @Nullable String nicName, String serverId, int lanId, boolean internetAccess,
+                 Set<String> ips, String macAddress, boolean dhcpActive, String gatewayIp, Firewall firewall,
                  ProvisioningState provisioningState) {
 
-      this.nicId = nicId;
+      this.id = id;
       this.nicName = nicName;
       this.serverId = serverId;
       this.lanId = lanId;
@@ -184,8 +197,15 @@ public class NIC {
       this.dhcpActive = dhcpActive;
       this.gatewayIp = gatewayIp;
       this.provisioningState = provisioningState;
+      this.firewall = firewall;
    }
 
+   @Nullable
+   public Firewall getFirewall() {
+      return firewall;
+   }
+
+   @Nullable
    public String getNicName() {
       return nicName;
    }
@@ -193,8 +213,8 @@ public class NIC {
    /**
     * Identifier of the virtual NIC
     */
-   public String getNicId() {
-      return nicId;
+   public String getId() {
+      return id;
    }
 
    /**
@@ -246,7 +266,7 @@ public class NIC {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(nicId);
+      return Objects.hashCode(id);
    }
 
    @Override
@@ -256,12 +276,12 @@ public class NIC {
       if (obj == null || getClass() != obj.getClass())
          return false;
       NIC that = NIC.class.cast(obj);
-      return Objects.equal(this.nicId, that.nicId);
+      return Objects.equal(this.id, that.id);
    }
 
    protected ToStringHelper string() {
       return Objects.toStringHelper(this)
-            .add("nicId", nicId)
+            .add("id", id)
             .add("nicName", nicName)
             .add("serverId", serverId)
             .add("lanId", lanId)

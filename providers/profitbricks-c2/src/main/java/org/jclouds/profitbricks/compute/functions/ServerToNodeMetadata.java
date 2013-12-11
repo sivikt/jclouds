@@ -78,14 +78,14 @@ public class ServerToNodeMetadata implements Function<Server, NodeMetadata> {
             .build();
 
       HardwareBuilder hardwareBuilder = new HardwareBuilder()
-         .id(server.getServerId())
+         .id(server.getId())
          .processor(new Processor(server.getCores(), 0))
          .ram(server.getRam())
          .location(serverAvailabilityZone);
 
       NodeMetadataBuilder nodeMetadataBuilder = new NodeMetadataBuilder()
-         .id(server.getServerId())
-         .providerId(server.getServerId())
+         .id(server.getId())
+         .providerId(server.getId())
          .name(server.getServerName())
          .hostname(server.getServerName())
          .status(serverStateToNodeStatus.apply(server))

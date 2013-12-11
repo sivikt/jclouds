@@ -61,7 +61,7 @@ public class ServerStateToNodeMetadataStatusTest {
       return Server.builder()
             .virtualMachineState(vmState)
             .provisioningState(provState)
-            .serverId("1")
+            .id("1")
             .dataCenterId("1")
             .cores(1)
             .ram(256)

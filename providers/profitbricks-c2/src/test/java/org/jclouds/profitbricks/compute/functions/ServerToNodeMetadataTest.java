@@ -81,10 +81,10 @@ public class ServerToNodeMetadataTest {
       NodeMetadata nodeMetadata = func.apply(expectedServer);
 
       assertNotNull(nodeMetadata);
-      assertEquals(nodeMetadata.getId(), expectedServer.getServerId());
+      assertEquals(nodeMetadata.getId(), expectedServer.getId());
       assertEquals(nodeMetadata.getHostname(), expectedServer.getServerName());
       assertEquals(nodeMetadata.getName(), expectedServer.getServerName());
-      assertEquals(nodeMetadata.getProviderId(), expectedServer.getServerId());
+      assertEquals(nodeMetadata.getProviderId(), expectedServer.getId());
       assertEquals(nodeMetadata.getStatus(), NodeMetadata.Status.RUNNING);
 
       assertNotNull(nodeMetadata.getOperatingSystem());
@@ -99,7 +99,7 @@ public class ServerToNodeMetadataTest {
       assertEquals(nodeMetadata.getLocation().getParent().getId(), regionLoc.getId());
 
       assertNotNull(nodeMetadata.getHardware());
-      assertEquals(nodeMetadata.getHardware().getId(), expectedServer.getServerId());
+      assertEquals(nodeMetadata.getHardware().getId(), expectedServer.getId());
       assertNotNull(nodeMetadata.getHardware().getProcessors());
       assertEquals(nodeMetadata.getHardware().getProcessors().size(), 1);
       assertEquals(nodeMetadata.getHardware().getProcessors().get(0).getCores(), 2.0);
@@ -117,7 +117,7 @@ public class ServerToNodeMetadataTest {
    public Server expectedServer() {
       return Server.builder()
             .dataCenterId("11111-2222-3333-4444-25195ac4515a")
-            .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
+            .id("47491020-5c6a-1f75-1548-25195ac4515a")
             .serverName("LinuxServer")
             .cores(2)
             .ram(1024)
@@ -129,7 +129,7 @@ public class ServerToNodeMetadataTest {
             .availabilityZone(AvailabilityZone.ZONE_1)
             .addNIC(NIC.builder()
                   .nicName("MainMain")
-                  .nicId("db37ecd8-daec-4b00-b629-e3e54d03ea13")
+                  .id("db37ecd8-daec-4b00-b629-e3e54d03ea13")
                   .serverId("47491020-5c6a-1f75-1548-25195ac4515a")
                   .addIP("46.16.77.120")
                   .addIP("46.16.79.250")
@@ -145,7 +145,6 @@ public class ServerToNodeMetadataTest {
    }
 
    private class LocationImpl implements Location {
-
       @Override
       public LocationScope getScope() {
          return LocationScope.REGION;
@@ -168,12 +167,12 @@ public class ServerToNodeMetadataTest {
 
       @Override
       public Map<String, Object> getMetadata() {
-         return null;  //To change body of implemented methods use File | Settings | File Templates.
+         return null;
       }
 
       @Override
       public Set<String> getIso3166Codes() {
-         return null;  //To change body of implemented methods use File | Settings | File Templates.
+         return null;
       }
    }
 

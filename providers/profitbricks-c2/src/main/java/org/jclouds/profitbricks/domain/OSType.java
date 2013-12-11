@@ -22,7 +22,10 @@ package org.jclouds.profitbricks.domain;
  * @author Serj Sintsov
  */
 public enum OSType {
-   WINDOWS, LINUX, OTHER, UNKNOWN;
+   WINDOWS,
+   LINUX,
+   OTHER,
+   UNKNOWN;
 
    public String value() {
       return name();

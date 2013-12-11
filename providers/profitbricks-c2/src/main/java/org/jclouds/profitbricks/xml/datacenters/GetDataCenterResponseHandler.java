@@ -51,7 +51,7 @@ public class GetDataCenterResponseHandler extends BasePBResponseHandler<DataCent
       if (isDone) return;
 
       if (qName.equals("region")) dataCenterBuilder.region(Regions.fromValue(trimAndGetTagStrValue()));
-      else if (qName.equals("dataCenterId")) dataCenterBuilder.dataCenterId(trimAndGetTagStrValue());
+      else if (qName.equals("dataCenterId")) dataCenterBuilder.id(trimAndGetTagStrValue());
       else if (qName.equals("dataCenterName")) dataCenterBuilder.dataCenterName(trimAndGetTagStrValue());
       else if (qName.equals("provisioningState")) dataCenterBuilder.provisioningState(ProvisioningState.fromValue(trimAndGetTagStrValue()));
       else if (qName.equals("return")) {

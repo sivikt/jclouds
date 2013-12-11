@@ -16,6 +16,7 @@ public enum Regions {
       return name();
    }
 
+   // TODO remove or leave
    public static final Set<String> profitBricksC2Regions = ImmutableSet.of(NORTH_AMERICA.value(), EUROPE.value(),
          DEFAULT.value());
 

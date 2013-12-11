@@ -19,6 +19,7 @@ package org.jclouds.profitbricks.domain;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
 import java.util.Set;
@@ -40,13 +41,13 @@ public class Server {
 
    public static abstract class Builder<T extends Builder<T>> {
 
+      protected String id;
       protected String dataCenterId;
       protected String serverName;
       protected int cores;
       protected int ram;
       protected OSType osType;
       protected AvailabilityZone availabilityZone;
-      protected String serverId;
       protected Date creationTime;
       protected Date lastModificationTime;
       protected ProvisioningState provisioningState;
@@ -111,10 +112,10 @@ public class Server {
       }
 
       /**
-       * @see Server#getServerId()
+       * @see Server#getId()
        */
-      public T serverId(String serverId) {
-         this.serverId = serverId;
+      public T id(String id) {
+         this.id = id;
          return self();
       }
 
@@ -162,13 +163,13 @@ public class Server {
       protected void checkFields() {
          checkState(cores > 0, "Number of core must be >=1");
          checkState(ram >= 256, "Minimal RAM size is 256 MiB");
-         checkNotNull(serverId, "serverId");
-         checkNotNull(dataCenterId, "dataCenterId");
+         checkNotNull(id, "id");
+         checkNotNull(dataCenterId, "id");
          checkNotNull(provisioningState, "provisioningState");
          checkNotNull(virtualMachineState, "virtualMachineState");
 
          for (NIC nic : nics)
-            checkState(serverId.equals(nic.getServerId()), "nic '%s' doesn't match server's id '%s'", nic.getNicId(), serverId);
+            checkState(id.equals(nic.getServerId()), "nic '%s' doesn't match server's id '%s'", nic.getId(), id);
          nics = ImmutableSet.copyOf(nics);
 
          availabilityZone = availabilityZone == null ? AvailabilityZone.AUTO : availabilityZone;  // TODO find checkReturnDefault..or something
@@ -184,16 +185,16 @@ public class Server {
 
       @Override
       protected Server buildInstance() {
-         return new Server(dataCenterId, serverId, serverName, cores, ram, osType, availabilityZone, creationTime,
+         return new Server(dataCenterId, id, serverName, cores, ram, osType, availabilityZone, creationTime,
                            lastModificationTime, provisioningState, virtualMachineState, nics);
       }
    }
 
-   protected Server(String dataCenterId, String serverId, String serverName, int cores, int ram, OSType osType,
+   protected Server(String dataCenterId, String id, String serverName, int cores, int ram, OSType osType,
                     AvailabilityZone availabilityZone, Date creationTime, Date lastModificationTime,
                     ProvisioningState provisioningState, VirtualMachineState virtualMachineState, Set<NIC> nics) {
+      this.id = id;
       this.dataCenterId = dataCenterId;
-      this.serverId = serverId;
       this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
@@ -219,7 +220,7 @@ public class Server {
    }
 
    private String dataCenterId;
-   private String serverId;
+   private String id;
    private String serverName;
    private int cores;
    private int ram;
@@ -241,13 +242,14 @@ public class Server {
    /**
     * Identifier of the virtual server
     */
-   public String getServerId() {
-      return serverId;
+   public String getId() {
+      return id;
    }
 
    /**
-    * Emptiable. Outputs the name of the specified virtual server
+    * Outputs the name of the specified virtual server
     */
+   @Nullable
    public String getServerName() {
       return serverName;
    }
@@ -269,15 +271,17 @@ public class Server {
    }
 
    /**
-    * Nullable. Time when the specified virtual server has been created
+    * Time when the specified virtual server has been created
     */
+   @Nullable
    public Date getCreationTime() {
       return creationTime;
    }
 
    /**
-    * Nullable. Time when the specified virtual server has last been modified
+    * Time when the specified virtual server has last been modified
     */
+   @Nullable
    public Date getLastModificationTime() {
       return lastModificationTime;
    }
@@ -340,7 +344,7 @@ public class Server {
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(serverId);
+      return Objects.hashCode(id);
    }
 
    @Override
@@ -351,13 +355,13 @@ public class Server {
          return false;
       Server that = Server.class.cast(obj);
 
-      return Objects.equal(this.serverId, that.serverId);
+      return Objects.equal(this.id, that.id);
    }
 
    protected Objects.ToStringHelper string() {
       return Objects.toStringHelper(this)
-            .add("dataCenterId", dataCenterId)
-            .add("serverId", serverId)
+            .add("id", id)
+            .add("id", dataCenterId)
             .add("serverName", serverName)
             .add("creationTime", creationTime)
             .add("lastModificationTime", lastModificationTime)

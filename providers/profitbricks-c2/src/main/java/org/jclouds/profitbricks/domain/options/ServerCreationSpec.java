@@ -41,6 +41,7 @@ public class ServerCreationSpec {
       protected String dataCenterId;
       protected String serverName;
       protected String bootFromImageId;
+      protected String bootFromStorageId;
       protected int cores;
       protected int ram;
       protected boolean internetAccess;
@@ -73,10 +74,20 @@ public class ServerCreationSpec {
       }
 
       /**
-       * Id of the image which you want to use for this server
+       * Defines an existing CD-ROM/DVD image ID to be set as boot device of the server.
+       * Note that only one boot device can be used at the same time.
        */
       public T bootFromImageId(String bootFromImageId) {
          this.bootFromImageId = bootFromImageId;
+         return self();
+      }
+
+      /**
+       * Defines an existing storage device ID to be set as boot device of the server.
+       * Note that only one boot device can be used at the same time.
+       */
+      public T bootFromStorageId(String bootFromStorageId) {
+         this.bootFromStorageId = bootFromStorageId;
          return self();
       }
 
@@ -85,12 +96,7 @@ public class ServerCreationSpec {
        */
       public T cores(int cores) {
          this.cores = cores;
-         checkCores();
          return self();
-      }
-
-      private void checkCores() {
-         checkState(cores > 0, "Number of core must be >=1");
       }
 
       /**
@@ -98,14 +104,8 @@ public class ServerCreationSpec {
        */
       public T ram(int ram) {
          this.ram = ram;
-         checkRam();
          return self();
       }
-
-      private void checkRam() {
-         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
-      }
-
       /**
        * Connect this server to the Internet?
        */
@@ -131,8 +131,15 @@ public class ServerCreationSpec {
       }
 
       protected void checkFields() {
-         checkCores();
-         checkRam();
+         checkState(cores > 0, "Number of core must be >=1");
+         checkState(ram >= 256, "Minimal RAM size is 256 MiB");
+
+         dataCenterId = Strings.emptyToNull(dataCenterId);
+         serverName = Strings.emptyToNull(serverName);
+         bootFromImageId = Strings.emptyToNull(bootFromImageId);
+         bootFromStorageId = Strings.emptyToNull(bootFromStorageId);
+
+         checkState(!(bootFromImageId != null && bootFromStorageId != null), "Only one boot device can be used at the same time");
       }
    }
 
@@ -145,25 +152,28 @@ public class ServerCreationSpec {
       @Override
       protected ServerCreationSpec buildInstance() {
          return new ServerCreationSpec(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone,
-                                        bootFromImageId);
+                                       bootFromImageId, bootFromStorageId);
       }
    }
 
    protected ServerCreationSpec(String dataCenterId, String serverName, int cores, int ram, boolean internetAccess,
-                                OSType osType, AvailabilityZone availabilityZone, String bootFromImageId) {
-      this.dataCenterId = Strings.emptyToNull(dataCenterId);
-      this.serverName = Strings.emptyToNull(serverName);
+                                OSType osType, AvailabilityZone availabilityZone, String bootFromImageId,
+                                String bootFromStorageId) {
+      this.dataCenterId = dataCenterId;
+      this.serverName = serverName;
       this.cores = cores;
       this.ram = ram;
       this.internetAccess = internetAccess;
       this.osType = osType;
       this.availabilityZone = availabilityZone;
-      this.bootFromImageId = Strings.emptyToNull(bootFromImageId);
+      this.bootFromImageId = bootFromImageId;
+      this.bootFromStorageId = bootFromStorageId;
    }
 
    private String dataCenterId;
    private String serverName;
    private String bootFromImageId;
+   private String bootFromStorageId;
 
    private int cores;
    private int ram;
@@ -183,6 +193,10 @@ public class ServerCreationSpec {
 
    public String getBootFromImageId() {
       return bootFromImageId;
+   }
+
+   public String getBootFromStorageId() {
+      return bootFromStorageId;
    }
 
    public int getCores() {
@@ -213,6 +227,8 @@ public class ServerCreationSpec {
             .add("cores", cores)
             .add("ram", ram)
             .add("osType", osType)
+            .add("bootFromStorageId", bootFromStorageId)
+            .add("bootFromImageId", bootFromImageId)
             .add("availabilityZone", availabilityZone);
    }
 
