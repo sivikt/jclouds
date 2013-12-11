@@ -30,7 +30,7 @@ import org.jclouds.profitbricks.compute.functions.TemplateToServerCreationSpec;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.compute.functions.ServerToNodeMetadata;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link ComputeServiceAdapter}.

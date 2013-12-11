@@ -17,7 +17,7 @@
 package org.jclouds.profitbricks.xml.servers;
 
 import com.google.common.base.Strings;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

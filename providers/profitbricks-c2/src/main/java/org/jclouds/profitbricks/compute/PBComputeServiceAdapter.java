@@ -31,7 +31,7 @@ import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.PBApi;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;

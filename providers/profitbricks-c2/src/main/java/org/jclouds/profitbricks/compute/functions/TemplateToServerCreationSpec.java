@@ -22,7 +22,7 @@ import org.jclouds.domain.Location;
 import org.jclouds.domain.LocationScope;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

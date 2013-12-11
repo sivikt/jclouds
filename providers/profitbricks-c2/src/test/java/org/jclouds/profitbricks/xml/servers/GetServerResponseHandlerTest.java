@@ -19,6 +19,7 @@ package org.jclouds.profitbricks.xml.servers;
 import org.jclouds.date.internal.SimpleDateFormatDateService;
 import org.jclouds.http.functions.BaseHandlerTest;
 import org.jclouds.profitbricks.domain.*;
+import org.jclouds.profitbricks.domain.NIC;
 import org.testng.annotations.Test;
 
 import java.io.InputStream;

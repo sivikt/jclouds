@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.jclouds.http.functions.ParseSax;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;

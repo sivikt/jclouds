@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.domain.options;
+package org.jclouds.profitbricks.domain.specs;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;

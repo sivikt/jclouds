@@ -18,7 +18,7 @@ package org.jclouds.profitbricks.features;
 
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;

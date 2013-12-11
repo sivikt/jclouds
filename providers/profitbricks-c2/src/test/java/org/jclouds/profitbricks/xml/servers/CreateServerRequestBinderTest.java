@@ -20,7 +20,7 @@ import com.google.common.collect.Maps;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.options.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
 import org.testng.annotations.Test;
 
