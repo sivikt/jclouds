@@ -14,21 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
+package org.jclouds.profitbricks.xml;
 
+import org.jclouds.net.domain.IpProtocol;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.Server;
 
 import javax.inject.Singleton;
 
 /**
- * Maps {@link Server} specific enums to strings. Useful in the requests binders.
+ * Maps ProfitBricks' specific enums to strings. Useful in requests binders.
  *
  * @author Serj Sintsov
  */
 @Singleton
-public class ServerEnumsToStringMapper {
+public class EnumsToRequestParamMapper {
 
    public String mapOSType(OSType osType) {
       return osType == null ? "" : osType.value();
@@ -36,6 +36,10 @@ public class ServerEnumsToStringMapper {
 
    public String mapAvailabilityZone(AvailabilityZone zone) {
       return zone == null ? "" : zone.value();
+   }
+
+   public String mapIpProtocol(IpProtocol protocol) {
+      return protocol == null ? "" : protocol.name();
    }
 
 }

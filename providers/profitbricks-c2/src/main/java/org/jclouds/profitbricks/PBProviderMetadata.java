@@ -16,8 +16,6 @@
  */
 package org.jclouds.profitbricks;
 
-import com.google.common.base.Joiner;
-import org.jclouds.profitbricks.domain.Regions;
 import org.jclouds.providers.ProviderMetadata;
 import org.jclouds.providers.internal.BaseProviderMetadata;
 
@@ -27,7 +25,6 @@ import java.util.Properties;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
-import static org.jclouds.location.reference.LocationConstants.PROPERTY_REGIONS;
 
 /**
  * Implementation of {@link ProviderMetadata} for

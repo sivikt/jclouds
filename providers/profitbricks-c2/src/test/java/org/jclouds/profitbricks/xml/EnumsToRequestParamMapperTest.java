@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
+package org.jclouds.profitbricks.xml;
 
+import org.jclouds.net.domain.IpProtocol;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
 import org.testng.annotations.Test;
@@ -23,14 +24,14 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test for {@code ServerEnumsToStringMapper}
+ * Test for {@link EnumsToRequestParamMapper}
  *
  * @author Serj Sintsov
  */
-@Test(groups = "unit", testName = "ServerEnumsToStringMapperTest")
-public class ServerEnumsToStringMapperTest {
+@Test(groups = "unit", testName = "EnumsToRequestParamMapperTest")
+public class EnumsToRequestParamMapperTest {
 
-   private ServerEnumsToStringMapper mapper = new ServerEnumsToStringMapper();
+   private EnumsToRequestParamMapper mapper = new EnumsToRequestParamMapper();
 
    @Test
    public void testMapOsType() {
@@ -47,6 +48,15 @@ public class ServerEnumsToStringMapperTest {
       assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.AUTO), "AUTO");
       assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_1), "ZONE_1");
       assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_2), "ZONE_2");
+   }
+
+   @Test
+   public void testMapIpProtocol() {
+      assertEquals(mapper.mapIpProtocol(null), "");
+      assertEquals(mapper.mapIpProtocol(IpProtocol.ALL), "ALL");
+      assertEquals(mapper.mapIpProtocol(IpProtocol.TCP), "TCP");
+      assertEquals(mapper.mapIpProtocol(IpProtocol.UDP), "UDP");
+      assertEquals(mapper.mapIpProtocol(IpProtocol.ICMP), "ICMP");
    }
 
 }

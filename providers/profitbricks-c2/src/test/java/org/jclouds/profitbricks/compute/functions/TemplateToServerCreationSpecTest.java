@@ -18,7 +18,7 @@ package org.jclouds.profitbricks.compute.functions;
 
 /**
  * Test for {@link TemplateToServerCreationSpec}
- *
+ *            todo finish
  * @author Serj Sintsov
  */
 public class TemplateToServerCreationSpecTest {

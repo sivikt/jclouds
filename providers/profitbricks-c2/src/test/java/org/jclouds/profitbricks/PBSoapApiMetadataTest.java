@@ -20,7 +20,7 @@ import org.jclouds.compute.internal.BaseComputeServiceApiMetadataTest;
 import org.testng.annotations.Test;
 
 /**
- * Test for {@code PBApi}
+ * Test for {@link PBApi}
  *
  * @author Serj Sintsov
  */

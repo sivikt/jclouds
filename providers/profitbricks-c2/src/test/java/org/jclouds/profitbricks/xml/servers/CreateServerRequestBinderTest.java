@@ -21,6 +21,7 @@ import org.jclouds.http.HttpRequest;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.xml.EnumsToRequestParamMapper;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
 import org.testng.annotations.Test;
 
@@ -43,12 +44,12 @@ public class CreateServerRequestBinderTest {
 
    @Test
    public void checkAllFieldsAreMapped() {
-      ServerEnumsToStringMapper mapperMock = createMock(ServerEnumsToStringMapper.class);
+      EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
       expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("OS_TYPE");
       expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("ZONE");
       replay(mapperMock);
 
-      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(new ServerCreationSpecToXmlMapper(mapperMock));
+      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
 
       HttpRequest request = createRequest();
 
@@ -72,13 +73,13 @@ public class CreateServerRequestBinderTest {
 
    @Test
    public void checkNotEmptyFieldsAreMapped() {
-      ServerEnumsToStringMapper mapperMock = createMock(ServerEnumsToStringMapper.class);
+      EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
 
       expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("");
       expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("");
       replay(mapperMock);
 
-      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(new ServerCreationSpecToXmlMapper(mapperMock));
+      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
 
       HttpRequest request = createRequest();
 

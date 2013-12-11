@@ -14,10 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
+package org.jclouds.profitbricks.xml.firewalls;
 
 import org.jclouds.http.HttpRequest;
-import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
 import org.jclouds.profitbricks.xml.BaseRequestBinder;
 import org.jclouds.profitbricks.xml.EnumsToRequestParamMapper;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
@@ -32,12 +32,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * @author Serj Sintsov
  */
-public class CreateServerRequestBinder extends BaseRequestBinder {
+public class AddFirewallRuleRequestBinder extends BaseRequestBinder {
 
    private EnumsToRequestParamMapper enumsToRequestParam;
 
    @Inject
-   public CreateServerRequestBinder(EnumsToRequestParamMapper enumsToRequestParam) {
+   public AddFirewallRuleRequestBinder(EnumsToRequestParamMapper enumsToRequestParam) {
       this.enumsToRequestParam = checkNotNull(enumsToRequestParam, "enumsToRequestParam");
    }
 
@@ -45,25 +45,31 @@ public class CreateServerRequestBinder extends BaseRequestBinder {
    public <R extends HttpRequest> R bindToRequest(R request, Map<String, Object> postParams) {
       checkNotNull(request, "request");
 
-      Object serverSpecObj = postParams.get(PBApiRequestParameters.SERVER_SPECIFICATION);
-      checkNotNull(serverSpecObj, "server specification");
-      ServerCreationSpec serverSpec = ServerCreationSpec.class.cast(serverSpecObj);
+      Object firewallRuleSpecObj = postParams.get(PBApiRequestParameters.FIREWALL_RULE_SPECIFICATION);
+      Object nicIdObj = postParams.get(PBApiRequestParameters.NIC_ID);
 
-      return createRequest(request, mapToXml(serverSpec));
+      checkNotNull(firewallRuleSpecObj, "firewall rule specification");
+      FirewallRuleCreationSpec firewallRuleSpec = FirewallRuleCreationSpec.class.cast(firewallRuleSpecObj);
+
+      checkNotNull(nicIdObj, "nicId");
+      String nicId = String.class.cast(nicIdObj);
+
+      return createRequest(request, mapToXml(nicId, firewallRuleSpec));
    }
 
-   private String mapToXml(ServerCreationSpec serverSpec) {
+   private String mapToXml(String nicId, FirewallRuleCreationSpec spec) {
       return "<ws:createServer>" +
                 "<request>" +
-                   addIfNotEmpty("<dataCenterId>%s</dataCenterId>", serverSpec.getDataCenterId()) +
-                   addIfNotEmpty("<serverName>%s</serverName>", serverSpec.getServerName()) +
-                   justAdd("<cores>%s</cores>", serverSpec.getCores()) +
-                   justAdd("<ram>%s</ram>", serverSpec.getRam()) +
-                   justAdd("<internetAccess>%s</internetAccess>", serverSpec.isInternetAccess()) +
-                   addIfNotEmpty("<bootFromImageId>%s</bootFromImageId>", serverSpec.getBootFromImageId()) +
-                   addIfNotEmpty("<osType>%s</osType>", enumsToRequestParam.mapOSType(serverSpec.getOsType())) +
-                   addIfNotEmpty("<availabilityZone>%s</availabilityZone>", enumsToRequestParam.mapAvailabilityZone(serverSpec.getAvailabilityZone())) +
+                   addIfNotNull("<icmpCode>%s</icmpCode>", spec.getIcmpCode()) +
+                   addIfNotNull("<icmpType>%s</icmpType>", spec.getIcmpType()) +
+                   addIfNotNull("<portRangeEnd>%s</portRangeEnd>", spec.getToPort()) +
+                   addIfNotNull("<portRangeStart>%s</portRangeStart>", spec.getFromPort()) +
+                   justAdd("<protocol>%s</protocol>", enumsToRequestParam.mapIpProtocol(spec.getProtocol())) +
+                   addIfNotEmpty("<sourceIp>%s</sourceIp>", spec.getSourceIp()) +
+                   addIfNotEmpty("<sourceMac>%s</sourceMac>", spec.getSourceMac()) +
+                   addIfNotEmpty("<targetIp>%s</targetIp>", spec.getTargetIp()) +
                 "</request>" +
+                justAdd("<nicId>%s</nicId>", nicId) +
              "</ws:createServer>";
    }
 

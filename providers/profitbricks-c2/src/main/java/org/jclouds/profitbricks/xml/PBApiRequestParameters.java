@@ -28,6 +28,16 @@ public final class PBApiRequestParameters {
     */
    public static final String SERVER_SPECIFICATION = "serverSpec";
 
+   /**
+    * Used to pass {@link org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec} into payload
+    */
+   public static final String FIREWALL_RULE_SPECIFICATION = "firewallRuleSpec";
+
+   /**
+    * Used to pass {@link org.jclouds.profitbricks.domain.NIC#getId()} into payload
+    */
+   public static final String NIC_ID = "nicId";
+
    private PBApiRequestParameters() { }
 
 }

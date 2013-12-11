@@ -53,7 +53,7 @@ public class NIC {
       protected boolean dhcpActive;
       protected String gatewayIp;
       protected ProvisioningState provisioningState;
-      protected Firewall firewall;
+      protected String firewallId;
 
       /**
        * @see NIC#getNicName()
@@ -139,8 +139,8 @@ public class NIC {
       /**
        * @see NIC#getProvisioningState()
        */
-      public T provisioningState(Firewall firewall) {
-         this.firewall = firewall;
+      public T provisioningState(String firewallId) {
+         this.firewallId = firewallId;
          return self();
       }
 
@@ -155,10 +155,7 @@ public class NIC {
          checkNotNull(gatewayIp, "gatewayIp");
          checkNotNull(provisioningState, "provisioningState");
 
-         if (firewall != null)
-            checkState(id.equals(firewall.getNicId()), "firewall nicId and target nic id are different");
-
-         return new NIC(id, nicName, serverId, lanId, internetAccess, ips, macAddress, dhcpActive, gatewayIp, firewall,
+         return new NIC(id, nicName, serverId, lanId, internetAccess, ips, macAddress, dhcpActive, gatewayIp, firewallId,
                         provisioningState);
       }
 
@@ -181,10 +178,10 @@ public class NIC {
    private boolean dhcpActive;
    private String gatewayIp;
    private ProvisioningState provisioningState;
-   private Firewall firewall;
+   private String firewallId;
 
    protected NIC(String id, @Nullable String nicName, String serverId, int lanId, boolean internetAccess,
-                 Set<String> ips, String macAddress, boolean dhcpActive, String gatewayIp, Firewall firewall,
+                 Set<String> ips, String macAddress, boolean dhcpActive, String gatewayIp, String firewallId,
                  ProvisioningState provisioningState) {
 
       this.id = id;
@@ -197,12 +194,15 @@ public class NIC {
       this.dhcpActive = dhcpActive;
       this.gatewayIp = gatewayIp;
       this.provisioningState = provisioningState;
-      this.firewall = firewall;
+      this.firewallId = firewallId;
    }
 
+   /**
+    * Identifier of the related firewall
+    */
    @Nullable
-   public Firewall getFirewall() {
-      return firewall;
+   public String getFirewallId() {
+      return firewallId;
    }
 
    @Nullable
@@ -290,7 +290,8 @@ public class NIC {
             .add("macAddress", macAddress)
             .add("dhcpActive", dhcpActive)
             .add("gatewayIp", gatewayIp)
-            .add("provisioningState", provisioningState);
+            .add("provisioningState", provisioningState)
+            .add("firewallId", firewallId);
    }
 
    @Override

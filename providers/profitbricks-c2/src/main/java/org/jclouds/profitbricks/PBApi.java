@@ -17,10 +17,9 @@
 package org.jclouds.profitbricks;
 
 import org.jclouds.profitbricks.features.DataCenterApi;
+import org.jclouds.profitbricks.features.FirewallApi;
 import org.jclouds.profitbricks.features.ServerApi;
 import org.jclouds.rest.annotations.*;
-
-import java.io.Closeable;
 
 /**
  * Provides access to ProfitBricks's Cloud Compute specific features.
@@ -34,12 +33,15 @@ import java.io.Closeable;
  * @see <a href="https://api.profitbricks.com/1.2" />
  * @see <a href="https://api.profitbricks.com/1.2/wsdl" />
  */
-public interface PBApi extends Closeable {
+public interface PBApi {
 
    @Delegate
    DataCenterApi dataCenterApi();
 
    @Delegate
    ServerApi serversApi();
+
+   @Delegate
+   FirewallApi firewallApi();
 
 }
