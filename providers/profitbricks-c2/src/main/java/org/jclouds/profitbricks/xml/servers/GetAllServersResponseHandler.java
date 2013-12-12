@@ -25,7 +25,8 @@ import javax.inject.Inject;
 import java.util.Set;
 
 /**
- * XML parser to handle success response on GetAllServers request.
+ * XML parser to handle success response on
+ * {@link org.jclouds.profitbricks.features.ServerApi#getAllServers()} request.
  *
  * @author Serj Sintsov
  */

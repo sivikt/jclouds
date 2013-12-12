@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import org.jclouds.date.DateCodec;
 import org.jclouds.date.DateCodecFactory;
 import org.jclouds.http.functions.ParseSax;
+import org.jclouds.javax.annotation.Nullable;
 
 import java.util.Date;
 
@@ -68,6 +69,16 @@ public abstract class BasePBResponseHandler<T> extends ParseSax.HandlerForGenera
    @VisibleForTesting
    protected int textBufferToIntValue() {
       return Integer.parseInt(trimAndGetTagStrValue());
+   }
+
+   /**
+    * Uses {@link #trimAndGetTagStrValue()}
+    */
+   @VisibleForTesting
+   @Nullable
+   protected Integer textBufferToIntegerValue() {
+      String s = trimAndGetTagStrValue();
+      return s.length() > 0 ? Integer.valueOf(s) : null;
    }
 
    /**

@@ -31,7 +31,8 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Base ProfitBricks API test
+ * Base ProfitBricks API integration test. Useful to check request headers,
+ * body, and so on.
  *
  * @author Serj Sintsov
  */

@@ -28,7 +28,8 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Create XML payload to send new server creation request.
+ * Create XML payload for operation
+ * {@link org.jclouds.profitbricks.features.ServerApi#createServer(org.jclouds.profitbricks.domain.specs.ServerCreationSpec)}.
  *
  * @author Serj Sintsov
  */

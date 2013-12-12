@@ -14,34 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml;
+package org.jclouds.profitbricks.features;
 
-import org.jclouds.net.domain.IpProtocol;
-import org.jclouds.profitbricks.domain.AvailabilityZone;
-import org.jclouds.profitbricks.domain.OSType;
-
-import javax.inject.Singleton;
+import org.testng.annotations.Test;
 
 /**
- * Maps ProfitBricks' specific enums to strings. Useful in requests binders.
- *
+ * Integration test for {@link DataCenterApi}.
+ * todo finish
  * @author Serj Sintsov
  */
-@Singleton
-public class EnumsToRequestParamMapper {
+@Test(groups = "unit", testName = "DataCenterApiTest")
+public class DataCenterApiTest extends BasePBApiTest<ServerApi> {
 
-   public String mapOSType(OSType osType) {
-      return osType == null ? "" : osType.value();
-   }
 
-   public String mapAvailabilityZone(AvailabilityZone zone) {
-      return zone == null ? "" : zone.value();
-   }
-
-   public String mapIpProtocol(IpProtocol protocol) {
-      if (protocol == IpProtocol.ALL)
-         return "ANY";
-      return protocol == null ? "" : protocol.name();
-   }
 
 }

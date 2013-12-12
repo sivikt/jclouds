@@ -51,7 +51,7 @@ public class AddFirewallRuleRequestBinderTest {
 
       HttpRequest request = createRequest();
 
-      String expectedPayload = "<ws:createServer>" +
+      String expectedPayload = "<ws:addFirewallRulesToNic>" +
                                  "<request>" +
                                     "<icmpCode>1</icmpCode>" +
                                     "<icmpType>2</icmpType>" +
@@ -63,7 +63,7 @@ public class AddFirewallRuleRequestBinderTest {
                                     "<targetIp>5.6.7.8</targetIp>" +
                                  "</request>" +
                                  "<nicId>ab-cd</nicId>" +
-                               "</ws:createServer>";
+                               "</ws:addFirewallRulesToNic>";
 
       HttpRequest resultRequest = requestBinder.bindToRequest(request, createParams(maxInfoSpec()));
       assertNotNull(resultRequest);
@@ -80,12 +80,12 @@ public class AddFirewallRuleRequestBinderTest {
 
       HttpRequest request = createRequest();
 
-      String expectedPayload = "<ws:createServer>" +
+      String expectedPayload = "<ws:addFirewallRulesToNic>" +
                                   "<request>" +
                                      "<protocol>null</protocol>" +
                                   "</request>" +
                                   "<nicId>ab-cd</nicId>" +
-                               "</ws:createServer>";
+                               "</ws:addFirewallRulesToNic>";
 
       HttpRequest resultRequest = requestBinder.bindToRequest(request, createParams(minInfoSpec()));
       assertNotNull(resultRequest);

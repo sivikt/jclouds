@@ -34,7 +34,7 @@ import java.io.IOException;
 import static org.jclouds.reflect.Reflection2.method;
 
 /**
- * Test for {@link org.jclouds.profitbricks.features.ServerApi}
+ * Integration test for {@link org.jclouds.profitbricks.features.ServerApi}.
  * 
  * @author Serj Sintsov
  */

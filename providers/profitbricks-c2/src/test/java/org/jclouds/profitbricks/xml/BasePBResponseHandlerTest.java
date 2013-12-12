@@ -82,6 +82,18 @@ public class BasePBResponseHandlerTest {
    }
 
    @Test
+   public void testTextBufferToIntegerValue() {
+      handler = new BasePBResponseHandlerImpl(dateCodecFactory);
+
+      handler.characters(new char[] {' ', '1', '2', '3', '4', '5', ' '}, 1, 2);
+      assertEquals(handler.textBufferToIntegerValue(), new Integer(12));
+
+      handler.clearTextBuffer();
+      handler.characters(new char[] {' ', '\t', ' '}, 0, 3);
+      assertEquals(handler.textBufferToIntegerValue(), null);
+   }
+
+   @Test
    public void testTextBufferToBoolValue() {
       handler = new BasePBResponseHandlerImpl(dateCodecFactory);
 

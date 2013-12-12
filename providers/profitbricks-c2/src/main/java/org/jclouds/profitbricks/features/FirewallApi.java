@@ -17,14 +17,18 @@
 package org.jclouds.profitbricks.features;
 
 import org.jclouds.http.filters.BasicAuthentication;
+import org.jclouds.profitbricks.domain.Firewall;
 import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.firewalls.AddFirewallRuleRequestBinder;
+import org.jclouds.profitbricks.xml.firewalls.GetFirewallResponseHandler;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.VirtualHost;
-import org.jclouds.rest.annotations.PayloadParam;
 import org.jclouds.rest.annotations.MapBinder;
+import org.jclouds.rest.annotations.Payload;
+import org.jclouds.rest.annotations.PayloadParam;
+import org.jclouds.rest.annotations.XMLResponseParser;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -56,5 +60,18 @@ public interface FirewallApi {
    @MapBinder(AddFirewallRuleRequestBinder.class) // TODO add Fallback?
    void addFirewallRule(@PayloadParam(NIC_ID) String nicId,
                         @PayloadParam(FIREWALL_RULE_SPECIFICATION) FirewallRuleCreationSpec ruleSpec);
+
+   /**
+    * Adds accept-rule to the firewall of a given NIC.
+    * @param firewallId {@link Firewall} identifier
+    * @return an existing {@link Firewall} or {@code null}
+    */
+   @POST // TODO live and expect test
+   @Named("GetFirewall")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:getFirewall><firewallId>{id}</firewallId></ws:getFirewall>")
+   @XMLResponseParser(GetFirewallResponseHandler.class) // TODO add Fallback?
+   Firewall getFirewall(@PayloadParam("id") String firewallId);
 
 }

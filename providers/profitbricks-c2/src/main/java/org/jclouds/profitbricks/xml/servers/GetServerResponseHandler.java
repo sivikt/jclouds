@@ -22,7 +22,7 @@ import org.jclouds.profitbricks.domain.Server;
 import javax.inject.Inject;
 
 /**
- * XML parser to handle success response on GetServer request.
+ * XML parser to handle success response on {@link org.jclouds.profitbricks.features.ServerApi#getServer(String)} request.
  *
  * @author Serj Sintsov
  */

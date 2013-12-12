@@ -28,7 +28,9 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Create XML payload to send new server creation request.
+ * Create XML payload to for
+ * {@link org.jclouds.profitbricks.features.FirewallApi#addFirewallRule(String, org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec)}
+ * request.
  *
  * @author Serj Sintsov
  */
@@ -58,7 +60,7 @@ public class AddFirewallRuleRequestBinder extends BaseRequestBinder {
    }
 
    private String mapToXml(String nicId, FirewallRuleCreationSpec spec) {
-      return "<ws:createServer>" +
+      return "<ws:addFirewallRulesToNic>" +
                 "<request>" +
                    addIfNotNull("<icmpCode>%s</icmpCode>", spec.getIcmpCode()) +
                    addIfNotNull("<icmpType>%s</icmpType>", spec.getIcmpType()) +
@@ -70,7 +72,7 @@ public class AddFirewallRuleRequestBinder extends BaseRequestBinder {
                    addIfNotEmpty("<targetIp>%s</targetIp>", spec.getTargetIp()) +
                 "</request>" +
                 justAdd("<nicId>%s</nicId>", nicId) +
-             "</ws:createServer>";
+             "</ws:addFirewallRulesToNic>";
    }
 
 }

@@ -53,7 +53,7 @@ public class EnumsToRequestParamMapperTest {
    @Test
    public void testMapIpProtocol() {
       assertEquals(mapper.mapIpProtocol(null), "");
-      assertEquals(mapper.mapIpProtocol(IpProtocol.ALL), "ALL");
+      assertEquals(mapper.mapIpProtocol(IpProtocol.ALL), "ANY");
       assertEquals(mapper.mapIpProtocol(IpProtocol.TCP), "TCP");
       assertEquals(mapper.mapIpProtocol(IpProtocol.UDP), "UDP");
       assertEquals(mapper.mapIpProtocol(IpProtocol.ICMP), "ICMP");

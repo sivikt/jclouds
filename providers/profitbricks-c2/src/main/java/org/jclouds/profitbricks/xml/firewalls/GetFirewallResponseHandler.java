@@ -14,43 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.profitbricks.xml.servers;
+package org.jclouds.profitbricks.xml.firewalls;
 
 import org.jclouds.date.DateCodecFactory;
-import org.jclouds.profitbricks.xml.BasePBResponseHandler;
+import org.jclouds.profitbricks.domain.Firewall;
+import org.jclouds.profitbricks.xml.ResponseParamToEnumsMapper;
 
 import javax.inject.Inject;
 
 /**
  * XML parser to handle success response on
- * {@link org.jclouds.profitbricks.features.ServerApi#createServer(org.jclouds.profitbricks.domain.specs.ServerCreationSpec)}
- * request.
+ * {@link org.jclouds.profitbricks.features.FirewallApi#getFirewall(String)} request.
  *
  * @author Serj Sintsov
  */
-public class CreateServerResponseHandler extends BasePBResponseHandler<String> {
-
-   private boolean isDone;
-   private String serverId;
+public class GetFirewallResponseHandler extends BaseFullFirewallInfoResponseHandler<Firewall> {
 
    @Inject
-   public CreateServerResponseHandler(DateCodecFactory dateCodecFactory) {
-      super(dateCodecFactory);
+   public GetFirewallResponseHandler(DateCodecFactory dateCodecFactory, ResponseParamToEnumsMapper paramToEnumsMapper) {
+      super(dateCodecFactory, paramToEnumsMapper);
    }
 
    @Override
-   public String getResult() {
-      return serverId;
+   public Firewall getResult() {
+      return currentFW;
    }
 
    @Override
    public void endElement(String uri, String name, String qName) {
-      if (isDone) return;
-      if (qName.equals("serverId")) {
-         serverId = trimAndGetTagStrValue();
-         isDone = true;
-      }
-      clearTextBuffer();
+      if (currentFW == null)
+         super.endElement(uri, name, qName);
    }
 
 }

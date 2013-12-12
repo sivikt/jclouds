@@ -145,7 +145,7 @@ public class FirewallRule {
 
          if (toPort != null) {
             checkState(0 < toPort && toPort < 65535, "toPort must be in range [1, 65534]");
-            checkState(toPort == null, "fromPort must be specified");
+            checkState(fromPort != null, "fromPort must be specified");
          }
 
          if (icmpCode != null)

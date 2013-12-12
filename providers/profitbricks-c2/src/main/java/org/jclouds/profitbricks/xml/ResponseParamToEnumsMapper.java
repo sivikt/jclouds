@@ -17,31 +17,27 @@
 package org.jclouds.profitbricks.xml;
 
 import org.jclouds.net.domain.IpProtocol;
-import org.jclouds.profitbricks.domain.AvailabilityZone;
-import org.jclouds.profitbricks.domain.OSType;
+import org.jclouds.profitbricks.domain.ProvisioningState;
 
 import javax.inject.Singleton;
 
 /**
- * Maps ProfitBricks' specific enums to strings. Useful in requests binders.
+ * Maps strings to ProfitBricks' specific enums. Useful in response handlers.
  *
  * @author Serj Sintsov
  */
 @Singleton
-public class EnumsToRequestParamMapper {
+public class ResponseParamToEnumsMapper {
 
-   public String mapOSType(OSType osType) {
-      return osType == null ? "" : osType.value();
+   public IpProtocol toIpProtocol(String s) {
+      if ("ANY".equals(s))
+         return IpProtocol.ALL;
+
+      return s == null ? null : IpProtocol.fromValue(s);
    }
 
-   public String mapAvailabilityZone(AvailabilityZone zone) {
-      return zone == null ? "" : zone.value();
-   }
-
-   public String mapIpProtocol(IpProtocol protocol) {
-      if (protocol == IpProtocol.ALL)
-         return "ANY";
-      return protocol == null ? "" : protocol.name();
+   public ProvisioningState toProvState(String s) {
+      return s == null ? null : ProvisioningState.fromValue(s);
    }
 
 }

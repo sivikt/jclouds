@@ -1,0 +1,34 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <ns2:getFirewallResponse xmlns:ns2="http://ws.api.profitbricks.com/">
+         <return>
+            <active>true</active>
+            <firewallId>63dbd146-0db5-4874-ae27-57280f0e1967</firewallId>
+            <firewallRules>
+               <firewallRuleId>f7747027-bdaf-4f01-a1ce-a2c86ab711bc</firewallRuleId>
+               <portRangeEnd>22</portRangeEnd>
+               <portRangeStart>22</portRangeStart>
+               <protocol>TCP</protocol>
+               <targetIp>69.194.130.64</targetIp>
+            </firewallRules>
+            <firewallRules>
+               <firewallRuleId>11111-2222-3333-4444-55555</firewallRuleId>
+               <portRangeEnd>400</portRangeEnd>
+               <portRangeStart>1</portRangeStart>
+               <protocol>TCP</protocol>
+               <targetIp>69.194.130.64</targetIp>
+               <sourceIp>172.168.38.1</sourceIp>
+               <sourceMac>aa:bb:cc:dd:ee:ff</sourceMac>
+               <icmpCode>254</icmpCode>
+               <icmpType>128</icmpType>
+            </firewallRules>
+            <firewallRules>
+               <firewallRuleId>64b0d008-ff2a-43cd-b157-d0526ed5d8f8</firewallRuleId>
+               <protocol>ANY</protocol>
+            </firewallRules>
+            <nicId>66437ecb-6e9a-4579-9da8-7b87cc40273b</nicId>
+            <provisioningState>INPROCESS</provisioningState>
+         </return>
+      </ns2:getFirewallResponse>
+   </S:Body>
+</S:Envelope>
