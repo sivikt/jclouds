@@ -35,28 +35,28 @@ public class EnumsToRequestParamMapperTest {
 
    @Test
    public void testMapOsType() {
-      assertEquals(mapper.mapOSType(null), "");
-      assertEquals(mapper.mapOSType(OSType.OTHER), "OTHER");
-      assertEquals(mapper.mapOSType(OSType.UNKNOWN), "UNKNOWN");
-      assertEquals(mapper.mapOSType(OSType.WINDOWS), "WINDOWS");
-      assertEquals(mapper.mapOSType(OSType.LINUX), "LINUX");
+      assertEquals(mapper.fromOSType(null), "");
+      assertEquals(mapper.fromOSType(OSType.OTHER), "OTHER");
+      assertEquals(mapper.fromOSType(OSType.UNKNOWN), "UNKNOWN");
+      assertEquals(mapper.fromOSType(OSType.WINDOWS), "WINDOWS");
+      assertEquals(mapper.fromOSType(OSType.LINUX), "LINUX");
    }
 
    @Test
    public void testMapAvailabilityZone() {
-      assertEquals(mapper.mapAvailabilityZone(null), "");
-      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.AUTO), "AUTO");
-      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_1), "ZONE_1");
-      assertEquals(mapper.mapAvailabilityZone(AvailabilityZone.ZONE_2), "ZONE_2");
+      assertEquals(mapper.fromAvailabilityZone(null), "");
+      assertEquals(mapper.fromAvailabilityZone(AvailabilityZone.AUTO), "AUTO");
+      assertEquals(mapper.fromAvailabilityZone(AvailabilityZone.ZONE_1), "ZONE_1");
+      assertEquals(mapper.fromAvailabilityZone(AvailabilityZone.ZONE_2), "ZONE_2");
    }
 
    @Test
    public void testMapIpProtocol() {
-      assertEquals(mapper.mapIpProtocol(null), "");
-      assertEquals(mapper.mapIpProtocol(IpProtocol.ALL), "ANY");
-      assertEquals(mapper.mapIpProtocol(IpProtocol.TCP), "TCP");
-      assertEquals(mapper.mapIpProtocol(IpProtocol.UDP), "UDP");
-      assertEquals(mapper.mapIpProtocol(IpProtocol.ICMP), "ICMP");
+      assertEquals(mapper.fromIpProtocol(null), "");
+      assertEquals(mapper.fromIpProtocol(IpProtocol.ALL), "ANY");
+      assertEquals(mapper.fromIpProtocol(IpProtocol.TCP), "TCP");
+      assertEquals(mapper.fromIpProtocol(IpProtocol.UDP), "UDP");
+      assertEquals(mapper.fromIpProtocol(IpProtocol.ICMP), "ICMP");
    }
 
 }

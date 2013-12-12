@@ -45,8 +45,8 @@ public class CreateServerRequestBinderTest {
    @Test
    public void checkAllFieldsAreMapped() {
       EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
-      expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("OS_TYPE");
-      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("ZONE");
+      expect(mapperMock.fromOSType(anyObject(OSType.class))).andReturn("OS_TYPE");
+      expect(mapperMock.fromAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("ZONE");
       replay(mapperMock);
 
       CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
@@ -75,8 +75,8 @@ public class CreateServerRequestBinderTest {
    public void checkNotEmptyFieldsAreMapped() {
       EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
 
-      expect(mapperMock.mapOSType(anyObject(OSType.class))).andReturn("");
-      expect(mapperMock.mapAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("");
+      expect(mapperMock.fromOSType(anyObject(OSType.class))).andReturn("");
+      expect(mapperMock.fromAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("");
       replay(mapperMock);
 
       CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);

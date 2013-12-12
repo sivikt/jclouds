@@ -30,15 +30,15 @@ import javax.inject.Singleton;
 @Singleton
 public class EnumsToRequestParamMapper {
 
-   public String mapOSType(OSType osType) {
+   public String fromOSType(OSType osType) {
       return osType == null ? "" : osType.value();
    }
 
-   public String mapAvailabilityZone(AvailabilityZone zone) {
+   public String fromAvailabilityZone(AvailabilityZone zone) {
       return zone == null ? "" : zone.value();
    }
 
-   public String mapIpProtocol(IpProtocol protocol) {
+   public String fromIpProtocol(IpProtocol protocol) {
       if (protocol == IpProtocol.ALL)
          return "ANY";
       return protocol == null ? "" : protocol.name();

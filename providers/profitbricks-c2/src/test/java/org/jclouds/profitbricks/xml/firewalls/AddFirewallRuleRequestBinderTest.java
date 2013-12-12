@@ -44,7 +44,7 @@ public class AddFirewallRuleRequestBinderTest {
    @Test
    public void checkAllFieldsAreMapped() {
       EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
-      expect(mapperMock.mapIpProtocol(anyObject(IpProtocol.class))).andReturn("PROTOCOL_TYPE");
+      expect(mapperMock.fromIpProtocol(anyObject(IpProtocol.class))).andReturn("PROTOCOL_TYPE");
       replay(mapperMock);
 
       AddFirewallRuleRequestBinder requestBinder = new AddFirewallRuleRequestBinder(mapperMock);
@@ -73,7 +73,7 @@ public class AddFirewallRuleRequestBinderTest {
    @Test
    public void checkNotEmptyFieldsAreMapped() {
       EnumsToRequestParamMapper mapperMock = createMock(EnumsToRequestParamMapper.class);
-      expect(mapperMock.mapIpProtocol(anyObject(IpProtocol.class))).andReturn(null);
+      expect(mapperMock.fromIpProtocol(anyObject(IpProtocol.class))).andReturn(null);
       replay(mapperMock);
 
       AddFirewallRuleRequestBinder requestBinder = new AddFirewallRuleRequestBinder(mapperMock);

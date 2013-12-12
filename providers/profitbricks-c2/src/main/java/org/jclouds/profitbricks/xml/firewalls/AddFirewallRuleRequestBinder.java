@@ -66,7 +66,7 @@ public class AddFirewallRuleRequestBinder extends BaseRequestBinder {
                    addIfNotNull("<icmpType>%s</icmpType>", spec.getIcmpType()) +
                    addIfNotNull("<portRangeEnd>%s</portRangeEnd>", spec.getToPort()) +
                    addIfNotNull("<portRangeStart>%s</portRangeStart>", spec.getFromPort()) +
-                   justAdd("<protocol>%s</protocol>", enumsToRequestParam.mapIpProtocol(spec.getProtocol())) +
+                   justAdd("<protocol>%s</protocol>", enumsToRequestParam.fromIpProtocol(spec.getProtocol())) +
                    addIfNotEmpty("<sourceIp>%s</sourceIp>", spec.getSourceIp()) +
                    addIfNotEmpty("<sourceMac>%s</sourceMac>", spec.getSourceMac()) +
                    addIfNotEmpty("<targetIp>%s</targetIp>", spec.getTargetIp()) +

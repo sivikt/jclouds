@@ -62,8 +62,8 @@ public class CreateServerRequestBinder extends BaseRequestBinder {
                    justAdd("<ram>%s</ram>", serverSpec.getRam()) +
                    justAdd("<internetAccess>%s</internetAccess>", serverSpec.isInternetAccess()) +
                    addIfNotEmpty("<bootFromImageId>%s</bootFromImageId>", serverSpec.getBootFromImageId()) +
-                   addIfNotEmpty("<osType>%s</osType>", enumsToRequestParam.mapOSType(serverSpec.getOsType())) +
-                   addIfNotEmpty("<availabilityZone>%s</availabilityZone>", enumsToRequestParam.mapAvailabilityZone(serverSpec.getAvailabilityZone())) +
+                   addIfNotEmpty("<osType>%s</osType>", enumsToRequestParam.fromOSType(serverSpec.getOsType())) +
+                   addIfNotEmpty("<availabilityZone>%s</availabilityZone>", enumsToRequestParam.fromAvailabilityZone(serverSpec.getAvailabilityZone())) +
                 "</request>" +
              "</ws:createServer>";
    }
