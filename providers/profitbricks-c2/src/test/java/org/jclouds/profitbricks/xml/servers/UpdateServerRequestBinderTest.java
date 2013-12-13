@@ -20,27 +20,24 @@ import com.google.common.collect.Maps;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.profitbricks.domain.AvailabilityZone;
 import org.jclouds.profitbricks.domain.OSType;
-import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerUpdatingSpec;
 import org.jclouds.profitbricks.xml.EnumsToRequestParamMapper;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
 
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
- * Test for {@link org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder}
+ * Test for {@link UpdateServerRequestBinder}
  *
  * @author Serj Sintsov
  */
-@Test(groups = "unit", testName = "CreateServerRequestBinderTest")
-public class CreateServerRequestBinderTest {
+@Test(groups = "unit", testName = "UpdateServerRequestBinderTest")
+public class UpdateServerRequestBinderTest {
 
    @Test
    public void checkAllFieldsAreMapped() {
@@ -49,24 +46,23 @@ public class CreateServerRequestBinderTest {
       expect(mapperMock.fromAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("ZONE");
       replay(mapperMock);
 
-      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
+      UpdateServerRequestBinder updateServerRequestBinder = new UpdateServerRequestBinder(mapperMock);
 
       HttpRequest request = createRequest();
 
-      String expectedPayload = "<ws:createServer>" +
+      String expectedPayload = "<ws:updateServer>" +
                                   "<request>" +
-                                     "<dataCenterId>11111-2222-3333-4444-25195ac4515a</dataCenterId>" +
+                                     "<serverId>id1</serverId>" +
                                      "<serverName>LinuxServer</serverName>" +
                                      "<cores>2</cores>" +
                                      "<ram>1024</ram>" +
-                                     "<internetAccess>true</internetAccess>" +
                                      "<bootFromImageId>836acb2c-66f9-11e2-9478-0025901dfe2a</bootFromImageId>" +
                                      "<osType>OS_TYPE</osType>" +
                                      "<availabilityZone>ZONE</availabilityZone>" +
                                   "</request>" +
-                               "</ws:createServer>";
+                               "</ws:updateServer>";
 
-      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(maxInfoServerSpec()));
+      HttpRequest resultRequest = updateServerRequestBinder.bindToRequest(request, createParams("id1", maxInfoServerSpec()));
       assertNotNull(resultRequest);
       assertEquals(resultRequest.getPayload().getRawContent(), expectedPayload);
    }
@@ -79,20 +75,20 @@ public class CreateServerRequestBinderTest {
       expect(mapperMock.fromAvailabilityZone(anyObject(AvailabilityZone.class))).andReturn("");
       replay(mapperMock);
 
-      CreateServerRequestBinder createServerRequestBinder = new CreateServerRequestBinder(mapperMock);
+      UpdateServerRequestBinder updateServerRequestBinder = new UpdateServerRequestBinder(mapperMock);
 
       HttpRequest request = createRequest();
 
-      String expectedPayload = "<ws:createServer>" +
+      String expectedPayload = "<ws:updateServer>" +
                                   "<request>" +
+                                     "<serverId>id1</serverId>" +
                                      "<cores>2</cores>" +
                                      "<ram>1024</ram>" +
-                                     "<internetAccess>false</internetAccess>" +
                                      "<bootFromStorageId>storageId</bootFromStorageId>" +
                                   "</request>" +
-                               "</ws:createServer>";
+                               "</ws:updateServer>";
 
-      HttpRequest resultRequest = createServerRequestBinder.bindToRequest(request, createParams(minInfoServerSpec()));
+      HttpRequest resultRequest = updateServerRequestBinder.bindToRequest(request, createParams("id1", minInfoServerSpec()));
       assertNotNull(resultRequest);
       assertEquals(resultRequest.getPayload().getRawContent(), expectedPayload);
    }
@@ -101,28 +97,27 @@ public class CreateServerRequestBinderTest {
       return HttpRequest.builder().method("POST").endpoint("http://home.local").build();
    }
 
-   private HashMap<String,Object> createParams(ServerCreationSpec serverCreationSpec) {
+   private HashMap<String,Object> createParams(String serverId, ServerUpdatingSpec serverUpdateSpec) {
       HashMap<String,Object> postParams = Maps.newHashMap();
-      postParams.put(PBApiRequestParameters.SERVER_SPECIFICATION, serverCreationSpec);
+      postParams.put(PBApiRequestParameters.SERVER_ID, serverId);
+      postParams.put(PBApiRequestParameters.SERVER_SPECIFICATION, serverUpdateSpec);
       return postParams;
    }
 
-   public ServerCreationSpec minInfoServerSpec() {
-      return ServerCreationSpec.builder()
+   public ServerUpdatingSpec minInfoServerSpec() {
+      return ServerUpdatingSpec.builder()
             .cores(2)
             .ram(1024)
             .bootFromStorageId("storageId")
             .build();
    }
 
-   public ServerCreationSpec maxInfoServerSpec() {
-      return ServerCreationSpec.builder()
-            .dataCenterId("11111-2222-3333-4444-25195ac4515a")
+   public ServerUpdatingSpec maxInfoServerSpec() {
+      return ServerUpdatingSpec.builder()
             .serverName("LinuxServer")
             .cores(2)
             .ram(1024)
             .osType(OSType.LINUX)
-            .internetAccess(true)
             .bootFromImageId("836acb2c-66f9-11e2-9478-0025901dfe2a")
             .availabilityZone(AvailabilityZone.ZONE_1)
             .build();

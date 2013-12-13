@@ -19,12 +19,15 @@ package org.jclouds.profitbricks.features;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerUpdatingSpec;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.servers.CreateServerRequestBinder;
 import org.jclouds.profitbricks.xml.servers.CreateServerResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
 import org.jclouds.profitbricks.xml.servers.GetServerResponseHandler;
+import org.jclouds.profitbricks.xml.servers.UpdateServerRequestBinder;
 import static org.jclouds.profitbricks.xml.PBApiRequestParameters.SERVER_SPECIFICATION;
+import static org.jclouds.profitbricks.xml.PBApiRequestParameters.SERVER_ID;
 import org.jclouds.rest.annotations.Payload;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.VirtualHost;
@@ -53,10 +56,7 @@ import java.util.Set;
 public interface ServerApi {
 
    /**
-    * Returns information about all virtual server, such as
-    * configuration, provisioning status, power status, etc.
-    *
-    * @return servers in your cloud data centers or empty if there are none
+    * @return all {@link Server}s in your cloud or empty set if there are none
     */
    @POST // TODO live and expect test
    @Named("GetAllServers")
@@ -67,10 +67,7 @@ public interface ServerApi {
    Set<Server> listServers();
 
    /**
-    * Returns information about a virtual server,
-    * such as configuration, provisioning status, power status, etc.
-    *
-    * @param serverId server identificator
+    * @param serverId {@link Server#getId()} identificator
     * @return an existing {@link Server} or {@code null}
     */
    @POST // TODO live and expect test
@@ -82,10 +79,7 @@ public interface ServerApi {
    Server getServer(@PayloadParam("id") String serverId);
 
    /**
-    * Creates a Virtual Server.
-    *
-    * @param serverSpec server creation specification
-    * @return server identifier or {@code null} if creation is failed
+    * @return {@link Server#getId()} identifier or {@code null} if creation is failed
     */
    @POST // TODO live and expect test
    @Named("CreateServer")
@@ -96,9 +90,7 @@ public interface ServerApi {
    String createServer(@PayloadParam(SERVER_SPECIFICATION) ServerCreationSpec serverSpec);
 
    /**
-    * Resets an existing virtual server (POWER CYCLE).
-    *
-    * @param serverId server entity identificator to reset
+    * @param serverId {@link Server#getId()} identificator
     */
    @POST // TODO live and expect test
    @Named("ResetServer")
@@ -108,9 +100,7 @@ public interface ServerApi {
    void resetServer(@PayloadParam("id") String serverId);
 
    /**
-    * Starts an existing virtual server.
-    *
-    * @param serverId server entity identificator to reset
+    * @param serverId {@link Server#getId()} identificator
     */
    @POST // TODO live and expect test
    @Named("StartServer")
@@ -120,9 +110,7 @@ public interface ServerApi {
    void startServer(@PayloadParam("id") String serverId);
 
    /**
-    * Stops an existing virtual server forcefully (HARD stop).
-    *
-    * @param serverId server entity identificator to reset
+    * @param serverId {@link Server#getId()} identificator
     */
    @POST // TODO live and expect test
    @Named("StopServer")
@@ -132,9 +120,7 @@ public interface ServerApi {
    void stopServer(@PayloadParam("id") String serverId);
 
    /**
-    * Stops an existing virtual server forcefully (HARD stop).
-    *
-    * @param serverId server entity identificator to reset
+    * @param serverId {@link Server#getId()} identificator
     */
    @POST // TODO live and expect test
    @Named("DeleteServer")
@@ -142,5 +128,17 @@ public interface ServerApi {
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:deleteServer><serverId>{id}</serverId></ws:deleteServer>") // TODO add Fallback?
    void deleteServer(@PayloadParam("id") String serverId);
+
+   /**
+    * @param {@link Server#getId()} identifier
+    * @param serverSpec new server options
+    */
+   @POST // TODO live and expect test
+   @Named("UpdateServer")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @MapBinder(UpdateServerRequestBinder.class) // TODO add Fallback?
+   void updateServer(@PayloadParam(SERVER_ID) String serverId,
+                     @PayloadParam(SERVER_SPECIFICATION) ServerUpdatingSpec serverSpec);
 
 }

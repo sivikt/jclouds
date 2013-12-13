@@ -40,8 +40,8 @@ import java.util.Set;
 public interface DataCenterApi {
 
    /**
-    * Returns information about all available data centers.
-    * @return set of {@link String} data centers identifiers or empty set if there are none
+    * @return set of {@link String}s which are basically {@link DataCenter#getId()} identifiers
+    *         or empty set if there are none
     */
    @POST // TODO live and expect test
    @Named("GetAllDataCenters")
@@ -49,10 +49,10 @@ public interface DataCenterApi {
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getAllDataCenters/>")
    @XMLResponseParser(GetAllServersResponseHandler.class) // TODO add Fallback?
-   Set<String> getAllDataCenters();
+   Set<String> listDataCenters();
 
    /**
-    * Returns information about an existing virtual data center’s state and configuration.
+    * @param dataCenterId {@link DataCenter#getId()} identifier
     * @return an instance of {@link DataCenter} or {@code null} if there are none such data center
     */
    @POST // TODO live and expect test

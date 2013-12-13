@@ -24,6 +24,11 @@ package org.jclouds.profitbricks.xml;
 public final class PBApiRequestParameters {
 
    /**
+    * Used to pass {@link org.jclouds.profitbricks.domain.Server#getId()} into payload
+    */
+   public static final String SERVER_ID = "serverId";
+
+   /**
     * Used to pass {@link org.jclouds.profitbricks.domain.specs.ServerCreationSpec} into payload
     */
    public static final String SERVER_SPECIFICATION = "serverSpec";

@@ -17,7 +17,7 @@
 package org.jclouds.profitbricks.xml.servers;
 
 import org.jclouds.http.HttpRequest;
-import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.domain.specs.ServerUpdatingSpec;
 import org.jclouds.profitbricks.xml.BaseRequestBinder;
 import org.jclouds.profitbricks.xml.EnumsToRequestParamMapper;
 import org.jclouds.profitbricks.xml.PBApiRequestParameters;
@@ -28,17 +28,17 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Create XML payload for operation
- * {@link org.jclouds.profitbricks.features.ServerApi#createServer(ServerCreationSpec)}.
+ * Create XML payload for
+ * {@link org.jclouds.profitbricks.features.ServerApi#updateServer(String, ServerUpdatingSpec)} operation.
  *
  * @author Serj Sintsov
  */
-public class CreateServerRequestBinder extends BaseRequestBinder {
+public class UpdateServerRequestBinder extends BaseRequestBinder {
 
    private EnumsToRequestParamMapper enumsToRequestParam;
 
    @Inject
-   public CreateServerRequestBinder(EnumsToRequestParamMapper enumsToRequestParam) {
+   public UpdateServerRequestBinder(EnumsToRequestParamMapper enumsToRequestParam) {
       this.enumsToRequestParam = checkNotNull(enumsToRequestParam, "enumsToRequestParam");
    }
 
@@ -47,26 +47,30 @@ public class CreateServerRequestBinder extends BaseRequestBinder {
       checkNotNull(request, "request");
 
       Object serverSpecObj = postParams.get(PBApiRequestParameters.SERVER_SPECIFICATION);
-      checkNotNull(serverSpecObj, "server specification");
-      ServerCreationSpec serverSpec = ServerCreationSpec.class.cast(serverSpecObj);
+      Object serverIdObj = postParams.get(PBApiRequestParameters.SERVER_ID);
 
-      return createRequest(request, mapToXml(serverSpec));
+      checkNotNull(serverSpecObj, "server specification");
+      ServerUpdatingSpec serverSpec = ServerUpdatingSpec.class.cast(serverSpecObj);
+
+      checkNotNull(serverIdObj, "serverId");
+      String serverId = String.class.cast(serverIdObj);
+
+      return createRequest(request, mapToXml(serverId, serverSpec));
    }
 
-   private String mapToXml(ServerCreationSpec serverSpec) {
-      return "<ws:createServer>" +
+   private String mapToXml(String serverId, ServerUpdatingSpec serverSpec) {
+      return "<ws:updateServer>" +
                 "<request>" +
-                   addIfNotEmpty("<dataCenterId>%s</dataCenterId>", serverSpec.getDataCenterId()) +
+                   justAdd("<serverId>%s</serverId>", serverId) +
                    addIfNotEmpty("<serverName>%s</serverName>", serverSpec.getServerName()) +
                    justAdd("<cores>%s</cores>", serverSpec.getCores()) +
                    justAdd("<ram>%s</ram>", serverSpec.getRam()) +
-                   justAdd("<internetAccess>%s</internetAccess>", serverSpec.isInternetAccess()) +
                    addIfNotEmpty("<bootFromImageId>%s</bootFromImageId>", serverSpec.getBootFromImageId()) +
                    addIfNotEmpty("<bootFromStorageId>%s</bootFromStorageId>", serverSpec.getBootFromStorageId()) +
                    addIfNotEmpty("<osType>%s</osType>", enumsToRequestParam.fromOSType(serverSpec.getOsType())) +
                    addIfNotEmpty("<availabilityZone>%s</availabilityZone>", enumsToRequestParam.fromAvailabilityZone(serverSpec.getAvailabilityZone())) +
                 "</request>" +
-             "</ws:createServer>";
+             "</ws:updateServer>";
    }
 
 }

@@ -28,10 +28,11 @@ import org.jclouds.rest.annotations.*;
  * REST is coming soon. So, by the default all PB communications are
  * delegated to SOAP endpoints.
  *
- * @author Serj Sintsov
  * @see <a href="http://www.profitbricks.com/apidoc/APIDocumentation.html" />
  * @see <a href="https://api.profitbricks.com/1.2" />
  * @see <a href="https://api.profitbricks.com/1.2/wsdl" />
+ *
+ * @author Serj Sintsov
  */
 public interface PBApi {
 

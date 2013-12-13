@@ -32,11 +32,11 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class ServerCreationSpec {
 
-   public static Builder<?> builder() {
-      return new ConcreteBuilder();
+   public static Builder builder() {
+      return new Builder();
    }
 
-   public abstract static class Builder<T extends Builder<T>> {
+   public static class Builder {
 
       protected String dataCenterId;
       protected String serverName;
@@ -44,90 +44,91 @@ public class ServerCreationSpec {
       protected String bootFromStorageId;
       protected int cores;
       protected int ram;
-      protected boolean internetAccess;
+      protected Boolean internetAccess;
       protected OSType osType;
       protected AvailabilityZone availabilityZone;
-
-      protected abstract T self();
 
       public ServerCreationSpec build() {
          checkFields();
          return buildInstance();
       }
 
-      protected abstract ServerCreationSpec buildInstance();
+      protected ServerCreationSpec buildInstance() {
+         return new ServerCreationSpec(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone,
+                                       bootFromImageId, bootFromStorageId);
+      }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getDataCenterId()
        */
-      public T dataCenterId(String dataCenterId) {
+      public Builder dataCenterId(String dataCenterId) {
          this.dataCenterId = dataCenterId;
-         return self();
+         return this;
       }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getServerName()
        */
-      public T serverName(String serverName) {
+      public Builder serverName(String serverName) {
          this.serverName = serverName;
-         return self();
+         return this;
       }
 
       /**
        * Defines an existing CD-ROM/DVD image ID to be set as boot device of the server.
        * Note that only one boot device can be used at the same time.
        */
-      public T bootFromImageId(String bootFromImageId) {
+      public Builder bootFromImageId(String bootFromImageId) {
          this.bootFromImageId = bootFromImageId;
-         return self();
+         return this;
       }
 
       /**
        * Defines an existing storage device ID to be set as boot device of the server.
        * Note that only one boot device can be used at the same time.
        */
-      public T bootFromStorageId(String bootFromStorageId) {
+      public Builder bootFromStorageId(String bootFromStorageId) {
          this.bootFromStorageId = bootFromStorageId;
-         return self();
+         return this;
       }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getCores()
        */
-      public T cores(int cores) {
+      public Builder cores(int cores) {
          this.cores = cores;
-         return self();
+         return this;
       }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getRam()
        */
-      public T ram(int ram) {
+      public Builder ram(int ram) {
          this.ram = ram;
-         return self();
+         return this;
       }
       /**
        * Connect this server to the Internet?
        */
-      public T internetAccess(boolean internetAccess) {
+      public Builder internetAccess(boolean internetAccess) {
          this.internetAccess = internetAccess;
-         return self();
+         return this;
       }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getAvailabilityZone()
        */
-      public T availabilityZone(AvailabilityZone zone) {
+      public Builder availabilityZone(AvailabilityZone zone) {
          this.availabilityZone = zone;
-         return self();
+         return this;
       }
 
       /**
        * @see org.jclouds.profitbricks.domain.Server#getOsType()
        */
-      public T osType(OSType osType) {
+      public Builder osType(OSType osType) {
          this.osType = osType;
-         return self();
+         return this;
       }
 
       protected void checkFields() {
@@ -143,20 +144,7 @@ public class ServerCreationSpec {
       }
    }
 
-   private static class ConcreteBuilder extends Builder<ConcreteBuilder> {
-      @Override
-      protected ConcreteBuilder self() {
-         return this;
-      }
-
-      @Override
-      protected ServerCreationSpec buildInstance() {
-         return new ServerCreationSpec(dataCenterId, serverName, cores, ram, internetAccess, osType, availabilityZone,
-                                       bootFromImageId, bootFromStorageId);
-      }
-   }
-
-   protected ServerCreationSpec(String dataCenterId, String serverName, int cores, int ram, boolean internetAccess,
+   protected ServerCreationSpec(String dataCenterId, String serverName, int cores, int ram, Boolean internetAccess,
                                 OSType osType, AvailabilityZone availabilityZone, String bootFromImageId,
                                 String bootFromStorageId) {
       this.dataCenterId = dataCenterId;
@@ -170,18 +158,18 @@ public class ServerCreationSpec {
       this.bootFromStorageId = bootFromStorageId;
    }
 
-   private String dataCenterId;
-   private String serverName;
-   private String bootFromImageId;
-   private String bootFromStorageId;
+   protected String dataCenterId;
+   protected String serverName;
+   protected String bootFromImageId;
+   protected String bootFromStorageId;
 
-   private int cores;
-   private int ram;
+   protected int cores;
+   protected int ram;
 
-   private boolean internetAccess;
+   protected Boolean internetAccess;
 
-   private OSType osType;
-   private AvailabilityZone availabilityZone;
+   protected OSType osType;
+   protected AvailabilityZone availabilityZone;
 
    public String getDataCenterId() {
       return dataCenterId;
@@ -207,7 +195,7 @@ public class ServerCreationSpec {
       return ram;
    }
 
-   public boolean isInternetAccess() {
+   public Boolean isInternetAccess() {
       return internetAccess;
    }
 
