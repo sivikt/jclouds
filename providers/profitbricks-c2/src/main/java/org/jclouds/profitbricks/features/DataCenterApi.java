@@ -19,8 +19,14 @@ package org.jclouds.profitbricks.features;
 import org.jclouds.http.filters.BasicAuthentication;
 import org.jclouds.profitbricks.domain.DataCenter;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
-import org.jclouds.profitbricks.xml.servers.GetAllServersResponseHandler;
-import org.jclouds.rest.annotations.*;
+import org.jclouds.profitbricks.xml.datacenters.GetAllDataCentersResponseHandler;
+import org.jclouds.profitbricks.xml.datacenters.GetDataCenterResponseHandler;
+import org.jclouds.rest.annotations.SinceApiVersion;
+import org.jclouds.rest.annotations.RequestFilters;
+import org.jclouds.rest.annotations.VirtualHost;
+import org.jclouds.rest.annotations.Payload;
+import org.jclouds.rest.annotations.XMLResponseParser;
+import org.jclouds.rest.annotations.PayloadParam;
 
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
@@ -48,7 +54,7 @@ public interface DataCenterApi {
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getAllDataCenters/>")
-   @XMLResponseParser(GetAllServersResponseHandler.class) // TODO add Fallback?
+   @XMLResponseParser(GetAllDataCentersResponseHandler.class) // TODO add Fallback?
    Set<String> listDataCenters();
 
    /**
@@ -60,7 +66,7 @@ public interface DataCenterApi {
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getDataCenter><dataCenterId>{id}</dataCenterId></ws:getDataCenter>")
-   @XMLResponseParser(GetAllServersResponseHandler.class) // TODO add Fallback?
+   @XMLResponseParser(GetDataCenterResponseHandler.class) // TODO add Fallback?
    DataCenter getDataCenter(@PayloadParam("id") String dataCenterId);
 
 }

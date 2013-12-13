@@ -16,16 +16,63 @@
  */
 package org.jclouds.profitbricks.features;
 
+import com.google.common.collect.ImmutableList;
+import org.jclouds.http.functions.ParseSax;
+import org.jclouds.profitbricks.xml.datacenters.GetAllDataCentersResponseHandler;
+import org.jclouds.profitbricks.xml.datacenters.GetDataCenterResponseHandler;
+import org.jclouds.reflect.Invocation;
+import org.jclouds.rest.internal.GeneratedHttpRequest;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+
+import static org.jclouds.reflect.Reflection2.method;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Integration test for {@link DataCenterApi}.
- * todo finish
+ *
  * @author Serj Sintsov
  */
 @Test(groups = "unit", testName = "DataCenterApiTest")
 public class DataCenterApiTest extends BasePBApiTest<ServerApi> {
 
+   @Test
+   public void getDataCenter() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(DataCenterApi.class, "getDataCenter", String.class),
+            ImmutableList.<Object>of("4aa7")
+      );
 
+      GeneratedHttpRequest request = processor.apply(invocation);
+      assertNotNull(request);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:getDataCenter><dataCenterId>4aa7</dataCenterId></ws:getDataCenter>", "text/xml", false);
+      assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), GetDataCenterResponseHandler.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void listDataCenters() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(method(DataCenterApi.class, "listDataCenters"));
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:getAllDataCenters/>", "text/xml", false);
+      assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), GetAllDataCentersResponseHandler.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
 
 }
