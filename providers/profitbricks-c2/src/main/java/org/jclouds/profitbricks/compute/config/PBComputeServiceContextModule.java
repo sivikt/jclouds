@@ -18,13 +18,13 @@ package org.jclouds.profitbricks.compute.config;
 
 import com.google.inject.Binder;
 import com.google.inject.Module;
-import org.jclouds.compute.domain.*;
+import org.jclouds.compute.domain.TemplateBuilder;
+import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.profitbricks.compute.domain.internal.PBTemplateBuilderImpl;
+import org.jclouds.profitbricks.compute.options.PBTemplateOptions;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link org.jclouds.compute.ComputeService}.
- *
- * TODO investigate and leave/remove
  *
  * @author Serj Sintsov
  */
@@ -33,6 +33,7 @@ public class PBComputeServiceContextModule implements Module {
    @Override
    public void configure(Binder binder) {
       binder.bind(TemplateBuilder.class).to(PBTemplateBuilderImpl.class);
+      binder.bind(TemplateOptions.class).to(PBTemplateOptions.class);
    }
 
 }

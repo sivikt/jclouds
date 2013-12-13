@@ -16,6 +16,7 @@
  */
 package org.jclouds.profitbricks.domain.specs;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.net.domain.IpProtocol;
@@ -208,6 +209,46 @@ public class FirewallRuleCreationSpec {
    @Nullable
    public Integer getIcmpCode() {
       return icmpCode;
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hashCode(protocol, sourceIp, sourceMac, targetIp, fromPort, toPort, icmpCode, icmpType);
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj)
+         return true;
+      if (obj == null || getClass() != obj.getClass())
+         return false;
+      FirewallRuleCreationSpec that = FirewallRuleCreationSpec.class.cast(obj);
+
+      return Objects.equal(this.protocol, that.protocol) &&
+             Objects.equal(this.sourceIp, that.sourceIp) &&
+             Objects.equal(this.sourceMac, that.sourceMac) &&
+             Objects.equal(this.targetIp, that.targetIp) &&
+             Objects.equal(this.fromPort, that.fromPort) &&
+             Objects.equal(this.toPort, that.toPort) &&
+             Objects.equal(this.icmpCode, that.icmpCode) &&
+             Objects.equal(this.icmpType, that.icmpType);
+   }
+
+   protected Objects.ToStringHelper string() {
+      return Objects.toStringHelper(this)
+            .add("protocol", protocol)
+            .add("sourceIp", sourceIp)
+            .add("sourceMac", sourceMac)
+            .add("targetIp", targetIp)
+            .add("fromPort", fromPort)
+            .add("toPort", toPort)
+            .add("icmpCode", icmpCode)
+            .add("icmpType", icmpType);
+   }
+
+   @Override
+   public String toString() {
+      return string().toString();
    }
 
 }
