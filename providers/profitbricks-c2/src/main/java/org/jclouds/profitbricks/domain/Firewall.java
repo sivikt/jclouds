@@ -181,7 +181,7 @@ public class Firewall {
    protected Objects.ToStringHelper string() {
       return Objects.toStringHelper(this)
             .add("id", id)
-            .add("id", nicId)
+            .add("nicId", nicId)
             .add("active", active)
             .add("provisioningState", provisioningState)
             .add("rules", rules);
