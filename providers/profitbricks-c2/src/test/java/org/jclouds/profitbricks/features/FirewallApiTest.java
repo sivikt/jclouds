@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.jclouds.http.functions.ParseSax;
 import org.jclouds.net.domain.IpProtocol;
 import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
+import org.jclouds.profitbricks.xml.firewalls.GetAllFirewallsResponseHandler;
 import org.jclouds.profitbricks.xml.firewalls.GetFirewallResponseHandler;
 import org.jclouds.reflect.Invocation;
 import org.jclouds.rest.internal.GeneratedHttpRequest;
@@ -99,6 +100,80 @@ public class FirewallApiTest extends BasePBApiTest<ServerApi> {
 
       assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
       assertPayloadEquals(request, expectedPayload, "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void getAllFirewalls() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(method(FirewallApi.class, "listFirewalls"));
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:getAllFirewalls/>", "text/xml", false);
+      assertResponseParserClassEquals(invocation.getInvokable(), request, ParseSax.class);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), GetAllFirewallsResponseHandler.class);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void removeFirewallRule() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(FirewallApi.class, "removeFirewallRule", String.class),
+            ImmutableList.<Object>of("82c0")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:removeFirewallRules><firewallRuleIds>82c0</firewallRuleIds></ws:removeFirewallRules>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void activate() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(FirewallApi.class, "activateFirewall", String.class),
+            ImmutableList.<Object>of("82c0")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:activateFirewalls><firewallIds>82c0</firewallIds></ws:activateFirewalls>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
+   @Test
+   public void deactivate() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(FirewallApi.class, "deactivateFirewall", String.class),
+            ImmutableList.<Object>of("82c0")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:deactivateFirewalls><firewallIds>82c0</firewallIds></ws:deactivateFirewalls>", "text/xml", false);
       assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
       assertFallbackClassEquals(invocation.getInvokable(), null);
 

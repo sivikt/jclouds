@@ -22,6 +22,7 @@ import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
 import org.jclouds.profitbricks.filters.PBSoapMessageEnvelope;
 import org.jclouds.profitbricks.xml.firewalls.AddFirewallRuleRequestBinder;
 import org.jclouds.profitbricks.xml.firewalls.GetFirewallResponseHandler;
+import org.jclouds.profitbricks.xml.firewalls.GetAllFirewallsResponseHandler;
 import org.jclouds.rest.annotations.SinceApiVersion;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.VirtualHost;
@@ -35,6 +36,8 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Set;
+
 import static org.jclouds.profitbricks.xml.PBApiRequestParameters.FIREWALL_RULE_SPECIFICATION;
 import static org.jclouds.profitbricks.xml.PBApiRequestParameters.NIC_ID;
 
@@ -49,21 +52,9 @@ import static org.jclouds.profitbricks.xml.PBApiRequestParameters.NIC_ID;
 public interface FirewallApi {
 
    /**
-    * Adds accept-rule to the firewall of a given NIC.
-    * @param nicId {@link org.jclouds.profitbricks.domain.NIC} identifier
-    * @param ruleSpec {@link org.jclouds.profitbricks.domain.FirewallRule} specification
-    */
-   @POST // TODO live and expect test
-   @Named("AddFirewallRule")
-   @Consumes(MediaType.TEXT_XML)
-   @Produces(MediaType.TEXT_XML)
-   @MapBinder(AddFirewallRuleRequestBinder.class) // TODO add Fallback?
-   void addFirewallRule(@PayloadParam(NIC_ID) String nicId,
-                        @PayloadParam(FIREWALL_RULE_SPECIFICATION) FirewallRuleCreationSpec ruleSpec);
-
-   /**
-    * Adds accept-rule to the firewall of a given NIC.
-    * @param firewallId {@link Firewall} identifier
+    * Returns information about the respective firewall.
+    *
+    * @param firewallId {@link org.jclouds.profitbricks.domain.Firewall#getId()} identifier
     * @return an existing {@link Firewall} or {@code null}
     */
    @POST // TODO live and expect test
@@ -74,4 +65,70 @@ public interface FirewallApi {
    @XMLResponseParser(GetFirewallResponseHandler.class) // TODO add Fallback?
    Firewall getFirewall(@PayloadParam("id") String firewallId);
 
+   /**
+    * Returns information about all configured firewall.
+    * @return set of all {@link Firewall}s in your cloud or empty set
+    */
+   @POST // TODO live and expect test
+   @Named("GetAllFirewalls")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:getAllFirewalls/>")
+   @XMLResponseParser(GetAllFirewallsResponseHandler.class) // TODO add Fallback?
+   Set<Firewall> listFirewalls();
+
+   /**
+    * @param firewallId {@link org.jclouds.profitbricks.domain.Firewall#getId()} identifier
+    */
+   @POST // TODO live and expect test
+   @Named("ActivateFirewall")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:activateFirewalls><firewallIds>{id}</firewallIds></ws:activateFirewalls>")
+   void activateFirewall(@PayloadParam("id") String firewallId);
+
+   /**
+    * @param firewallId {@link org.jclouds.profitbricks.domain.Firewall#getId()} identifier
+    */
+   @POST // TODO live and expect test
+   @Named("DeactivateFirewall")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:deactivateFirewalls><firewallIds>{id}</firewallIds></ws:deactivateFirewalls>")
+   void deactivateFirewall(@PayloadParam("id") String firewallId);
+
+   /**
+    * @param firewallId {@link org.jclouds.profitbricks.domain.Firewall#getId()}
+    */
+   @POST // TODO live and expect test
+   @Named("DeleteFirewall")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:deactivateFirewalls><firewallIds>{id}</firewallIds></ws:deactivateFirewalls>")
+   void deleteFirewall(@PayloadParam("id") String firewallId);
+
+   /**
+    * Adds accept-rule to the firewall of a given NIC.
+    * @param nicId {@link org.jclouds.profitbricks.domain.NIC#getId()} identifier
+    */
+   @POST // TODO live and expect test
+   @Named("AddFirewallRule")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @MapBinder(AddFirewallRuleRequestBinder.class) // TODO add Fallback?
+   void addFirewallRule(@PayloadParam(NIC_ID) String nicId,
+                        @PayloadParam(FIREWALL_RULE_SPECIFICATION) FirewallRuleCreationSpec ruleSpec);
+
+   /**
+    * @param ruleId an id of {@link org.jclouds.profitbricks.domain.FirewallRule#getId()} identifier
+    */
+   @POST // TODO live and expect test
+   @Named("RemoveSingleFirewallRule")
+   @Consumes(MediaType.TEXT_XML)
+   @Produces(MediaType.TEXT_XML)
+   @Payload("<ws:removeFirewallRules><firewallRuleIds>{id}</firewallRuleIds></ws:removeFirewallRules>")
+   void removeFirewallRule(@PayloadParam("id") String ruleId);
+
 }
+
+
