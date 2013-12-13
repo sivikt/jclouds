@@ -119,7 +119,7 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
 
    @Override
    public Iterable<Server> listNodes() {
-      return pbApi.serversApi().getAllServers();
+      return pbApi.serversApi().listServers();
    }
 
    @Override

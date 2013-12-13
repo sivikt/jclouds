@@ -64,7 +64,7 @@ public interface ServerApi {
    @Produces(MediaType.TEXT_XML)
    @Payload("<ws:getAllServers/>") // TODO add Fallback?
    @XMLResponseParser(GetAllServersResponseHandler.class)
-   Set<Server> getAllServers();
+   Set<Server> listServers();
 
    /**
     * Returns information about a virtual server,

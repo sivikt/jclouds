@@ -43,7 +43,7 @@ public class ServersApiTest extends BasePBApiTest<ServerApi> {
 
    @Test
    public void getAllServers() throws SecurityException, NoSuchMethodException, IOException {
-      Invocation invocation = Invocation.create(method(ServerApi.class, "getAllServers"));
+      Invocation invocation = Invocation.create(method(ServerApi.class, "listServers"));
 
       GeneratedHttpRequest request = processor.apply(invocation);
 

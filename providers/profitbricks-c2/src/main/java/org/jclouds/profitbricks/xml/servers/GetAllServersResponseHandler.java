@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * XML parser to handle success response on
- * {@link org.jclouds.profitbricks.features.ServerApi#getAllServers()} request.
+ * {@link org.jclouds.profitbricks.features.ServerApi#listServers()} request.
  *
  * @author Serj Sintsov
  */
