@@ -38,7 +38,7 @@ public class ServerCreationViaTemplateOptionsDemo extends BaseExample {
       pbOpts.serverSpec(ServerCreationSpec.builder()
             .serverName("Server_via_tpl_opts")
             .availabilityZone(AvailabilityZone.ZONE_1)
-            .bootFromStorageId("ee857448-e645-46dc-a9a9-0979a56d0061")
+            .bootFromStorageId("db3abc85-b184-421d-8b74-7ead11becd35") // Fr13-Storage, OpenSuse-12.2-server-amd64-06.18.13.img
             .cores(1)
             .ram(1024)
             .internetAccess(true)
@@ -51,7 +51,7 @@ public class ServerCreationViaTemplateOptionsDemo extends BaseExample {
             .build()
       );
 
-      Set<? extends NodeMetadata> createdNodesSet = cs.createNodesInGroup("single_group", 1, nodeCfg);
+      Set<? extends NodeMetadata> createdNodesSet = cs.createNodesInGroup("single-group", 1, nodeCfg);
       NodeMetadata createdNode = createdNodesSet.iterator().next();
 
       log(createdNode.toString());

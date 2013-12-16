@@ -19,7 +19,7 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
    public static void main(String[] args) throws RunNodesException, InterruptedException {
       initComputeServiceContext();
 
-      String nicId = "a57145f1-ce7d-4fc8-9d7a-4fe47db60dfe";
+      String nicId = "66437ecb-6e9a-4579-9da8-7b87cc40273b";
 
       listAllFirewalls();
       Firewall firewallByNIC = getFirewallByNIC(nicId);
@@ -50,10 +50,6 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       waitForFirewallAvailableState(firewallByNIC.getId());
 
       deleteFirewall(firewallByNIC.getId());
-
-      waitForFirewallAvailableState(firewallByNIC.getId());
-
-      getFirewallById(firewallByNIC.getId());
    }
 
    private static Set<Firewall> listAllFirewalls() {
@@ -114,28 +110,9 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       log("");
    }
 
-   private static void waitForFirewallAvailableState(String firewallId) throws InterruptedException {
-      final int RETRY_NUM = 200;
-
-      log("waiting until firewall provision state is AVAILABLE [" + firewallId + "]");
-
-
-      for (int i = 0; i < RETRY_NUM; i++) {
-         Firewall firewall = providerApi.firewallApi().getFirewall(firewallId);
-         if (firewall.getProvisioningState() == ProvisioningState.AVAILABLE) {
-            log("");
-            return;
-         }
-         else
-            Thread.sleep((long) 5*1000); // wait 5 sec
-      }
-
-      log("timeout exceed");
-   }
-
    private static void deactivate(String firewallId) {
       log(">> deactivating firewall " + firewallId);
-      providerApi.firewallApi().activateFirewall(firewallId);
+      providerApi.firewallApi().deactivateFirewall(firewallId);
       log("<< deactivating firewall " + firewallId);
       log("");
    }
@@ -159,6 +136,25 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       providerApi.firewallApi().deleteFirewall(firewallId);
       log("<< delete firewall by id=" + firewallId);
       log("");
+   }
+
+   private static void waitForFirewallAvailableState(String firewallId) throws InterruptedException {
+      final int RETRY_NUM = 200;
+
+      log("waiting until firewall provision state is AVAILABLE [" + firewallId + "]");
+
+
+      for (int i = 0; i < RETRY_NUM; i++) {
+         Firewall firewall = providerApi.firewallApi().getFirewall(firewallId);
+         if (firewall.getProvisioningState() == ProvisioningState.AVAILABLE) {
+            log("");
+            return;
+         }
+         else
+            Thread.sleep((long) 5*1000); // wait 5 sec
+      }
+
+      log("timeout exceed");
    }
 
 }
