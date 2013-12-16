@@ -3,6 +3,7 @@ package org.jclouds.profitbricks.examples;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.net.domain.IpProtocol;
 import org.jclouds.profitbricks.domain.Firewall;
+import org.jclouds.profitbricks.domain.FirewallRule;
 import org.jclouds.profitbricks.domain.ProvisioningState;
 import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
 
@@ -33,7 +34,7 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       waitForFirewallAvailableState(firewallByNIC.getId());
 
       addRuleToNic(nicId, FirewallRuleCreationSpec.builder()
-            .sourceIp("172.168.38.2")
+            .sourceIp("172.168.38.3")
             .protocol(IpProtocol.TCP)
             .fromPort(1)
             .toPort(400)
@@ -43,12 +44,12 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       waitForFirewallAvailableState(firewallByNIC.getId());
 
       firewallByNIC = getFirewallById(firewallByNIC.getId());
-
-      removeRuleById(firewallByNIC.getRules().iterator().next().getId());
+      for (FirewallRule rule : firewallByNIC.getRules())
+         removeRuleById(rule.getId());
 
       waitForFirewallAvailableState(firewallByNIC.getId());
 
-      removeFirewall(firewallByNIC.getId());
+      deleteFirewall(firewallByNIC.getId());
 
       waitForFirewallAvailableState(firewallByNIC.getId());
 
@@ -153,7 +154,7 @@ public class FirewallManipulationViaProviderApiDemo extends BaseExample {
       log("");
    }
 
-   private static void removeFirewall(String firewallId) {
+   private static void deleteFirewall(String firewallId) {
       log(">> delete firewall by id=" + firewallId);
       providerApi.firewallApi().deleteFirewall(firewallId);
       log("<< delete firewall by id=" + firewallId);

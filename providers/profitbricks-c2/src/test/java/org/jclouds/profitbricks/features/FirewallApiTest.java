@@ -180,4 +180,23 @@ public class FirewallApiTest extends BasePBApiTest<ServerApi> {
       checkHeaders(request);
    }
 
+   @Test
+   public void deleteFirewall() throws SecurityException, NoSuchMethodException, IOException {
+      Invocation invocation = Invocation.create(
+            method(FirewallApi.class, "deleteFirewall", String.class),
+            ImmutableList.<Object>of("82c0")
+      );
+
+      GeneratedHttpRequest request = processor.apply(invocation);
+
+      checkFilters(request);
+
+      assertRequestLineEquals(request, "POST https://api.profitbricks.com/1.2 HTTP/1.1");
+      assertPayloadEquals(request, "<ws:deleteFirewalls><firewallIds>82c0</firewallIds></ws:deleteFirewalls>", "text/xml", false);
+      assertSaxResponseParserClassEquals(invocation.getInvokable(), null);
+      assertFallbackClassEquals(invocation.getInvokable(), null);
+
+      checkHeaders(request);
+   }
+
 }

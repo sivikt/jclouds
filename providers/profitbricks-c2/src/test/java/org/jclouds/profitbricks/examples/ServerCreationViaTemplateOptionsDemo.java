@@ -45,10 +45,9 @@ public class ServerCreationViaTemplateOptionsDemo extends BaseExample {
             .osType(OSType.LINUX)
             .build()
       ).addFirewallRuleSpec(FirewallRuleCreationSpec.builder()
-            .sourceIp("172.168.38.2")
-            .protocol(IpProtocol.TCP)
-            .fromPort(1)
-            .toPort(400)
+            .protocol(IpProtocol.TCP) // allow SSH connections from any source to any target IP
+            .fromPort(22)
+            .toPort(22)
             .build()
       );
 

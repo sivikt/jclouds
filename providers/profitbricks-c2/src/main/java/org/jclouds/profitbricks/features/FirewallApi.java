@@ -104,7 +104,7 @@ public interface FirewallApi {
    @Named("DeleteFirewall")
    @Consumes(MediaType.TEXT_XML)
    @Produces(MediaType.TEXT_XML)
-   @Payload("<ws:deactivateFirewalls><firewallIds>{id}</firewallIds></ws:deactivateFirewalls>")
+   @Payload("<ws:deleteFirewalls><firewallIds>{id}</firewallIds></ws:deleteFirewalls>")
    void deleteFirewall(@PayloadParam("id") String firewallId);
 
    /**
