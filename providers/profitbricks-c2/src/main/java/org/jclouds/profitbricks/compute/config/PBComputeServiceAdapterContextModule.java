@@ -17,10 +17,17 @@
 package org.jclouds.profitbricks.compute.config;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.config.ComputeServiceAdapterContextModule;
-import org.jclouds.compute.domain.*;
+import org.jclouds.compute.domain.Hardware;
+import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.domain.NodeMetadata;
+import org.jclouds.compute.domain.OperatingSystem;
+import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.functions.IdentityFunction;
 import org.jclouds.profitbricks.compute.PBComputeServiceAdapter;
@@ -31,6 +38,13 @@ import org.jclouds.profitbricks.domain.OSType;
 import org.jclouds.profitbricks.domain.Server;
 import org.jclouds.profitbricks.compute.functions.ServerToNodeMetadata;
 import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
+import org.jclouds.profitbricks.predicates.ServerProvisionStateAvailable;
+import org.jclouds.util.Predicates2;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 
 /**
  * Configuration module with bindings to setup ProfitBricks {@link ComputeServiceAdapter}.
@@ -70,4 +84,15 @@ public class PBComputeServiceAdapterContextModule
       }).to(Class.class.cast(IdentityFunction.class));
    }
 
+   @Provides
+   @Singleton
+   @Named(TIMEOUT_NODE_RUNNING)
+   protected Predicate<Server> serverAvailable(ServerProvisionStateAvailable serverAvailable,
+                                               ComputeServiceConstants.Timeouts timeouts,
+                                               ComputeServiceConstants.PollPeriod period) {
+      return timeouts.nodeRunning == 0
+            ? serverAvailable
+            : Predicates2.retry(serverAvailable, timeouts.nodeRunning, period.pollInitialPeriod, period.pollMaxPeriod);
+   }
+   
 }

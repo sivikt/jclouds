@@ -17,20 +17,23 @@
 package org.jclouds.profitbricks.compute;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.Image;
+import org.jclouds.compute.domain.NodeMetadata;
 import org.jclouds.compute.domain.Template;
-import org.jclouds.compute.domain.ImageBuilder;
-import org.jclouds.compute.domain.OperatingSystem;
-import org.jclouds.compute.domain.OsFamily;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import org.jclouds.profitbricks.PBApi;
+import org.jclouds.profitbricks.compute.options.PBTemplateOptions;
+import org.jclouds.profitbricks.domain.NIC;
 import org.jclouds.profitbricks.domain.Server;
+import org.jclouds.profitbricks.domain.specs.FirewallRuleCreationSpec;
 import org.jclouds.profitbricks.domain.specs.ServerCreationSpec;
 
 import javax.annotation.Resource;
@@ -38,13 +41,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 
 /**
  * Designates connection between {@link org.jclouds.compute.ComputeService} API and
  * {@link org.jclouds.profitbricks.PBApi} API.
  *
- * TODO unit and live test
+ * TODO Seems this is a temporary solution. As for now adapter provides basics to manipulate with nodes.
+ * TODO After all provider specific API will be completed this class should be revised.
  *
  * @author Serj Sintsov
  */
@@ -55,30 +63,41 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
    @Named(ComputeServiceConstants.COMPUTE_LOGGER)
    protected Logger logger = Logger.NULL;
 
-   protected PBApi pbApi;
-   protected Function<Template, ServerCreationSpec> templateToServerSpec;
+   protected final PBApi pbApi;
+   protected final Function<Template, ServerCreationSpec> templateToServerSpec;
+   protected final Predicate<Server> serverAvailable;
+   protected final Function<Server, NodeMetadata> serverToNodeMetadata;
 
    @Inject
-   public PBComputeServiceAdapter(PBApi pbApi, Function<Template, ServerCreationSpec> templateToServerSpec) {
+   public PBComputeServiceAdapter(PBApi pbApi, Function<Template, ServerCreationSpec> templateToServerSpec,
+                                  @Named(TIMEOUT_NODE_RUNNING) Predicate<Server> serverAvailable,
+                                  Function<Server, NodeMetadata> serverToNodeMetadata) {
       this.pbApi = checkNotNull(pbApi, "pbApi");
       this.templateToServerSpec = checkNotNull(templateToServerSpec, "templateToServerSpec");
+      this.serverAvailable = checkNotNull(serverAvailable, "serverAvailable");
+      this.serverToNodeMetadata = checkNotNull(serverToNodeMetadata, "serverToNodeMetadata");
    }
 
    @Override
    public NodeAndInitialCredentials<Server> createNodeWithGroupEncodedIntoName(String group, String name, Template template) {
-      ServerCreationSpec serverSpec = templateToServerSpec.apply(template);
+      checkArgument(template.getOptions().getClass().isAssignableFrom(PBTemplateOptions.class),
+                    "template option's class must be assignable from " + PBTemplateOptions.class.getCanonicalName());
 
-      logger.trace(">> creating new server from template [%s]", serverSpec);
-      String createdServerId = pbApi.serversApi().createServer(serverSpec);
+      PBTemplateOptions pbTplOpts = template.getOptions().as(PBTemplateOptions.class);
+      checkNotNull(pbTplOpts.getServerSpec(), "ServerSpec has to be specified");
+
+      logger.trace(">> creating server from template [%s]", pbTplOpts.getServerSpec());
+      String createdServerId = pbApi.serversApi().createServer(pbTplOpts.getServerSpec());
       if (createdServerId == null) {
-         logger.trace("<< server creation failed. template [%s]", serverSpec);
-         return null; // TODO return exception when ComputeServiceAdapter will allow
+         logger.trace("<< server creation failed. template [%s]", pbTplOpts.getServerSpec());
+         return null;
       }
       logger.trace("<< server created with id=%s", createdServerId);
 
-      logger.trace(">> getting server with id=%s", createdServerId);
-      Server createdServer = pbApi.serversApi().getServer(createdServerId);
-      logger.trace("<< got server [%s]", createdServer);
+      Server createdServer = blockUntilServerProvisionStateAvailable(createdServerId);
+
+      if (!pbTplOpts.getFirewallRuleSpecs().isEmpty())
+         createdServer = setupFirewallRules(createdServer, pbTplOpts.getFirewallRuleSpecs());
 
       return new NodeAndInitialCredentials<Server>(
          createdServer,
@@ -87,17 +106,37 @@ public class PBComputeServiceAdapter implements ComputeServiceAdapter<Server, Ha
       );
    }
 
+   private Server setupFirewallRules(Server server, Set<FirewallRuleCreationSpec> firewallRules) {
+      logger.trace(">> adding firewall rules to server [id=%s]", server.getId());
+
+      if (server.getNics().isEmpty()) {
+         logger.trace("<< to add firewall rules server [id=%s] must have at least one NIC", server.getId());
+         return server;
+      }
+
+      NIC nic = Iterables.getOnlyElement(server.getNics());
+      for (FirewallRuleCreationSpec ruleSpec : firewallRules)
+         pbApi.firewallApi().addFirewallRule(nic.getId(), ruleSpec);
+
+      server = blockUntilServerProvisionStateAvailable(server.getId());
+
+      logger.trace(">> adding firewall rules to server [id=%s]", server.getId());
+      return server;
+   }
+
+   private Server blockUntilServerProvisionStateAvailable(String serverId) {
+      logger.trace(">> awaiting status running for server [%s]", serverId);
+      Server createdServer = pbApi.serversApi().getServer(serverId);
+      serverAvailable.apply(createdServer);
+      logger.trace("<< server is running [%s]", createdServer);
+
+      return pbApi.serversApi().getServer(serverId);
+   }
+
    @Override
    public Iterable<Image> listImages() {
       logger.trace("listing of Images doesn't implemented yet. Return empty iterable collection");
-      return ImmutableSet.of(new ImageBuilder()
-            .id("fake")
-            .status(Image.Status.AVAILABLE)
-            .operatingSystem(OperatingSystem.builder()
-                              .family(OsFamily.LINUX)
-                              .description(OsFamily.LINUX.value())
-                              .build())
-            .build());  // todo tmp workaround. provide all possible images
+      return ImmutableSet.of();  // TODO clarify does it really need; how to provide hardware profiles
    }
 
    @Override

@@ -29,9 +29,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
 /**
  * ProfitBricks' {@link TemplateBuilder} implementation.
  *
@@ -65,11 +62,12 @@ public class PBTemplateBuilderImpl extends TemplateBuilderImpl {
    }
 
    protected void chooseHardware() {
-      checkNotNull(hardware, "hardware must be not null");
-      checkState(hardware.getRam() > 0, "ram amount must be >0");
-      checkNotNull(hardware.getProcessors(), "at least one processor must be specified");
-      checkState(!hardware.getProcessors().isEmpty(), "at least one processor must be specified");
-      checkState(hardware.getProcessors().get(0).getCores() >0, "processor cores count must be >0");
+      // build fake hardware
+      hardware = new HardwareBuilder()
+            .id("fake")
+            .ram(0)
+            .processor(new Processor(0, 0))
+            .build();
    }
 
    protected void chooseLocation() {
@@ -83,7 +81,12 @@ public class PBTemplateBuilderImpl extends TemplateBuilderImpl {
    }
 
    protected void chooseImage() {
-      checkNotNull(image, "image must be not null");
+      // build fake image
+      image = new ImageBuilder()
+            .id("fake")
+            .operatingSystem(new OperatingSystem.Builder().family(OsFamily.LINUX).description(OsFamily.LINUX.value()).build())
+            .status(Image.Status.AVAILABLE)
+            .build();
    }
 
    @Override
