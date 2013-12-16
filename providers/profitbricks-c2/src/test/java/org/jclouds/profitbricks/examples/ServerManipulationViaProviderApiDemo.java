@@ -3,7 +3,7 @@ package org.jclouds.profitbricks.examples;
 import org.jclouds.compute.RunNodesException;
 
 /**
- * Illustrates ProfitBricks provider usage.
+ * Illustrates ProfitBricks Server API usage.
  *
  * @author Serj Sintsov
  */

@@ -6,7 +6,7 @@ import org.jclouds.compute.domain.*;
 import java.util.Set;
 
 /**
- * Illustrates ProfitBricks provider usage.
+ * Illustrates ProfitBricks Server API usage.
  *
  * @author Serj Sintsov
  */
