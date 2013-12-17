@@ -1,5 +1,6 @@
 package org.jclouds.profitbricks.examples;
 
+import com.google.common.collect.Iterators;
 import org.jclouds.compute.RunNodesException;
 import org.jclouds.compute.domain.*;
 import org.jclouds.net.domain.IpProtocol;
@@ -52,7 +53,7 @@ public class ServerCreationViaTemplateOptionsDemo extends BaseExample {
       );
 
       Set<? extends NodeMetadata> createdNodesSet = cs.createNodesInGroup("single-group", 1, nodeCfg);
-      NodeMetadata createdNode = createdNodesSet.iterator().next();
+      NodeMetadata createdNode = Iterators.getOnlyElement(createdNodesSet.iterator());
 
       log(createdNode.toString());
 
