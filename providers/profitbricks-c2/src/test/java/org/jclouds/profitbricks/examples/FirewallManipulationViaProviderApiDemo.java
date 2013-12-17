@@ -17,7 +17,7 @@ import java.util.Set;
 public class FirewallManipulationViaProviderApiDemo extends BaseExample {
 
    public static void main(String[] args) throws RunNodesException, InterruptedException {
-      initComputeServiceContext();
+      initComputeServiceContext(args);
 
       String nicId = "66437ecb-6e9a-4579-9da8-7b87cc40273b";
 

@@ -20,7 +20,7 @@ import java.util.Set;
 public class ServerCreationViaTemplateOptionsDemo extends BaseExample {
 
    public static void main(String[] args) throws RunNodesException {
-      initComputeServiceContext();
+      initComputeServiceContext(args);
 
       listNodes();
 

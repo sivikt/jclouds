@@ -13,7 +13,7 @@ import java.util.Set;
 public class ServerManipulationViaComputeServiceDemo extends BaseExample {
 
    public static void main(String[] args) throws RunNodesException {
-      initComputeServiceContext();
+      initComputeServiceContext(args);
 
       String nodeId = "4b7e644d-b13d-45ae-9346-cfbc986c8785";
       NodeMetadata node = getNode(nodeId);
