@@ -35,6 +35,7 @@ import static java.util.logging.Logger.getAnonymousLogger;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.nameTask;
 import static org.jclouds.compute.options.RunScriptOptions.Builder.wrapInInitScript;
 import static org.jclouds.compute.options.TemplateOptions.Builder.inboundPorts;
+import static org.jclouds.compute.options.TemplateOptions.Builder.nodeNames;
 import static org.jclouds.compute.options.TemplateOptions.Builder.overrideLoginCredentials;
 import static org.jclouds.compute.options.TemplateOptions.Builder.runAsRoot;
 import static org.jclouds.compute.predicates.NodePredicates.TERMINATED;
@@ -44,6 +45,7 @@ import static org.jclouds.compute.predicates.NodePredicates.runningInGroup;
 import static org.jclouds.compute.util.ComputeServiceUtils.getCores;
 import static org.jclouds.util.Predicates2.retry;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -226,7 +228,6 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
          NodeMetadata node = get(nodes, 0);
          LoginCredentials good = node.getCredentials();
          assert good.identity != null : nodes;
-         assert good.credential != null : nodes;
 
          for (Entry<? extends NodeMetadata, ExecResponse> response : client.runScriptOnNodesMatching(
                runningInGroup(group), "hostname",
@@ -362,6 +363,30 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
       checkOsMatchesTemplate(node2);
    }
 
+   @Test(enabled = true, dependsOnMethods = "testCreateTwoNodesWithRunScript")
+   public void testCreateTwoNodesWithOneSpecifiedName() throws Exception {
+      Set<? extends NodeMetadata> nodes;
+      try {
+         nodes = newTreeSet(client.createNodesInGroup(group, 2, nodeNames(ImmutableSet.of("first-node"))));
+      } catch (RunNodesException e) {
+         nodes = newTreeSet(concat(e.getSuccessfulNodes(), e.getNodeErrors().keySet()));
+         throw e;
+      }
+
+      assertEquals(nodes.size(), 2, "expected two nodes but was " + nodes);
+      NodeMetadata node1 = Iterables.getFirst(nodes, null);
+      NodeMetadata node2 = Iterables.getLast(nodes, null);
+      // credentials aren't always the same
+      // assertEquals(node1.getCredentials(), node2.getCredentials());
+
+      assertTrue(node1.getName().equals("first-node") || node2.getName().equals("first-node"),
+              "one node should be named 'first-node'");
+      assertFalse(node1.getName().equals("first-node") && node2.getName().equals("first-node"),
+              "one node should be named something other than 'first-node");
+
+      this.nodes.addAll(nodes);
+   }
+
    private Template refreshTemplate() {
       return template = addRunScriptToTemplate(buildTemplate(client.templateBuilder()));
    }
@@ -391,7 +416,7 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
       }
    }
 
-   @Test(enabled = true, dependsOnMethods = "testCreateTwoNodesWithRunScript")
+   @Test(enabled = true, dependsOnMethods = "testCreateTwoNodesWithOneSpecifiedName")
    public void testCreateAnotherNodeWithANewContextToEnsureSharedMemIsntRequired() throws Exception {
       initializeContext();
 
@@ -460,7 +485,7 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
    public void testCredentialsCache() throws Exception {
       initializeContext();
       for (NodeMetadata node : nodes)
-         assert (view.utils().credentialStore().get("node#" + node.getId()) != null) : "credentials for " + node.getId();
+         assert view.utils().credentialStore().get("node#" + node.getId()) != null : "credentials for " + node.getId();
    }
 
    protected Map<? extends NodeMetadata, ExecResponse> runScriptWithCreds(final String group, OperatingSystem os,
@@ -481,7 +506,6 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
          assertNotNull(node.getCredentials());
          if (node.getCredentials().identity != null) {
             assertNotNull(node.getCredentials().identity);
-            assertNotNull(node.getCredentials().credential);
             sshPing(node, taskName);
          }
       }
@@ -511,7 +535,7 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
          assertLocationSameOrChild(checkNotNull(metadata.getLocation(), "location of %s", metadata), template.getLocation());
          checkImageIdMatchesTemplate(metadata);
          checkOsMatchesTemplate(metadata);
-         assert (metadata.getStatus() == Status.RUNNING) : metadata;
+         assert metadata.getStatus() == Status.RUNNING : metadata;
          // due to DHCP the addresses can actually change in-between runs.
          assertEquals(metadata.getPrivateAddresses().size(), node.getPrivateAddresses().size(), format(
                "[%s] didn't match: [%s]", metadata.getPrivateAddresses(), node.getPrivateAddresses().size()));
@@ -632,9 +656,9 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
 
    protected ServiceStats trackAvailabilityOfProcessOnNode(Statement process, String processName, NodeMetadata node) {
       ServiceStats stats = new ServiceStats();
-      Stopwatch watch = new Stopwatch().start();
+      Stopwatch watch = Stopwatch.createStarted();
       ExecResponse exec = client.runScriptOnNode(node.getId(), process, runAsRoot(false).wrapInInitScript(false));
-      stats.backgroundProcessMilliseconds = watch.elapsedTime(TimeUnit.MILLISECONDS);
+      stats.backgroundProcessMilliseconds = watch.elapsed(TimeUnit.MILLISECONDS);
       watch.reset().start();
       
       HostAndPort socket = null;
@@ -644,7 +668,7 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
          throw new NoSuchElementException(format("%s%n%s%s", e.getMessage(), exec.getOutput(), exec.getError()));
       }
 
-      stats.socketOpenMilliseconds = watch.elapsedTime(TimeUnit.MILLISECONDS);
+      stats.socketOpenMilliseconds = watch.elapsed(TimeUnit.MILLISECONDS);
 
       getAnonymousLogger().info(format("<< %s on node(%s)[%s] %s", processName, node.getId(), socket, stats));
       return stats;
@@ -673,10 +697,10 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
       ImmutableMap<String, String> userMetadata = ImmutableMap.<String, String> of("test", group);
       
       ImmutableSet<String> tags = ImmutableSet. of(group);
-      Stopwatch watch = new Stopwatch().start();
+      Stopwatch watch = Stopwatch.createStarted();
       NodeMetadata node = getOnlyElement(client.createNodesInGroup(group, 1,
             inboundPorts(22, 8080).blockOnPort(22, 300).userMetadata(userMetadata).tags(tags)));
-      long createSeconds = watch.elapsedTime(TimeUnit.SECONDS);
+      long createSeconds = watch.elapsed(TimeUnit.SECONDS);
 
       final String nodeId = node.getId();
 
@@ -690,7 +714,7 @@ public abstract class BaseComputeServiceLiveTest extends BaseComputeServiceConte
 
       client.runScriptOnNode(nodeId, JettyStatements.install(), nameTask("configure-jetty"));
 
-      long configureSeconds = watch.elapsedTime(TimeUnit.SECONDS);
+      long configureSeconds = watch.elapsed(TimeUnit.SECONDS);
 
       getAnonymousLogger().info(
             format(

@@ -26,11 +26,11 @@
   </parent>
   <groupId>org.apache.jclouds</groupId>
   <artifactId>jclouds-project</artifactId>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.8.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>Apache jclouds (incubating)  Project</name>
-  <url>http://jclouds.incubator.apache.org/</url>
-  <description>Apache jclouds (incubating): Concurrent API for Cloud Services</description>
+  <name>Apache jclouds Project</name>
+  <url>http://jclouds.apache.org/</url>
+  <description>Apache jclouds: Concurrent API for Cloud Services</description>
   <inceptionYear>2009</inceptionYear>
 
   <licenses>
@@ -78,9 +78,9 @@
   </mailingLists>
 
   <scm>
-    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-jclouds.git</connection>
-    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/incubator-jclouds.git</developerConnection>
-    <url>https://git-wip-us.apache.org/repos/asf?p=incubator-jclouds.git</url>
+    <connection>scm:git:https://git-wip-us.apache.org/repos/asf/jclouds.git</connection>
+    <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/jclouds.git</developerConnection>
+    <url>https://git-wip-us.apache.org/repos/asf?p=jclouds.git</url>
     <tag>HEAD</tag>
   </scm>
   
@@ -96,18 +96,6 @@
       </snapshots>
     </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <distributionManagement>
     <site>
@@ -121,12 +109,10 @@
       <name>Adrian Cole</name>
       <id>adriancole</id>
       <email>adrian -at- jclouds -dot- org</email>
-      <organization>jclouds</organization>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
-      <url>http://jclouds.incubator.apache.org</url>
       <timezone>-8</timezone>
     </developer>
     <developer>
@@ -135,7 +121,7 @@
       <email>abayer -at- apache -dot- org</email>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -143,7 +129,7 @@
       <id>gaul</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -152,7 +138,7 @@
       <email>aphillips -at- qrmedia -dot- com</email>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
       <timezone>+1</timezone>
     </developer>
@@ -161,7 +147,7 @@
       <id>silkysun</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -169,7 +155,7 @@
       <id>everett</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -177,7 +163,7 @@
       <id>nacx</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -185,7 +171,7 @@
       <id>iocanel</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
     <developer>
@@ -193,7 +179,7 @@
       <id>mattstep</id>
       <roles>
         <role>Committer</role>
-        <role>PPMC Member</role>
+        <role>PMC Member</role>
       </roles>
     </developer>
   </developers>
@@ -214,6 +200,7 @@
     <jclouds.test.listener>org.jclouds.test.testng.UnitTestStatusListener</jclouds.test.listener>
     <test.ssh.keyfile />
     <sourceReleaseAssemblyDescriptor>source-release-zip-tar</sourceReleaseAssemblyDescriptor>
+    <okhttp.version>1.3.0</okhttp.version>
   </properties>
 
   <dependencyManagement>
@@ -252,6 +239,11 @@
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-server</artifactId>
         <version>8.1.8.v20121106</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp</groupId>
+        <artifactId>mockwebserver</artifactId>
+        <version>${okhttp.version}</version>
       </dependency>
       <dependency>
         <groupId>org.testng</groupId>
@@ -477,6 +469,23 @@
                 <package>com.google</package>
               </packages>
             </exception>
+            <exception>
+              <conflictingDependencies>
+                <dependency>
+                  <groupId>com.jcraft</groupId>
+                  <artifactId>jsch.agentproxy.core</artifactId>
+                  <version>0.0.7</version>
+                </dependency>
+                <dependency>
+                  <groupId>com.jcraft</groupId>
+                  <artifactId>jsch.agentproxy.connector-factory</artifactId>
+                  <version>0.0.7</version>
+                </dependency>
+              </conflictingDependencies>
+              <packages>
+                <package>com.jcraft.jsch.agentproxy</package>
+              </packages>
+            </exception>
           </exceptions>
           <ignoredResources>
             <!-- For all the jetty packages -->
@@ -597,20 +606,20 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>3.1</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
           <source>${maven.compile.source}</source>
           <target>${maven.compile.target}</target>
             <showDeprecation>false</showDeprecation>
             <showWarnings>true</showWarnings>
-            <compilerArguments>
-              <Xlint />
-              <Xlint:-deprecation />
-              <Xlint:-rawtypes />
-              <Xlint:-serial />
-              <Xlint:-unchecked />
-            </compilerArguments>
+            <compilerArgs>
+              <compilerArg>-Xlint</compilerArg>
+              <compilerArg>-Xlint:-deprecation</compilerArg>
+              <compilerArg>-Xlint:-rawtypes</compilerArg>
+              <compilerArg>-Xlint:-serial</compilerArg>
+              <compilerArg>-Xlint:-unchecked</compilerArg>
+            </compilerArgs>
         </configuration>
       </plugin>
       <plugin>
@@ -663,18 +672,11 @@
       </plugin>
       <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.9.1</version>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.jclouds</groupId>
-            <artifactId>jclouds-resources</artifactId>
-            <version>${project.version}</version>
-          </dependency>
-        </dependencies>
+        <version>2.11</version>
         <configuration>
-          <!-- jclouds-resources has the checkstyle config in the classpath -->
-          <configLocation>resources/checkstyle.xml</configLocation>
+          <!-- configLocation configured via profiles -->
           <violationSeverity>warning</violationSeverity>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
         </configuration>
       </plugin>
     </plugins>
@@ -703,10 +705,6 @@
         <plugin>
           <artifactId>maven-jxr-plugin</artifactId>
           <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-remote-resources-plugin</artifactId>
-          <version>1.4</version>
         </plugin>
         <plugin>
           <artifactId>maven-pmd-plugin</artifactId>
@@ -805,7 +803,7 @@
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
-          <version>0.9</version>
+          <version>0.10</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -999,26 +997,38 @@
       </distributionManagement>
       <build>
         <plugins>
-          <plugin>      
-            <artifactId>maven-remote-resources-plugin</artifactId>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>process</goal>
-                </goals>
-                <configuration>
-                  <skip>true</skip>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>        
           <plugin>
             <!-- When building jclouds-project, override the config to use the local file -->
             <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.9.1</version>
             <configuration>
               <configLocation>../resources/checkstyle.xml</configLocation>
-              <violationSeverity>warning</violationSeverity>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>not-jclouds-project</id>
+      <activation>
+        <file>
+          <!-- only in the jclouds-project module -->
+          <missing>src/etc/header.txt</missing>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.jclouds</groupId>
+                <artifactId>jclouds-resources</artifactId>
+                <version>${project.version}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <!-- jclouds-resources has the checkstyle config in the classpath -->
+              <configLocation>resources/checkstyle.xml</configLocation>
             </configuration>
           </plugin>
         </plugins>            

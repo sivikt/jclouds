@@ -16,12 +16,16 @@
  */
 package org.jclouds.openstack.swift.blobstore.integration;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.google.common.io.ByteStreams;
 import org.jclouds.blobstore.BlobStore;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.integration.internal.BaseBlobIntegrationTest;
@@ -34,11 +38,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import com.google.common.hash.Hashing;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * 
@@ -61,7 +63,7 @@ public class SwiftBlobIntegrationLiveTest extends BaseBlobIntegrationTest {
       return props;
    }
    
-   private InputSupplier<InputStream> oneHundredOneConstitutions;
+   private ByteSource oneHundredOneConstitutions;
 
    public SwiftBlobIntegrationLiveTest() {
       provider = System.getProperty("test.swift.provider", "swift");
@@ -128,6 +130,32 @@ public class SwiftBlobIntegrationLiveTest extends BaseBlobIntegrationTest {
       }
    }
 
+   // InputStreamPayloads are handled differently than File; Test InputStreams too
+   @Test(groups = { "integration", "live" })
+   public void testMultipartChunkedInputStream() throws InterruptedException, IOException {
+      String container = getContainerName();
+      try {
+         BlobStore blobStore = view.getBlobStore();
+
+         blobStore.createContainerInLocation(null, container);
+
+         File inFile = createFileBiggerThan(PART_SIZE);
+         File outFile = new File("target/lots-of-const-readback.txt");
+
+         InputStream contentToUpload = new FileInputStream(inFile);
+         Blob write = blobStore.blobBuilder("const.txt").payload(contentToUpload).contentLength(inFile.length()).build();
+         blobStore.putBlob(container, write, PutOptions.Builder.multipart());
+
+         Blob read = blobStore.getBlob(container, "const.txt");
+         Files.copy(read.getPayload(), outFile);
+
+         assertEquals(Files.hash(outFile, Hashing.md5()), Files.hash(inFile, Hashing.md5()));
+
+      } finally {
+         returnContainer(container);
+      }
+   }
+
    @Override
    protected int getIncorrectContentMD5StatusCode() {
       return 422;
@@ -148,14 +176,14 @@ public class SwiftBlobIntegrationLiveTest extends BaseBlobIntegrationTest {
    private File createFileBiggerThan(long partSize) throws IOException {
       long copiesNeeded = (partSize / getOneHundredOneConstitutionsLength()) + 1;
 
-      InputSupplier<InputStream> temp = ByteStreams.join(oneHundredOneConstitutions);
+      ByteSource temp = ByteSource.concat(oneHundredOneConstitutions);
 
       for (int i = 0; i < copiesNeeded; i++) {
-         temp = ByteStreams.join(temp, oneHundredOneConstitutions);
+         temp = ByteSource.concat(temp, oneHundredOneConstitutions);
       }
 
       File fileToUpload = new File("target/lots-of-const.txt");
-      Files.copy(temp, fileToUpload);
+      temp.copyTo(Files.asByteSink(fileToUpload));
 
       assertTrue(fileToUpload.length() > partSize);
       return fileToUpload;

@@ -38,7 +38,6 @@ import javax.inject.Singleton;
 
 import org.jclouds.Constants;
 import org.jclouds.collect.Memoized;
-import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.HardwareBuilder;
@@ -111,6 +110,7 @@ public class GleSYSComputeServiceAdapter implements ComputeServiceAdapter<Server
 
       CreateServerOptions createServerOptions = new CreateServerOptions();
       createServerOptions.ip(templateOptions.getIp());
+      template.getOptions().userMetadata(ComputeServiceConstants.NODE_GROUP_KEY, group);
 
       Map<String, String> md = metadataAndTagsAsCommaDelimitedValue(template.getOptions());
       if (md.size() > 0) {

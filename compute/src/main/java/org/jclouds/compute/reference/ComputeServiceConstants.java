@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.util.Predicates2;
 
 import com.google.common.base.Supplier;
@@ -48,10 +47,10 @@ public interface ComputeServiceConstants {
 
    public static final String COMPUTE_LOGGER = "jclouds.compute";
    public static final String LOCAL_PARTITION_GB_PATTERN = "disk_drive/%s/gb";
+   public static final String NODE_GROUP_KEY = "jclouds-group";
 
    @Singleton
    public static class NamingConvention {
-
       @Inject(optional = true)
       public final Supplier<String> randomSuffix = new Supplier<String>() {
          final SecureRandom random = new SecureRandom();
@@ -91,7 +90,7 @@ public interface ComputeServiceConstants {
       @Named(OS_VERSION_MAP_JSON)
       // TODO: switch this to read from resource, failing back to string
       // constant on classpath problem
-      public String osVersionMapJson = "{\"suse\":{\"\":\"\",\"11\":\"11\",\"11 SP1\":\"11 SP1\"},\"debian\":{\"\":\"\",\"lenny\":\"5.0\",\"6\":\"6.0\",\"squeeze\":\"6.0\"},\"centos\":{\"\":\"\",\"5\":\"5.0\",\"5.2\":\"5.2\",\"5.3\":\"5.3\",\"5.4\":\"5.4\",\"5.5\":\"5.5\",\"5.6\":\"5.6\",\"5.7\":\"5.7\",\"6\":\"6.0\",\"6.0\":\"6.0\"},\"rhel\":{\"\":\"\",\"5\":\"5.0\",\"5.2\":\"5.2\",\"5.3\":\"5.3\",\"5.4\":\"5.4\",\"5.5\":\"5.5\",\"5.6\":\"5.6\",\"5.7\":\"5.7\",\"6\":\"6.0\",\"6.0\":\"6.0\"},\"solaris\":{\"\":\"\",\"10\":\"10\"},\"ubuntu\":{\"\":\"\",\"hardy\":\"8.04\",\"karmic\":\"9.10\",\"lucid\":\"10.04\",\"10.04.1\":\"10.04\",\"maverick\":\"10.10\",\"natty\":\"11.04\",\"oneiric\":\"11.10\",\"precise\":\"12.04\"},\"windows\":{\"\":\"\",\"7\":\"7\",\"2003\":\"2003\",\"2003 Standard\":\"2003\",\"2003 R2\":\"2003 R2\",\"2008\":\"2008\",\"2008 Web\":\"2008\",\"2008 Server\":\"2008\",\"Server 2008\":\"2008\",\"2008 R1\":\"2008 R1\",\"2008 R2\":\"2008 R2\",\"Server 2008 R2\":\"2008 R2\",\"2008 Server R2\":\"2008 R2\",\"2008 SP2\":\"2008 SP2\",\"Server 2008 SP2\":\"2008 SP2\"}}";
+      public String osVersionMapJson = "{\"suse\":{\"\":\"\",\"11\":\"11\",\"11 SP1\":\"11 SP1\"},\"debian\":{\"\":\"\",\"lenny\":\"5.0\",\"6\":\"6.0\",\"squeeze\":\"6.0\"},\"centos\":{\"\":\"\",\"5\":\"5.0\",\"5.2\":\"5.2\",\"5.3\":\"5.3\",\"5.4\":\"5.4\",\"5.5\":\"5.5\",\"5.6\":\"5.6\",\"5.7\":\"5.7\",\"6\":\"6.0\",\"6.0\":\"6.0\",\"6.2\":\"6.2\",\"6.3\":\"6.3\",\"6.4\":\"6.4\"},\"rhel\":{\"\":\"\",\"5\":\"5.0\",\"5.2\":\"5.2\",\"5.3\":\"5.3\",\"5.4\":\"5.4\",\"5.5\":\"5.5\",\"5.6\":\"5.6\",\"5.7\":\"5.7\",\"6\":\"6.0\",\"6.0\":\"6.0\",\"6.1\":\"6.1\",\"6.3\":\"6.3\",\"6.4\":\"6.4\"},\"solaris\":{\"\":\"\",\"10\":\"10\"},\"ubuntu\":{\"\":\"\",\"hardy\":\"8.04\",\"karmic\":\"9.10\",\"lucid\":\"10.04\",\"10.04.1\":\"10.04\",\"maverick\":\"10.10\",\"natty\":\"11.04\",\"oneiric\":\"11.10\",\"precise\":\"12.04\",\"quantal\":\"12.10\",\"raring\":\"13.04\"},\"windows\":{\"\":\"\",\"7\":\"7\",\"2003\":\"2003\",\"2003 Standard\":\"2003\",\"2003 R2\":\"2003 R2\",\"2008\":\"2008\",\"2008 Web\":\"2008\",\"2008 Server\":\"2008\",\"Server 2008\":\"2008\",\"2008 R1\":\"2008 R1\",\"2008 R2\":\"2008 R2\",\"Server 2008 R2\":\"2008 R2\",\"2008 Server R2\":\"2008 R2\",\"2008 SP2\":\"2008 SP2\",\"Server 2008 SP2\":\"2008 SP2\"}}";
    }
 
    @Singleton

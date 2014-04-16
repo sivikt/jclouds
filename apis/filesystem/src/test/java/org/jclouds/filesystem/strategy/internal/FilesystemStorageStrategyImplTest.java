@@ -47,9 +47,8 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 
 /**
  * Test class for {@link FilesystemStorageStrategyImpl } class
@@ -354,11 +353,9 @@ public class FilesystemStorageStrategyImplTest {
 
       // verify that the files is equal
       File blobFullPath = new File(TARGET_CONTAINER_NAME, blobKey);
-      InputSupplier<FileInputStream> expectedInput =
-            Files.newInputStreamSupplier(sourceFile);
-      InputSupplier<FileInputStream> actualInput =
-            Files.newInputStreamSupplier(blobFullPath);
-      assertTrue(ByteStreams.equal(expectedInput, actualInput),
+      ByteSource expectedInput = Files.asByteSource(sourceFile);
+      ByteSource actualInput = Files.asByteSource(blobFullPath);
+      assertTrue(expectedInput.contentEquals(actualInput),
             "Files are not equal");
    }
 
@@ -375,11 +372,9 @@ public class FilesystemStorageStrategyImplTest {
 
       // verify that the files is equal
       File blobFullPath = new File(TARGET_CONTAINER_NAME, blobKey);
-      InputSupplier<FileInputStream> expectedInput =
-            Files.newInputStreamSupplier(sourceFile);
-      InputSupplier<FileInputStream> actualInput =
-            Files.newInputStreamSupplier(blobFullPath);
-      assertTrue(ByteStreams.equal(expectedInput, actualInput),
+      ByteSource expectedInput = Files.asByteSource(sourceFile);
+      ByteSource actualInput = Files.asByteSource(blobFullPath);
+      assertTrue(expectedInput.contentEquals(actualInput),
             "Files are not equal");
    }
 

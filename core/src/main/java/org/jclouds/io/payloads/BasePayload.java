@@ -17,13 +17,11 @@
 package org.jclouds.io.payloads;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static com.google.common.io.ByteStreams.copy;
-import static com.google.common.io.Closeables.closeQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+
+import com.google.common.base.Throwables;
 
 import org.jclouds.io.MutableContentMetadata;
 import org.jclouds.io.Payload;
@@ -45,28 +43,21 @@ public abstract class BasePayload<V> implements Payload {
       this.contentMetadata = checkNotNull(contentMetadata, "contentMetadata");
    }
 
-   /**
-    * {@inheritDoc}
-    */
    @Override
-   public V getRawContent() {
-      return content;
+   public InputStream getInput() {
+      try {
+         return openStream();
+      } catch (IOException ioe) {
+         throw Throwables.propagate(ioe);
+      }
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void writeTo(OutputStream outstream) throws IOException {
-      checkState(!written || isRepeatable(), "can only write to an outputStream once");
-      written = true;
-      InputStream in = getInput();
-      try {
-         copy(in, outstream);
-         outstream.flush();
-      } finally {
-         closeQuietly(in);
-      }
+   public V getRawContent() {
+      return content;
    }
 
    @Override

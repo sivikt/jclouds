@@ -21,14 +21,15 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
-import org.jclouds.http.BaseJettyTest;
+import org.jclouds.ContextBuilder;
 import org.jclouds.http.HttpCommand;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.http.HttpResponse;
 import org.jclouds.http.IntegrationTestAsyncClient;
+import org.jclouds.http.IntegrationTestClient;
 import org.jclouds.io.Payloads;
+import org.jclouds.providers.AnonymousProviderMetadata;
 import org.jclouds.reflect.Invocation;
 import org.jclouds.rest.internal.RestAnnotationProcessor;
 import org.testng.annotations.Test;
@@ -50,31 +51,31 @@ public class BackoffLimitedRetryHandlerTest {
       long startTime = System.nanoTime();
       handler.imposeBackoffExponentialDelay(period, 2, 1, 5, "TEST FAILURE: 1");
       long elapsedTime = (System.nanoTime() - startTime) / 1000000;
-      assert (elapsedTime >= period - 1) : elapsedTime;
+      assert elapsedTime >= period - 1 : elapsedTime;
       assertTrue(elapsedTime < period + acceptableDelay);
 
       startTime = System.nanoTime();
       handler.imposeBackoffExponentialDelay(period, 2, 2, 5, "TEST FAILURE: 2");
       elapsedTime = (System.nanoTime() - startTime) / 1000000;
-      assert (elapsedTime >= period * 4 - 1) : elapsedTime;
+      assert elapsedTime >= period * 4 - 1 : elapsedTime;
       assertTrue(elapsedTime < period * 9);
 
       startTime = System.nanoTime();
       handler.imposeBackoffExponentialDelay(period, 2, 3, 5, "TEST FAILURE: 3");
       elapsedTime = (System.nanoTime() - startTime) / 1000000;
-      assert (elapsedTime >= period * 9 - 1) : elapsedTime;
+      assert elapsedTime >= period * 9 - 1 : elapsedTime;
       assertTrue(elapsedTime < period * 10);
 
       startTime = System.nanoTime();
       handler.imposeBackoffExponentialDelay(period, 2, 4, 5, "TEST FAILURE: 4");
       elapsedTime = (System.nanoTime() - startTime) / 1000000;
-      assert (elapsedTime >= period * 10 - 1) : elapsedTime;
+      assert elapsedTime >= period * 10 - 1 : elapsedTime;
       assertTrue(elapsedTime < period * 11);
 
       startTime = System.nanoTime();
       handler.imposeBackoffExponentialDelay(period, 2, 5, 5, "TEST FAILURE: 5");
       elapsedTime = (System.nanoTime() - startTime) / 1000000;
-      assert (elapsedTime >= period * 10 - 1) : elapsedTime;
+      assert elapsedTime >= period * 10 - 1 : elapsedTime;
       assertTrue(elapsedTime < period * 11);
 
    }
@@ -122,8 +123,10 @@ public class BackoffLimitedRetryHandlerTest {
       assertEquals(response.getPayload().getInput().read(), -1);
    }
 
-   private final Function<Invocation, HttpRequest> processor = BaseJettyTest.newBuilder(8100, new Properties()).buildInjector()
-         .getInstance(RestAnnotationProcessor.class);
+   private final Function<Invocation, HttpRequest> processor = ContextBuilder
+         .newBuilder(AnonymousProviderMetadata.forApiOnEndpoint(IntegrationTestClient.class, "http://localhost"))
+         .buildInjector().getInstance(RestAnnotationProcessor.class);
+   
 
    private HttpCommand createCommand() throws SecurityException, NoSuchMethodException {
       Invokable<IntegrationTestAsyncClient, String> method = method(IntegrationTestAsyncClient.class, "download", String.class);

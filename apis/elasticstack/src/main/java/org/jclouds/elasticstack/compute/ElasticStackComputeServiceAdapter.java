@@ -32,7 +32,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.jclouds.Constants;
-import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.compute.domain.HardwareBuilder;
@@ -119,6 +118,8 @@ public class ElasticStackComputeServiceAdapter implements
          client.destroyDrive(drive.getUuid());
          throw new IllegalStateException("could not image drive in time!");
       }
+
+      template.getOptions().userMetadata(ComputeServiceConstants.NODE_GROUP_KEY, tag);
 
       Server toCreate = small(name, drive.getUuid(), defaultVncPassword).mem(template.getHardware().getRam())
                .cpu((int) (template.getHardware().getProcessors().get(0).getSpeed()))

@@ -22,12 +22,12 @@
   <parent>
     <groupId>org.apache.jclouds</groupId>
     <artifactId>jclouds-project</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
     <relativePath>../../project/pom.xml</relativePath>
   </parent>
   <groupId>org.apache.jclouds.api</groupId>
   <artifactId>sts</artifactId>
-  <name>jcloud sts api</name>
+  <name>jclouds sts api</name>
   <description>jclouds components to access an implementation of Security Token Service (STS)</description>
   <packaging>bundle</packaging>
 
@@ -38,7 +38,7 @@
     <test.sts.identity>${test.aws.identity}</test.sts.identity>
     <test.sts.credential>${test.aws.credential}</test.sts.credential>
 
-    <jclouds.osgi.export>org.jclouds.aws*;version="${project.version},org.jclouds.sts*;version="${project.version}"</jclouds.osgi.export>
+    <jclouds.osgi.export>org.jclouds.aws*;version="${project.version}",org.jclouds.sts*;version="${project.version}"</jclouds.osgi.export>
     <jclouds.osgi.import>org.jclouds*;version="${project.version}",*</jclouds.osgi.import>
   </properties>
 

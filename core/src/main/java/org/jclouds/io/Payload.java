@@ -18,17 +18,26 @@ package org.jclouds.io;
 
 import java.io.Closeable;
 import java.io.InputStream;
+import java.io.IOException;
 
 import com.google.common.io.InputSupplier;
 
 /**
  * @author Adrian Cole
  */
-public interface Payload extends InputSupplier<InputStream>, WriteTo, Closeable {
+public interface Payload extends InputSupplier<InputStream>, Closeable {
 
    /**
     * Creates a new InputStream object of the payload.
     */
+   InputStream openStream() throws IOException;
+
+   /**
+    * Creates a new InputStream object of the payload.
+    *
+    * @deprecated see openStream
+    */
+   @Deprecated
    InputStream getInput();
 
    /**

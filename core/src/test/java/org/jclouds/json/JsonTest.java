@@ -30,7 +30,6 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.gson.FieldAttributes;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -139,12 +138,13 @@ public class JsonTest {
    }
 
    public void testMapStringObjectWithAllValidValuesOneDeep() {
-      Map<String, Object> map = Maps.newHashMap();
-      map.put("string", "string");
-      map.put("number", 1.0);
-      map.put("boolean", true);
-      map.put("map", ImmutableMap.of("key", "value"));
-      map.put("list", ImmutableList.of("key", "value"));
+      Map<String, Object> map = ImmutableMap.<String, Object>builder()
+         .put("string", "string")
+         .put("map", ImmutableMap.of("key", "value"))
+         .put("list", ImmutableList.of("key", "value"))
+         .put("boolean", true)
+         .put("number", 1.0)
+         .build();
       assertEquals(json.toJson(map),
                "{\"string\":\"string\",\"map\":{\"key\":\"value\"},\"list\":[\"key\",\"value\"],\"boolean\":true,\"number\":1.0}");
       Map<String, Object> map2 = json.fromJson(json.toJson(map), new TypeLiteral<Map<String, Object>>() {

@@ -23,6 +23,7 @@ import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_R
 import static org.jclouds.compute.util.ComputeServiceUtils.formatStatus;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -61,9 +62,9 @@ public class PollNodeRunning implements Function<AtomicReference<NodeMetadata>, 
       String originalId = node.get().getId();
       NodeMetadata originalNode = node.get();
       try {
-         Stopwatch stopwatch = new Stopwatch().start();
+         Stopwatch stopwatch = Stopwatch.createStarted();
          if (!nodeRunning.apply(node)) {
-            long timeWaited = stopwatch.elapsedMillis();
+            long timeWaited = stopwatch.elapsed(TimeUnit.MILLISECONDS);
             if (node.get() == null) {
                node.set(originalNode);
                throw new IllegalStateException(format("api response for node(%s) was null", originalId));

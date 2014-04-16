@@ -24,18 +24,14 @@ import static org.jclouds.blobstore.options.GetOptions.Builder.ifModifiedSince;
 import static org.jclouds.blobstore.options.GetOptions.Builder.ifUnmodifiedSince;
 import static org.jclouds.blobstore.options.GetOptions.Builder.range;
 import static org.jclouds.concurrent.FutureIterables.awaitCompletion;
-import static org.jclouds.io.ByteSources.asByteSource;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
 import static org.testng.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
@@ -65,9 +61,8 @@ import org.jclouds.http.BaseJettyTest;
 import org.jclouds.http.HttpResponseException;
 import org.jclouds.io.Payload;
 import org.jclouds.io.Payloads;
-import org.jclouds.io.WriteTo;
+import org.jclouds.io.payloads.ByteSourcePayload;
 import org.jclouds.io.payloads.InputStreamSupplierPayload;
-import org.jclouds.io.payloads.StreamingPayload;
 import org.jclouds.logging.Logger;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -82,6 +77,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
+import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import com.google.common.io.InputSupplier;
@@ -93,7 +89,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
  * @author Adrian Cole
  */
 public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
-   private InputSupplier<InputStream> oneHundredOneConstitutions;
+   private ByteSource oneHundredOneConstitutions;
    private byte[] oneHundredOneConstitutionsMD5;
    private static long oneHundredOneConstitutionsLength;
 
@@ -102,23 +98,23 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
    public void setUpResourcesOnThisThread(ITestContext testContext) throws Exception {
       super.setUpResourcesOnThisThread(testContext);
       oneHundredOneConstitutions = getTestDataSupplier();
-      oneHundredOneConstitutionsMD5 = md5Supplier(oneHundredOneConstitutions);
+      oneHundredOneConstitutionsMD5 = oneHundredOneConstitutions.hash(md5()).asBytes();
    }
 
-   protected static byte[] md5Supplier(InputSupplier<? extends InputStream> supplier) throws IOException {
-      return asByteSource(supplier.getInput()).hash(md5()).asBytes();
+   private static byte[] md5Supplier(InputSupplier<? extends InputStream> supplier) throws IOException {
+      return ByteStreams.hash(supplier, md5()).asBytes();
    }
 
    @SuppressWarnings("unchecked")
-   public static InputSupplier<InputStream> getTestDataSupplier() throws IOException {
+   public static ByteSource getTestDataSupplier() throws IOException {
       byte[] oneConstitution = ByteStreams.toByteArray(new GZIPInputStream(BaseJettyTest.class
                .getResourceAsStream("/const.txt.gz")));
-      InputSupplier<ByteArrayInputStream> constitutionSupplier = ByteStreams.newInputStreamSupplier(oneConstitution);
+      ByteSource constitutionSupplier = ByteSource.wrap(oneConstitution);
 
-      InputSupplier<InputStream> temp = ByteStreams.join(constitutionSupplier);
+      ByteSource temp = ByteSource.concat(constitutionSupplier);
 
       for (int i = 0; i < 100; i++) {
-         temp = ByteStreams.join(temp, constitutionSupplier);
+         temp = ByteSource.concat(temp, constitutionSupplier);
       }
       oneHundredOneConstitutionsLength = oneConstitution.length * 101l;
       return temp;
@@ -139,7 +135,7 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
    public void testPutFileParallel() throws InterruptedException, IOException, TimeoutException {
 
       File payloadFile = File.createTempFile("testPutFileParallel", "png");
-      Files.copy(createTestInput(32 * 1024), payloadFile);
+      createTestInput(32 * 1024).copyTo(Files.asByteSink(payloadFile));
       
       final Payload testPayload = Payloads.newFilePayload(payloadFile);
       final byte[] md5 = md5Supplier(testPayload);
@@ -183,7 +179,7 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
 
    @Test(groups = { "integration", "live" })
    public void testFileGetParallel() throws Exception {
-      final InputSupplier<? extends InputStream> supplier = createTestInput(32 * 1024);
+      final ByteSource supplier = createTestInput(32 * 1024);
       final String expectedContentDisposition = "attachment; filename=constit.txt";
       final String container = getContainerName();
       try {
@@ -200,7 +196,7 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
                         public Void apply(Blob from) {
                            try {
                               validateMetadata(from.getMetadata(), container, name);
-                              assertEquals(md5Supplier(from.getPayload()), md5Supplier(supplier));
+                              assertEquals(md5Supplier(from.getPayload()), supplier.hash(md5()).asBytes());
                               checkContentDisposition(from, expectedContentDisposition);
                            } catch (IOException e) {
                               Throwables.propagate(e);
@@ -223,13 +219,13 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
    }
 
    private void uploadInputSupplier(String container, String name, String contentDisposition,
-         InputSupplier<? extends InputStream> supplier) throws IOException {
+         ByteSource supplier) throws IOException {
       BlobStore blobStore = view.getBlobStore();
       blobStore.putBlob(container, blobStore.blobBuilder(name)
             .payload(new InputStreamSupplierPayload(supplier))
             .contentType("text/plain")
-            .contentMD5(md5Supplier(supplier))
-            .contentLength(ByteStreams.length(supplier))
+            .contentMD5(supplier.hash(md5()).asBytes())
+            .contentLength(supplier.size())
             .contentDisposition(contentDisposition)
             .build());
    }
@@ -301,14 +297,14 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
 
    @Test(groups = { "integration", "live" })
    public void testPutCorrectContentMD5() throws InterruptedException, IOException {
-      byte[] payload = ByteStreams.toByteArray(createTestInput(1024));
+      byte[] payload = createTestInput(1024).read();
       HashCode contentMD5 = md5().hashBytes(payload);
       putBlobWithMd5(payload, contentMD5);
    }
 
    @Test(groups = { "integration", "live" })
    public void testPutIncorrectContentMD5() throws InterruptedException, IOException {
-      byte[] payload = ByteStreams.toByteArray(createTestInput(1024));
+      byte[] payload = createTestInput(1024).read();
       HashCode contentMD5 = md5().hashBytes(new byte[0]);
       try {
          putBlobWithMd5(payload, contentMD5);
@@ -542,12 +538,7 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
    @Test(groups = { "integration", "live" })
    public void testPutObjectStream() throws InterruptedException, IOException, ExecutionException {
       PayloadBlobBuilder blobBuilder = view.getBlobStore().blobBuilder("streaming").payload(
-               new StreamingPayload(new WriteTo() {
-                  @Override
-                  public void writeTo(OutputStream outstream) throws IOException {
-                     outstream.write("foo".getBytes());
-                  }
-               }));
+               new ByteSourcePayload(ByteSource.wrap("foo".getBytes())));
       addContentMetadata(blobBuilder);
 
       Blob blob = blobBuilder.build();
@@ -599,9 +590,9 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
    }
 
    protected void checkContentEncoding(Blob blob, String contentEncoding) {
-      assert (blob.getPayload().getContentMetadata().getContentEncoding().indexOf(contentEncoding) != -1) : blob
+      assert blob.getPayload().getContentMetadata().getContentEncoding().indexOf(contentEncoding) != -1 : blob
                .getPayload().getContentMetadata().getContentEncoding();
-      assert (blob.getMetadata().getContentMetadata().getContentEncoding().indexOf(contentEncoding) != -1) : blob
+      assert blob.getMetadata().getContentMetadata().getContentEncoding().indexOf(contentEncoding) != -1 : blob
                .getMetadata().getContentMetadata().getContentEncoding();
    }
 
@@ -612,7 +603,7 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
                .getMetadata().getContentMetadata().getContentLanguage();
    }
 
-   protected volatile static Crypto crypto;
+   protected static volatile Crypto crypto;
    static {
       try {
          crypto = new JCECrypto();
@@ -669,12 +660,12 @@ public class BaseBlobIntegrationTest extends BaseBlobStoreIntegrationTest {
       assertEquals(metadata.getContentMetadata().getContentMD5(), md5().hashString(TEST_STRING, UTF_8).asBytes());
    }
 
-   /** @return InputSupplier containing a random length 0..length of random bytes. */
+   /** @return ByteSource containing a random length 0..length of random bytes. */
    @SuppressWarnings("unchecked")
-   private static InputSupplier<? extends InputStream> createTestInput(int length) {
+   private static ByteSource createTestInput(int length) {
       Random random = new Random();
       byte[] buffer = new byte[random.nextInt(length)];
       random.nextBytes(buffer);
-      return ByteStreams.newInputStreamSupplier(buffer);
+      return ByteSource.wrap(buffer);
    }
 }

@@ -35,12 +35,14 @@
 -->
         <module name="ModifierOrder"/>
         <module name="MultipleVariableDeclarations"/>
+        <module name="RedundantImport"/>
         <module name="RedundantModifier">
             <!-- VARIABLE_DEF disabled -->
             <property name="tokens" value="METHOD_DEF, ANNOTATION_FIELD_DEF, INTERFACE_DEF"/>
         </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="UnnecessaryParentheses"/>
+        <module name="UnusedImports"/>
     </module>
     <module name="RegexpMultiline">
         <property name="format" value="=\s*new ArrayList&lt;[^&gt;]"/>

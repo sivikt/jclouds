@@ -18,7 +18,6 @@ package org.jclouds.gae;
 
 import static com.google.appengine.api.urlfetch.FetchOptions.Builder.disallowTruncate;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -34,6 +33,7 @@ import org.jclouds.http.HttpRequest;
 import org.jclouds.http.HttpUtils;
 import org.jclouds.io.ContentMetadataCodec;
 import org.jclouds.io.Payload;
+import org.jclouds.util.Closeables2;
 
 import com.google.appengine.api.urlfetch.FetchOptions;
 import com.google.appengine.api.urlfetch.HTTPHeader;
@@ -42,7 +42,7 @@ import com.google.appengine.api.urlfetch.HTTPRequest;
 import com.google.appengine.repackaged.com.google.common.base.Throwables;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Closeables;
+import com.google.common.io.ByteStreams;
 
 /**
  * 
@@ -98,9 +98,7 @@ public class ConvertToGaeRequest implements Function<HttpRequest, HTTPRequest> {
       if (request.getPayload() != null) {
          InputStream input = request.getPayload().getInput();
          try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            request.getPayload().writeTo(out);
-            byte[] array = out.toByteArray();
+            byte[] array = ByteStreams.toByteArray(input);
             if (!request.getPayload().isRepeatable()) {
                Payload oldPayload = request.getPayload();
                request.setPayload(array);
@@ -113,7 +111,7 @@ public class ConvertToGaeRequest implements Function<HttpRequest, HTTPRequest> {
          } catch (IOException e) {
             Throwables.propagate(e);
          } finally {
-            Closeables.closeQuietly(input);
+            Closeables2.closeQuietly(input);
          }
 
          for (Entry<String, String> header : contentMetadataCodec.toHeaders(

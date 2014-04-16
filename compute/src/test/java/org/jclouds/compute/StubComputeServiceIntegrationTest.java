@@ -396,7 +396,7 @@ public class StubComputeServiceIntegrationTest extends BaseComputeServiceLiveTes
             return actual == null;
          }
          try {
-            String real = Strings2.toString(((Payload) actual));
+            String real = Strings2.toString((Payload) actual);
             assertEquals(real, expected);
             return true;
          } catch (IOException e) {
@@ -483,6 +483,12 @@ public class StubComputeServiceIntegrationTest extends BaseComputeServiceLiveTes
    public void testCreateAnotherNodeWithANewContextToEnsureSharedMemIsntRequired() throws Exception {
       super.testCreateAnotherNodeWithANewContextToEnsureSharedMemIsntRequired();
    }
+
+   @Test(enabled = true, dependsOnMethods = "testCreateAnotherNodeWithANewContextToEnsureSharedMemIsntRequired")
+   public void testCreateTwoNodesWithOneSpecifiedName() throws Exception {
+      super.testCreateTwoNodesWithOneSpecifiedName();
+   }
+
 
    @Test(enabled = true, dependsOnMethods = "testCreateAnotherNodeWithANewContextToEnsureSharedMemIsntRequired")
    public void testCredentialsCache() throws Exception {

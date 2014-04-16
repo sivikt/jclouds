@@ -30,7 +30,6 @@ import static com.google.common.collect.Iterables.size;
 import static com.google.common.collect.Multimaps.filterKeys;
 import static com.google.common.io.BaseEncoding.base64;
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.io.Closeables.closeQuietly;
 import static com.google.common.net.HttpHeaders.CONTENT_DISPOSITION;
 import static com.google.common.net.HttpHeaders.CONTENT_ENCODING;
 import static com.google.common.net.HttpHeaders.CONTENT_LANGUAGE;
@@ -38,6 +37,7 @@ import static com.google.common.net.HttpHeaders.CONTENT_LENGTH;
 import static com.google.common.net.HttpHeaders.CONTENT_MD5;
 import static com.google.common.net.HttpHeaders.CONTENT_TYPE;
 import static com.google.common.net.HttpHeaders.EXPIRES;
+import static org.jclouds.util.Closeables2.closeQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,6 +64,7 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.io.ByteSource;
 import com.google.common.reflect.Invokable;
 import com.google.inject.Inject;
 
@@ -161,7 +162,7 @@ public class HttpUtils {
    public static byte[] closeClientButKeepContentStream(PayloadEnclosing response) {
       byte[] returnVal = toByteArrayOrNull(response);
       if (returnVal != null && !response.getPayload().isRepeatable()) {
-         Payload newPayload = Payloads.newByteArrayPayload(returnVal);
+         Payload newPayload = Payloads.newByteSourcePayload(ByteSource.wrap(returnVal));
          MutableContentMetadata fromMd = response.getPayload().getContentMetadata();
          MutableContentMetadata toMd = newPayload.getContentMetadata();
          copy(fromMd, toMd);

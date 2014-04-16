@@ -26,7 +26,6 @@ import java.util.Map;
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.vcloud.domain.network.FenceMode;
 import org.jclouds.vcloud.domain.network.IpAddressAllocationMode;
-import org.jclouds.vcloud.options.InstantiateVAppTemplateOptions;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Objects.ToStringHelper;
@@ -223,6 +222,22 @@ public class VCloudTemplateOptions extends TemplateOptions implements Cloneable 
          return VCloudTemplateOptions.class.cast(options.userMetadata(key, value));
       }
 
+      /**
+       * @see TemplateOptions#nodeNames(Iterable)
+       */
+      public static VCloudTemplateOptions nodeNames(Iterable<String> nodeNames) {
+         VCloudTemplateOptions options = new VCloudTemplateOptions();
+         return VCloudTemplateOptions.class.cast(options.nodeNames(nodeNames));
+      }
+
+      /**
+       * @see TemplateOptions#networks(Iterable)
+       */
+      public static VCloudTemplateOptions networks(Iterable<String> networks) {
+         VCloudTemplateOptions options = new VCloudTemplateOptions();
+         return VCloudTemplateOptions.class.cast(options.networks(networks));
+      }
+
    }
 
    /**
@@ -314,6 +329,22 @@ public class VCloudTemplateOptions extends TemplateOptions implements Cloneable 
    @Override
    public VCloudTemplateOptions userMetadata(String key, String value) {
       return VCloudTemplateOptions.class.cast(super.userMetadata(key, value));
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public VCloudTemplateOptions nodeNames(Iterable<String> nodeNames) {
+      return VCloudTemplateOptions.class.cast(super.nodeNames(nodeNames));
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public VCloudTemplateOptions networks(Iterable<String> networks) {
+      return VCloudTemplateOptions.class.cast(super.networks(networks));
    }
 
 }

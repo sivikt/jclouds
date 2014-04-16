@@ -49,10 +49,11 @@ See http://code.google.com/p/jclouds for details."
             domain.Blob domain.internal.BlobBuilderImpl options.PutOptions
             options.PutOptions$Builder
             options.CreateContainerOptions options.ListContainerOptions]
-           [org.jclouds.io Payload Payloads payloads.StreamingPayload]
+           [org.jclouds.io Payload Payloads]
            java.util.Arrays
            [java.security DigestOutputStream MessageDigest]
-           com.google.common.collect.ImmutableSet))
+           com.google.common.collect.ImmutableSet
+           com.google.common.io.ByteSource))
 
 ;;
 ;; Payload support for creating Blobs.
@@ -72,13 +73,8 @@ See http://code.google.com/p/jclouds for details."
   (payload [s] (Payloads/newStringPayload s))
   java.io.File
   (payload [f] (Payloads/newFilePayload f))
-  clojure.lang.IFn
-  ;; This will let you pass a closure to payload that takes an OutputStream
-  ;; as argument and writes to it when called from a StreamingPayload.
-  (payload [func]
-           (StreamingPayload. (reify org.jclouds.io.WriteTo
-                                     (writeTo [this output-stream]
-                                              (func output-stream))))))
+  ByteSource
+  (payload [bs] (Payloads/newByteSourcePayload bs)))
 
 ;; something in clojure 1.3 (namespaces?) does not like a private type called byte-array-type, 
 ;; so we refer to (class (make-array ...)) directly; and it only parses if it is its own block, 

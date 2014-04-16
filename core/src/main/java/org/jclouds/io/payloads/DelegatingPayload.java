@@ -20,7 +20,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+
+import com.google.common.base.Throwables;
 
 import org.jclouds.io.MutableContentMetadata;
 import org.jclouds.io.Payload;
@@ -41,8 +42,20 @@ public class DelegatingPayload implements Payload {
     * {@inheritDoc}
     */
    @Override
+   public InputStream openStream() throws IOException {
+      return delegate.openStream();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public InputStream getInput() {
-      return delegate.getInput();
+      try {
+         return openStream();
+      } catch (IOException ioe) {
+         throw Throwables.propagate(ioe);
+      }
    }
 
    /**
@@ -59,14 +72,6 @@ public class DelegatingPayload implements Payload {
    @Override
    public boolean isRepeatable() {
       return delegate.isRepeatable();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void writeTo(OutputStream outstream) throws IOException {
-      delegate.writeTo(outstream);
    }
 
    /**

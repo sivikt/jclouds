@@ -25,7 +25,6 @@ import java.util.Map;
 import javax.inject.Named;
 
 import org.jclouds.javax.annotation.Nullable;
-import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 import org.jclouds.openstack.v2_0.domain.Link;
 import org.jclouds.openstack.v2_0.domain.Resource;
 
@@ -60,7 +59,15 @@ public class Server extends Resource {
     */
    public static enum Status {
 
-      ACTIVE, BUILD, REBUILD, SUSPENDED, PAUSED, RESIZE, VERIFY_RESIZE, REVERT_RESIZE, PASSWORD, REBOOT, HARD_REBOOT, DELETED, UNKNOWN, ERROR, STOPPED, UNRECOGNIZED;
+      ACTIVE, BUILD, REBUILD, SUSPENDED, PAUSED, RESIZE, VERIFY_RESIZE, REVERT_RESIZE, PASSWORD, REBOOT, HARD_REBOOT,
+      DELETED, UNKNOWN, ERROR,
+
+      /**
+       * @deprecated please use {@code Status.SHUTOFF} instead
+       */
+      @Deprecated STOPPED,
+
+      UNRECOGNIZED, MIGRATING, SHUTOFF, RESCUE, SOFT_DELETED, SHELVED, SHELVED_OFFLOADED;
 
       public String value() {
          return name();

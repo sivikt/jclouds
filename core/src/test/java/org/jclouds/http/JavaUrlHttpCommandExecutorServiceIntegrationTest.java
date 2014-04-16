@@ -24,7 +24,6 @@ import static org.jclouds.Constants.PROPERTY_USER_THREADS;
 import java.util.Properties;
 
 import org.jclouds.http.config.JavaUrlHttpCommandExecutorServiceModule;
-import org.jclouds.http.internal.JavaUrlHttpCommandExecutorService;
 import org.testng.annotations.Test;
 
 import com.google.inject.Module;
@@ -34,14 +33,14 @@ import com.google.inject.Module;
  * 
  * @author Adrian Cole
  */
-@Test
+@Test(groups = "integration")
 public class JavaUrlHttpCommandExecutorServiceIntegrationTest extends BaseHttpCommandExecutorServiceIntegrationTest {
 
    protected Module createConnectionModule() {
       return new JavaUrlHttpCommandExecutorServiceModule();
    }
 
-   protected void addConnectionProperties(Properties props) {
+   protected void addOverrideProperties(Properties props) {
       props.setProperty(PROPERTY_MAX_CONNECTIONS_PER_CONTEXT, 50 + "");
       props.setProperty(PROPERTY_MAX_CONNECTIONS_PER_HOST, 0 + "");
       // IO workers not used in this executor

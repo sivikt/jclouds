@@ -16,21 +16,21 @@
  */
 package org.jclouds.io.payloads;
 
-import static com.google.common.io.Closeables.closeQuietly;
+import static org.jclouds.util.Closeables2.closeQuietly;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
+import com.google.common.io.Closer;
 import com.google.common.io.InputSupplier;
 
 /**
  * @author Adrian Cole
+ * @deprecated see ByteSourcePayload
  */
+@Deprecated
 public class InputStreamSupplierPayload extends BasePayload<InputSupplier<? extends InputStream>> {
-   private List<InputStream> toClose = Lists.newArrayList();
+   private final Closer closer = Closer.create();
 
    public InputStreamSupplierPayload(InputSupplier<? extends InputStream> content) {
       super(content);
@@ -40,14 +40,8 @@ public class InputStreamSupplierPayload extends BasePayload<InputSupplier<? exte
     * {@inheritDoc}
     */
    @Override
-   public InputStream getInput() {
-      try {
-         InputStream returnVal = content.getInput();
-         toClose.add(returnVal);
-         return returnVal;
-      } catch (IOException e) {
-         throw Throwables.propagate(e);
-      }
+   public InputStream openStream() throws IOException {
+      return closer.register(content.getInput());
    }
 
    /**
@@ -63,9 +57,6 @@ public class InputStreamSupplierPayload extends BasePayload<InputSupplier<? exte
     */
    @Override
    public void release() {
-      if (toClose.size() > 0)
-         for (InputStream content = toClose.remove(0); toClose.size() > 0; content = toClose.remove(0))
-            closeQuietly(content);
+      closeQuietly(closer);
    }
-
 }

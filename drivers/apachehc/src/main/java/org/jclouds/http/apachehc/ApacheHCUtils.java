@@ -19,7 +19,6 @@ package org.jclouds.http.apachehc;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.Set;
@@ -178,15 +177,12 @@ public class ApacheHCUtils {
       }
 
       @Override
-      public InputStream getInput() {
+      public InputStream openStream() throws IOException {
          try {
             return content.getContent();
          } catch (IllegalStateException e) {
-            Throwables.propagate(e);
-         } catch (IOException e) {
-            Throwables.propagate(e);
+            throw Throwables.propagate(e);
          }
-         return null;
       }
 
       @Override
@@ -201,12 +197,6 @@ public class ApacheHCUtils {
          } catch (IOException e) {
          }
       }
-
-      @Override
-      public void writeTo(OutputStream outstream) throws IOException {
-         super.writeTo(outstream);
-      }
-
    }
 
 }

@@ -18,8 +18,6 @@ package org.jclouds.blobstore.functions;
 
 import static org.testng.Assert.assertEquals;
 
-import java.io.File;
-
 import org.jclouds.ContextBuilder;
 import org.jclouds.blobstore.domain.Blob;
 import org.jclouds.blobstore.domain.Blob.Factory;
@@ -42,11 +40,6 @@ public class BlobNameTest {
       blob.getMetadata().setName("foo");
 
       assertEquals(fn.apply(blob), "foo");
-   }
-
-   @Test(expectedExceptions = IllegalArgumentException.class)
-   public void testMustBeBlob() {
-      fn.apply(new File("foo"));
    }
 
    @Test(expectedExceptions = { NullPointerException.class, IllegalStateException.class })

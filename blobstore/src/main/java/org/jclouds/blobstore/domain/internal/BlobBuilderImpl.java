@@ -35,6 +35,7 @@ import org.jclouds.io.Payloads;
 import org.jclouds.io.payloads.PhantomPayload;
 
 import com.google.common.collect.Maps;
+import com.google.common.io.ByteSource;
 
 /**
  * @author Adrian Cole
@@ -86,6 +87,11 @@ public class BlobBuilderImpl implements BlobBuilder {
     */
    @Override
    public PayloadBlobBuilder payload(byte[] data) {
+      return payload(newPayload(checkNotNull(data, "data")));
+   }
+
+   @Override
+   public PayloadBlobBuilder payload(ByteSource data) {
       return payload(newPayload(checkNotNull(data, "data")));
    }
 
@@ -146,6 +152,11 @@ public class BlobBuilderImpl implements BlobBuilder {
          return builder.payload(payload);
       }
 
+      /**
+       * @deprecated Callers should instead call BlobBuilder.contentMD5,
+       * usually with the results from Guava Hashing.md5().
+       */
+      @Deprecated
       @Override
       public PayloadBlobBuilder calculateMD5() throws IOException {
          return builder.payload(Payloads.calculateMD5(payload));
@@ -158,6 +169,11 @@ public class BlobBuilderImpl implements BlobBuilder {
 
       @Override
       public PayloadBlobBuilder payload(byte[] payload) {
+         return builder.payload(payload);
+      }
+
+      @Override
+      public PayloadBlobBuilder payload(ByteSource payload) {
          return builder.payload(payload);
       }
 

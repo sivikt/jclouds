@@ -19,12 +19,10 @@ package org.jclouds.io.payloads;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.Key;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 
 import org.jclouds.io.Payload;
 
@@ -44,12 +42,7 @@ public abstract class BaseCipherPayload extends DelegatingPayload {
    public abstract Cipher initializeCipher(Key key);
 
    @Override
-   public CipherInputStream getInput() {
-      return new CipherInputStream(super.getInput(), initializeCipher(key));
-   }
-
-   @Override
-   public void writeTo(OutputStream outstream) throws IOException {
-      super.writeTo(new CipherOutputStream(outstream, initializeCipher(key)));
+   public CipherInputStream openStream() throws IOException {
+      return new CipherInputStream(super.openStream(), initializeCipher(key));
    }
 }

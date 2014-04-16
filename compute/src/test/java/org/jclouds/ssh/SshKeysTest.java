@@ -33,9 +33,9 @@ import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Map;
 
+import com.google.common.io.Resources;
+
 import org.jclouds.crypto.Pems;
-import org.jclouds.io.Payloads;
-import org.jclouds.ssh.SshKeys;
 import org.jclouds.util.Strings2;
 import org.testng.annotations.Test;
 
@@ -119,7 +119,7 @@ public class SshKeysTest {
    @Test
    public void testEncodeAsOpenSSH() throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
       String encoded = SshKeys.encodeAsOpenSSH((RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(
-               SshKeys.publicKeySpecFromOpenSSH(Payloads.newPayload(getClass().getResourceAsStream("/test.pub")))));
+               SshKeys.publicKeySpecFromOpenSSH(Resources.asByteSource(Resources.getResource(getClass(), "/test.pub")))));
       assertEquals(encoded, Strings2.toStringAndClose(getClass().getResourceAsStream("/test.pub")).trim());
    }
 

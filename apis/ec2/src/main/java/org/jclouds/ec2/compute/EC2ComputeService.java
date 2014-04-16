@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.collect.Iterables.concat;
 import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.jclouds.compute.config.ComputeServiceProperties.RESOURCENAME_DELIMITER;
@@ -32,16 +33,31 @@ import static org.jclouds.ec2.reference.EC2Constants.PROPERTY_EC2_GENERATE_INSTA
 import static org.jclouds.ec2.util.Tags.resourceToTagsAsMap;
 import static org.jclouds.util.Predicates2.retry;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.ImmutableMultimap.Builder;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.inject.Inject;
 import org.jclouds.Constants;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.collect.Memoized;
@@ -84,22 +100,6 @@ import org.jclouds.ec2.domain.Tag;
 import org.jclouds.ec2.util.TagFilterBuilder;
 import org.jclouds.scriptbuilder.functions.InitAdminAccess;
 import org.jclouds.util.Strings2;
-
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.ImmutableMultimap.Builder;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.inject.Inject;
 
 /**
  * @author Adrian Cole
@@ -153,8 +153,9 @@ public class EC2ComputeService extends BaseComputeService {
 
       if (client.getTagApiForRegion(region).isPresent()) {
          Map<String, String> common = metadataAndTagsAsValuesOfEmptyString(template.getOptions());
-         if (common.size() > 0 || generateInstanceNames) {
-            return addTagsToInstancesInRegion(common, nodes, region, group);
+         if (generateInstanceNames || !common.isEmpty() || !template.getOptions().getNodeNames().isEmpty()) {
+            return addTagsAndNamesToInstancesInRegion(common, template.getOptions().getNodeNames(),
+                    nodes, region, group);
          }
       }
       return nodes;
@@ -167,17 +168,24 @@ public class EC2ComputeService extends BaseComputeService {
       }
    };
    
-   private Set<NodeMetadata> addTagsToInstancesInRegion(Map<String, String> common, Set<? extends NodeMetadata> input,
-         String region, String group) {
+   private Set<NodeMetadata> addTagsAndNamesToInstancesInRegion(Map<String, String> common, Set<String> nodeNames,
+                                                                Set<? extends NodeMetadata> input, String region,
+                                                                String group) {
       Map<String, ? extends NodeMetadata> instancesById = Maps.uniqueIndex(input, instanceId);
       ImmutableSet.Builder<NodeMetadata> builder = ImmutableSet.<NodeMetadata> builder();
+
+      List<String> namesToUse = newArrayList(nodeNames);
       if (generateInstanceNames && !common.containsKey("Name")) {
          for (Map.Entry<String, ? extends NodeMetadata> entry : instancesById.entrySet()) {
             String id = entry.getKey();
-            NodeMetadata instance = entry.getValue();
-
+            String name;
+            if (!namesToUse.isEmpty()) {
+               name = namesToUse.remove(0);
+            } else {
+               name = id.replaceAll(".*-", group + "-");
+            }
             Map<String, String> tags = ImmutableMap.<String, String> builder().putAll(common)
-                  .put("Name", id.replaceAll(".*-", group + "-")).build();
+                  .put("Name", name).build();
             logger.debug(">> applying tags %s to instance %s in region %s", tags, id, region);
             client.getTagApiForRegion(region).get().applyToResources(tags, ImmutableSet.of(id));
             builder.add(addTagsForInstance(tags, instancesById.get(id)));

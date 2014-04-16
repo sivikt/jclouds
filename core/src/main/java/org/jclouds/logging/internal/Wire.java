@@ -17,8 +17,8 @@
 package org.jclouds.logging.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.io.Closeables.closeQuietly;
 import static org.jclouds.io.Payloads.newPayload;
+import static org.jclouds.util.Closeables2.closeQuietly;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -93,9 +93,14 @@ public abstract class Wire {
          long bytesRead = ByteStreams.copy(instream, out);
          if (bytesRead >= limit)
             logger.debug("over limit %d/%d: wrote temp file", bytesRead, limit);
-         wire(header, out.getSupplier().getInput());
+         InputStream is = out.asByteSource().openStream();
+         try {
+            wire(header, is);
+         } finally {
+            is.close();
+         }
          // we must call FileBackedOutputStream.reset to remove temporary file
-         return new FilterInputStream(out.getSupplier().getInput()) {
+         return new FilterInputStream(out.asByteSource().openStream()) {
             @Override
             public void close() throws IOException {
                super.close();

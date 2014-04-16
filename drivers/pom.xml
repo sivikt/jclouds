@@ -22,7 +22,7 @@
   <parent>
     <artifactId>jclouds-project</artifactId>
     <groupId>org.apache.jclouds</groupId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
     <relativePath>../project/pom.xml</relativePath>
   </parent>
   <artifactId>jclouds-drivers-project</artifactId>
@@ -39,5 +39,6 @@
     <module>jsch</module>
     <module>netty</module>
     <module>enterprise</module>
+    <module>okhttp</module>
   </modules>
 </project>

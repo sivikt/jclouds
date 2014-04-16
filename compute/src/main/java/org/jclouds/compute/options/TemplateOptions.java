@@ -82,6 +82,8 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
          to.userMetadata(this.getUserMetadata());
       if (this.getTags().size() > 0)
          to.tags(getTags());
+      if (!this.getNodeNames().isEmpty())
+         to.nodeNames(getNodeNames());
       if (!this.shouldBlockUntilRunning())
          to.blockUntilRunning(false);
       if (!this.shouldBlockOnComplete())
@@ -96,6 +98,8 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
          to.overrideAuthenticateSudo(this.shouldAuthenticateSudo());
       if (this.getTaskName() != null)
          to.nameTask(this.getTaskName());
+      if (!this.getNetworks().isEmpty())
+         to.networks(this.getNetworks());
    }
 
    public static class ImmutableTemplateOptions extends TemplateOptions {
@@ -297,18 +301,38 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
       }
 
       @Override
+       public Set<String> getNodeNames() {
+         return delegate.getNodeNames();
+      }
+
+      @Override
+      public TemplateOptions nodeNames(Iterable<String> nodeNames) {
+         throw new IllegalArgumentException("nodeNames are immutable");
+      }
+
+      @Override
       public Set<String> getGroups() {
          return delegate.getGroups();
       }
 
       @Override
       public TemplateOptions securityGroups(Iterable<String> securityGroups) {
-         throw new IllegalArgumentException("tags are immutable");
+         throw new IllegalArgumentException("security groups are immutable");
       }
 
       @Override
       public TemplateOptions securityGroups(String... securityGroups) {
-         throw new IllegalArgumentException("tags are immutable");
+         throw new IllegalArgumentException("security groups are immutable");
+      }
+
+      @Override
+      public TemplateOptions networks(Iterable<String> networks) {
+         throw new IllegalArgumentException("networks are immutable");
+      }
+
+      @Override
+      public TemplateOptions networks(String... networks) {
+         throw new IllegalArgumentException("networks are immutable");
       }
 
       @Override
@@ -348,7 +372,10 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
 
    protected Map<String, String> userMetadata = Maps.newLinkedHashMap();
 
-   @Override
+   protected Set<String> nodeNames = ImmutableSet.of();
+
+   protected Set<String> networks = ImmutableSet.of();
+
    public boolean equals(Object o) {
       if (this == o)
          return true;
@@ -356,15 +383,16 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
          return false;
       TemplateOptions that = TemplateOptions.class.cast(o);
       return super.equals(that) && equal(this.inboundPorts, that.inboundPorts) && equal(this.script, that.script)
-            && equal(this.publicKey, that.publicKey) && equal(this.privateKey, that.privateKey)
-            && equal(this.blockUntilRunning, that.blockUntilRunning) && equal(this.tags, that.tags)
-            && equal(this.securityGroups, that.securityGroups) && equal(this.userMetadata, that.userMetadata);
+              && equal(this.publicKey, that.publicKey) && equal(this.privateKey, that.privateKey)
+              && equal(this.blockUntilRunning, that.blockUntilRunning) && equal(this.tags, that.tags)
+              && equal(this.securityGroups, that.securityGroups) && equal(this.userMetadata, that.userMetadata)
+              && equal(this.nodeNames, that.nodeNames) && equal(this.networks, that.networks);
    }
 
    @Override
    public int hashCode() {
       return Objects.hashCode(super.hashCode(), inboundPorts, script, publicKey, privateKey, blockUntilRunning, tags,
-                              securityGroups, userMetadata);
+                              securityGroups, userMetadata, nodeNames, networks);
    }
 
    @Override
@@ -382,10 +410,14 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
          toString.add("blockUntilRunning", blockUntilRunning);
       if (tags.size() != 0)
          toString.add("tags", tags);
+      if (!nodeNames.isEmpty())
+         toString.add("nodeNames", nodeNames);
       if (securityGroups.size() != 0)
          toString.add("securityGroups", securityGroups);
       if (userMetadata.size() != 0)
          toString.add("userMetadata", userMetadata);
+      if (!networks.isEmpty())
+         toString.add("networks", networks);
       return toString;
    }
 
@@ -401,6 +433,10 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
       return tags;
    }
 
+   public Set<String> getNodeNames() {
+      return nodeNames;
+   }
+
    public Set<String> getGroups() {
       return securityGroups;
    }
@@ -411,6 +447,10 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
 
    public String getPublicKey() {
       return publicKey;
+   }
+
+   public Set<String> getNetworks() {
+      return networks;
    }
 
    /**
@@ -476,6 +516,19 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
    }
 
    /**
+    * specifies names to be used for the created nodes.
+    *
+    * Note that this does not guarantee uniqueness - if there are already existing nodes with a name
+    * specified here, there will still be a new node created with the same name. Also, if more
+    * nodes are to be created than there are names, subsequent names will use the default naming strategy
+    * for that cloud.
+    */
+   public TemplateOptions nodeNames(Iterable<String> nodeNames) {
+      this.nodeNames = ImmutableSet.copyOf(checkNotNull(nodeNames, "nodeNames"));
+      return this;
+   }
+
+   /**
     * assigns the created nodes to these security groups
     */
    public TemplateOptions securityGroups(Iterable<String> securityGroups) {
@@ -488,6 +541,21 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
     */
    public TemplateOptions securityGroups(String... securityGroups) {
       return securityGroups(ImmutableSet.copyOf(securityGroups));
+   }
+
+   /**
+    * Assigns the created nodes to these networks
+    */
+   public TemplateOptions networks(Iterable<String> networks) {
+      this.networks = ImmutableSet.copyOf(checkNotNull(networks, "networks"));
+      return this;
+   }
+
+   /**
+    * @see TemplateOptions#networks(Iterable)
+    */
+   public TemplateOptions networks(String... networks) {
+      return networks(ImmutableSet.copyOf(networks));
    }
 
    /**
@@ -562,6 +630,14 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
       }
 
       /**
+       * @see TemplateOptions#nodeNames
+       */
+      public static TemplateOptions nodeNames(Iterable<String> nodeNames) {
+         TemplateOptions options = new TemplateOptions();
+         return options.nodeNames(nodeNames);
+      }
+
+      /**
        * @see TemplateOptions#securityGroups
        */
       public static TemplateOptions securityGroups(Iterable<String> securityGroups) {
@@ -575,6 +651,22 @@ public class TemplateOptions extends RunScriptOptions implements Cloneable {
       public static TemplateOptions securityGroups(String... securityGroups) {
          TemplateOptions options = new TemplateOptions();
          return options.securityGroups(securityGroups);
+      }
+
+      /**
+       * @see TemplateOptions#networks
+       */
+      public static TemplateOptions networks(Iterable<String> networks) {
+         TemplateOptions options = new TemplateOptions();
+         return options.networks(networks);
+      }
+
+      /**
+       * @see TemplateOptions#networks
+       */
+      public static TemplateOptions networks(String... networks) {
+         TemplateOptions options = new TemplateOptions();
+         return options.networks(networks);
       }
 
       /**

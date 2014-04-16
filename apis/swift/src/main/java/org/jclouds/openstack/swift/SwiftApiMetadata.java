@@ -24,7 +24,6 @@ import static org.jclouds.reflect.Reflection2.typeToken;
 import java.net.URI;
 import java.util.Properties;
 
-import org.jclouds.apis.ApiMetadata;
 import org.jclouds.blobstore.BlobStoreContext;
 import org.jclouds.openstack.swift.blobstore.config.SwiftBlobStoreContextModule;
 import org.jclouds.openstack.swift.blobstore.config.TemporaryUrlExtensionModule.SwiftTemporaryUrlExtensionModule;
@@ -45,7 +44,7 @@ public class SwiftApiMetadata extends BaseRestApiMetadata {
 
    /**
     * @deprecated please use {@code org.jclouds.ContextBuilder#buildApi(SwiftClient.class)} as
-    *             {@link SwiftAsyncClient} interface will be removed in jclouds 1.7.
+    *             {@link SwiftAsyncClient} interface will be removed in jclouds 2.0.
     */
    @Deprecated
    public static final TypeToken<org.jclouds.rest.RestContext<? extends SwiftClient, ? extends SwiftAsyncClient>> CONTEXT_TOKEN = new TypeToken<org.jclouds.rest.RestContext<? extends SwiftClient, ? extends SwiftAsyncClient>>() {

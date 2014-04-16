@@ -24,7 +24,9 @@ import java.io.InputStream;
 
 /**
  * @author Adrian Cole
+ * @deprecated see ByteSourcePayload
  */
+@Deprecated
 public class ByteArrayPayload extends BasePayload<byte[]> {
    public ByteArrayPayload(byte[] content) {
       this(content, null);
@@ -41,7 +43,7 @@ public class ByteArrayPayload extends BasePayload<byte[]> {
     * {@inheritDoc}
     */
    @Override
-   public InputStream getInput() {
+   public InputStream openStream() {
       return new ByteArrayInputStream(content);
    }
 

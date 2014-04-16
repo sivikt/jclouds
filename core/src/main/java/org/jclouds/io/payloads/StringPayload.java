@@ -26,7 +26,9 @@ import com.google.common.base.Charsets;
  * a different encoding, please use {@link ByteArrayPayload}.
  * 
  * @author Adrian Cole
+ * @deprecated see ByteSourcePayload
  */
+@Deprecated
 public class StringPayload extends BasePayload<String> {
 
    private final byte[] bytes;
@@ -43,7 +45,7 @@ public class StringPayload extends BasePayload<String> {
     * {@inheritDoc}
     */
    @Override
-   public InputStream getInput() {
+   public InputStream openStream() {
       return new ByteArrayInputStream(bytes);
    }
 

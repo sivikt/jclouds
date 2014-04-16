@@ -26,9 +26,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.Properties;
@@ -54,16 +52,16 @@ import org.jclouds.http.HttpRequest;
 import org.jclouds.io.Payload;
 import org.jclouds.io.payloads.PhantomPayload;
 import org.jclouds.io.payloads.StringPayload;
+import org.jclouds.util.Closeables2;
 import org.jclouds.util.Strings2;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.google.common.collect.Sets;
+import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 import com.google.inject.CreationException;
 
 /**
@@ -586,9 +584,7 @@ public class FilesystemAsyncBlobStoreTest {
 
         assertNotNull(resultBlob, "Blob exists");
         // checks file content
-        InputSupplier<FileInputStream> expectedFile =
-                Files.newInputStreamSupplier(new File(
-                TARGET_CONTAINER_NAME, blobKey));
+        ByteSource expectedFile = Files.asByteSource(new File(TARGET_CONTAINER_NAME, blobKey));
         assertTrue(ByteStreams.equal(expectedFile, resultBlob.getPayload()),
                 "Blob payload differs from file content");
         // metadata are verified in the test for blobMetadata, so no need to
@@ -711,7 +707,7 @@ public class FilesystemAsyncBlobStoreTest {
         try {
             assertEquals(input.substring(1), Strings2.toString(payload));
         } finally {
-            Closeables.closeQuietly(payload);
+            Closeables2.closeQuietly(payload);
         }
 
         GetOptions getOptionsRangeTail = new GetOptions();
@@ -721,7 +717,7 @@ public class FilesystemAsyncBlobStoreTest {
         try {
             assertEquals(input.substring(5), Strings2.toString(payload));
         } finally {
-            Closeables.closeQuietly(payload);
+            Closeables2.closeQuietly(payload);
         }
 
         GetOptions getOptionsFragment = new GetOptions();
@@ -731,7 +727,7 @@ public class FilesystemAsyncBlobStoreTest {
         try {
             assertEquals(input.substring(4, 7), Strings2.toString(payload));
         } finally {
-            Closeables.closeQuietly(payload);
+            Closeables2.closeQuietly(payload);
         }
     }
 

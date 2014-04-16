@@ -52,20 +52,22 @@ import org.jclouds.proxy.ProxyConfig;
 import org.jclouds.rest.AuthorizationException;
 import org.jclouds.ssh.SshClient;
 import org.jclouds.ssh.SshException;
+import org.jclouds.util.Closeables2;
 import org.jclouds.util.Strings2;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
-import com.google.common.io.Closeables;
 import com.google.common.net.HostAndPort;
 import com.google.inject.Inject;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.agentproxy.Connector;
 
 /**
  * This class needs refactoring. It is not thread safe.
@@ -124,25 +126,28 @@ public class JschSshClient implements SshClient {
 
 
    public JschSshClient(ProxyConfig proxyConfig, BackoffLimitedRetryHandler backoffLimitedRetryHandler, HostAndPort socket,
-            LoginCredentials loginCredentials, int timeout) {
+            LoginCredentials loginCredentials, int timeout, Optional<Connector> agentConnector) {
       this.user = checkNotNull(loginCredentials, "loginCredentials").getUser();
       this.host = checkNotNull(socket, "socket").getHostText();
       checkArgument(socket.getPort() > 0, "ssh port must be greater then zero" + socket.getPort());
-      checkArgument(loginCredentials.getPassword() != null || loginCredentials.getPrivateKey() != null,
-               "you must specify a password or a key");
+      checkArgument(loginCredentials.getPassword() != null || loginCredentials.hasUnencryptedPrivateKey() || agentConnector.isPresent(),
+               "you must specify a password, a key or an SSH agent needs to be available");
       this.backoffLimitedRetryHandler = checkNotNull(backoffLimitedRetryHandler, "backoffLimitedRetryHandler");
-      if (loginCredentials.getPrivateKey() == null) {
+      if (loginCredentials.getPassword() != null) {
          this.toString = String.format("%s:pw[%s]@%s:%d", loginCredentials.getUser(),
                base16().lowerCase().encode(md5().hashString(loginCredentials.getPassword(), UTF_8).asBytes()), host,
                socket.getPort());
-      } else {
+      } else if (loginCredentials.hasUnencryptedPrivateKey()) {
          String fingerPrint = fingerprintPrivateKey(loginCredentials.getPrivateKey());
          String sha1 = sha1PrivateKey(loginCredentials.getPrivateKey());
          this.toString = String.format("%s:rsa[fingerprint(%s),sha1(%s)]@%s:%d", loginCredentials.getUser(),
-                  fingerPrint, sha1, host, socket.getPort());
+                 fingerPrint, sha1, host, socket.getPort());
+      } else {
+         this.toString = String.format("%s:rsa[ssh-agent]@%s:%d", loginCredentials.getUser(), host, socket.getPort());
       }
       sessionConnection = SessionConnection.builder().hostAndPort(HostAndPort.fromParts(host, socket.getPort())).loginCredentials(
-               loginCredentials).proxy(checkNotNull(proxyConfig, "proxyConfig")).connectTimeout(timeout).sessionTimeout(timeout).build();
+               loginCredentials).proxy(checkNotNull(proxyConfig, "proxyConfig")).connectTimeout(timeout).sessionTimeout(timeout)
+               .agentConnector(agentConnector).build();
    }
 
    @Override
@@ -273,7 +278,7 @@ public class JschSshClient implements SshClient {
          try {
             sftp.put(is, path);
          } finally {
-            Closeables.closeQuietly(contents);
+            Closeables2.closeQuietly(contents);
          }
          return null;
       }
@@ -353,9 +358,9 @@ public class JschSshClient implements SshClient {
          @Override
          public void clear() {
             if (inputStream != null)
-               Closeables.closeQuietly(inputStream);
+               Closeables2.closeQuietly(inputStream);
             if (errStream != null)
-               Closeables.closeQuietly(errStream);
+               Closeables2.closeQuietly(errStream);
             if (executor != null)
                executor.disconnect();
          }

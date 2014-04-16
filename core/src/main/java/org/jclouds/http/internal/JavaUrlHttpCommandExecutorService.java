@@ -19,7 +19,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Throwables.propagate;
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.io.Closeables.closeQuietly;
+import static com.google.common.io.Closeables.close;
 import static com.google.common.net.HttpHeaders.CONTENT_LENGTH;
 import static com.google.common.net.HttpHeaders.HOST;
 import static com.google.common.net.HttpHeaders.USER_AGENT;
@@ -46,7 +46,6 @@ import javax.net.ssl.SSLContext;
 
 import org.jclouds.Constants;
 import org.jclouds.JcloudsVersion;
-import org.jclouds.http.HttpCommandExecutorService;
 import org.jclouds.http.HttpRequest;
 import org.jclouds.http.HttpResponse;
 import org.jclouds.http.HttpUtils;
@@ -61,6 +60,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableMultimap.Builder;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.CountingOutputStream;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.inject.Inject;
@@ -76,12 +76,11 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
    public static final String DEFAULT_USER_AGENT = String.format("jclouds/%s java/%s", JcloudsVersion.get(), System
             .getProperty("java.version"));
 
-   private final Supplier<SSLContext> untrustedSSLContextProvider;
-   private final Function<URI, Proxy> proxyForURI;
-   private final HostnameVerifier verifier;
-   private final Field methodField;
+   protected final Supplier<SSLContext> untrustedSSLContextProvider;
+   protected final Function<URI, Proxy> proxyForURI;
+   protected final HostnameVerifier verifier;
    @Inject(optional = true)
-   Supplier<SSLContext> sslContextSupplier;
+   protected Supplier<SSLContext> sslContextSupplier;
 
    @Inject
    public JavaUrlHttpCommandExecutorService(HttpUtils utils, ContentMetadataCodec contentMetadataCodec,
@@ -96,8 +95,6 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
       this.untrustedSSLContextProvider = checkNotNull(untrustedSSLContextProvider, "untrustedSSLContextProvider");
       this.verifier = checkNotNull(verifier, "verifier");
       this.proxyForURI = checkNotNull(proxyForURI, "proxyForURI");
-      this.methodField = HttpURLConnection.class.getDeclaredField("method");
-      this.methodField.setAccessible(true);
    }
 
    @Override
@@ -109,13 +106,13 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
       } catch (IOException e) {
          in = bufferAndCloseStream(connection.getErrorStream());
       } catch (RuntimeException e) {
-         closeQuietly(in);
+         close(in, true);
          throw propagate(e);
       }
 
       int responseCode = connection.getResponseCode();
       if (responseCode == 204) {
-         closeQuietly(in);
+         close(in, true);
          in = null;
       }
       builder.statusCode(responseCode);
@@ -145,7 +142,7 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
             in = new ByteArrayInputStream(toByteArray(inputStream));
          }
       } finally {
-         closeQuietly(inputStream);
+         close(inputStream, true);
       }
       return in;
    }
@@ -153,21 +150,8 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
    @Override
    protected HttpURLConnection convert(HttpRequest request) throws IOException, InterruptedException {
       boolean chunked = "chunked".equals(request.getFirstHeaderOrNull("Transfer-Encoding"));
-      URL url = request.getEndpoint().toURL();
 
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxyForURI.apply(request.getEndpoint()));
-      if (connection instanceof HttpsURLConnection) {
-         HttpsURLConnection sslCon = (HttpsURLConnection) connection;
-         if (utils.relaxHostname())
-            sslCon.setHostnameVerifier(verifier);
-         if (sslContextSupplier != null) {
-             // used for providers which e.g. use certs for authentication (like FGCP)
-             // Provider provides SSLContext impl (which inits context with key manager)
-             sslCon.setSSLSocketFactory(sslContextSupplier.get().getSocketFactory());
-         } else if (utils.trustAllCerts()) {
-             sslCon.setSSLSocketFactory(untrustedSSLContextProvider.get().getSocketFactory());
-         }
-      }
+      HttpURLConnection connection = initConnection(request);
       connection.setConnectTimeout(utils.getConnectionTimeout());
       connection.setReadTimeout(utils.getSocketOpenTimeout());
       connection.setAllowUserInteraction(false);
@@ -175,20 +159,9 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
       // ex. Caused by: java.io.IOException: HTTPS hostname wrong: should be
       // <adriancole.s3int0.s3-external-3.amazonaws.com>
       connection.setInstanceFollowRedirects(false);
-      try {
-         connection.setRequestMethod(request.getMethod());
-      } catch (ProtocolException e) {
-         try {
-            methodField.set(connection, request.getMethod());
-         } catch (IllegalAccessException e1) {
-            logger.error(e, "could not set request method: ", request.getMethod());
-            propagate(e1);
-         }
-      }
 
-      for (Map.Entry<String, String> entry : request.getHeaders().entries()) {
-         connection.setRequestProperty(entry.getKey(), entry.getValue());
-      }
+      setRequestMethodBypassingJREMethodLimitation(connection, request.getMethod());
+      configureRequestHeaders(connection, request);
 
       String host = request.getEndpoint().getHost();
       if (request.getEndpoint().getPort() != -1) {
@@ -228,6 +201,86 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
       return connection;
    }
 
+   /**
+    * Creates and initializes the connection.
+    */
+   protected HttpURLConnection initConnection(HttpRequest request) throws IOException {
+      URL url = request.getEndpoint().toURL();
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxyForURI.apply(request.getEndpoint()));
+      if (connection instanceof HttpsURLConnection) {
+         HttpsURLConnection sslCon = (HttpsURLConnection) connection;
+         if (utils.relaxHostname())
+            sslCon.setHostnameVerifier(verifier);
+         if (sslContextSupplier != null) {
+             // used for providers which e.g. use certs for authentication (like FGCP)
+             // Provider provides SSLContext impl (which inits context with key manager)
+             sslCon.setSSLSocketFactory(sslContextSupplier.get().getSocketFactory());
+         } else if (utils.trustAllCerts()) {
+             sslCon.setSSLSocketFactory(untrustedSSLContextProvider.get().getSocketFactory());
+         }
+      }
+      return connection;
+   }
+
+   /**
+    * Configure the HTTP request headers in the connection.
+    */
+   protected void configureRequestHeaders(HttpURLConnection connection, HttpRequest request) {
+      for (Map.Entry<String, String> entry : request.getHeaders().entries()) {
+         connection.setRequestProperty(entry.getKey(), entry.getValue());
+      }
+   }
+
+   /**
+    * Workaround for a bug in <code>HttpURLConnection.setRequestMethod(String)</code>
+    * The implementation of Sun Microsystems is throwing a <code>ProtocolException</code>
+    * when the method is other than the HTTP/1.1 default methods. So
+    * to use PATCH and others, we must apply this workaround.
+    *
+    * See issue http://java.net/jira/browse/JERSEY-639
+    */
+   private void setRequestMethodBypassingJREMethodLimitation(final HttpURLConnection httpURLConnection, final String method) {
+      try {
+         httpURLConnection.setRequestMethod(method);
+         // If the JRE does not support the given method, set it using reflection
+      } catch (final ProtocolException pe) {
+         Class<?> connectionClass = httpURLConnection.getClass();
+         Field delegateField = null;
+         try {
+            // SSL connections may have the HttpURLConnection wrapped inside
+            delegateField = connectionClass.getDeclaredField("delegate");
+            delegateField.setAccessible(true);
+            HttpURLConnection delegateConnection = (HttpURLConnection) delegateField.get(httpURLConnection);
+            setRequestMethodBypassingJREMethodLimitation(delegateConnection, method);
+         } catch (NoSuchFieldException e) {
+            // Ignore for now, keep going
+         } catch (IllegalArgumentException e) {
+            logger.error(e, "could not set request method: ", method);
+            propagate(e);
+         } catch (IllegalAccessException e) {
+            logger.error(e, "could not set request method: ", method);
+            propagate(e);
+         }
+         try {
+            Field methodField = null;
+            while (connectionClass != null) {
+               try {
+                  methodField = connectionClass.getDeclaredField("method");
+               } catch (NoSuchFieldException e) {
+                  connectionClass = connectionClass.getSuperclass();
+                  continue;
+               }
+               methodField.setAccessible(true);
+               methodField.set(httpURLConnection, method);
+               break;
+            }
+         } catch (final Exception e) {
+            logger.error(e, "could not set request method: ", method);
+            propagate(e);
+         }
+      }
+   }
+
    protected void writeNothing(HttpURLConnection connection) {
       if (!HttpRequest.NON_PAYLOAD_METHODS.contains(connection.getRequestMethod())) {
          connection.setRequestProperty(CONTENT_LENGTH, "0");
@@ -252,7 +305,7 @@ public class JavaUrlHttpCommandExecutorService extends BaseHttpCommandExecutorSe
       connection.setDoOutput(true);
       CountingOutputStream out = new CountingOutputStream(connection.getOutputStream());
       try {
-         payload.writeTo(out);
+         ByteStreams.copy(payload, out);
       } catch (IOException e) {
          logger.error(e, "error after writing %d/%s bytes to %s", out.getCount(), lengthDesc, connection.getURL());
          throw e;

@@ -17,11 +17,8 @@
 package org.jclouds.aws.s3;
 
 import static com.google.common.hash.Hashing.md5;
-import static com.google.common.io.ByteStreams.join;
-import static com.google.common.io.ByteStreams.newInputStreamSupplier;
 import static com.google.common.io.ByteStreams.toByteArray;
 import static org.jclouds.aws.s3.blobstore.options.AWSS3PutOptions.Builder.storageClass;
-import static org.jclouds.io.ByteSources.asByteSource;
 import static org.jclouds.io.Payloads.newByteArrayPayload;
 import static org.jclouds.s3.options.ListBucketOptions.Builder.withPrefix;
 import static org.testng.Assert.assertEquals;
@@ -29,10 +26,8 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Set;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -62,8 +57,8 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.ByteSource;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
 
 /**
  * Tests behavior of {@code S3Client}
@@ -75,7 +70,7 @@ public class AWSS3ClientLiveTest extends S3ClientLiveTest {
    public AWSS3ClientLiveTest() {
       provider = "aws-s3";
    }
-   private InputSupplier<InputStream> oneHundredOneConstitutions;
+   private ByteSource oneHundredOneConstitutions;
    private byte[] oneHundredOneConstitutionsMD5;
    private static long oneHundredOneConstitutionsLength;
 
@@ -89,18 +84,18 @@ public class AWSS3ClientLiveTest extends S3ClientLiveTest {
    public void setUpResourcesOnThisThread(ITestContext testContext) throws Exception {
       super.setUpResourcesOnThisThread(testContext);
       oneHundredOneConstitutions = getTestDataSupplier();
-      oneHundredOneConstitutionsMD5 = asByteSource(oneHundredOneConstitutions.getInput()).hash(md5()).asBytes();
+      oneHundredOneConstitutionsMD5 = oneHundredOneConstitutions.hash(md5()).asBytes();
    }
 
    @SuppressWarnings("unchecked")
-   public static InputSupplier<InputStream> getTestDataSupplier() throws IOException {
+   public static ByteSource getTestDataSupplier() throws IOException {
       byte[] oneConstitution = toByteArray(new GZIPInputStream(BaseJettyTest.class.getResourceAsStream("/const.txt.gz")));
-      InputSupplier<ByteArrayInputStream> constitutionSupplier = newInputStreamSupplier(oneConstitution);
+      ByteSource constitutionSupplier = ByteSource.wrap(oneConstitution);
 
-      InputSupplier<InputStream> temp = join(constitutionSupplier);
+      ByteSource temp = ByteSource.concat(constitutionSupplier);
       // we have to go beyond 5MB per part
       for (oneHundredOneConstitutionsLength = oneConstitution.length; oneHundredOneConstitutionsLength < 5 * 1024 * 1024; oneHundredOneConstitutionsLength += oneConstitution.length) {
-         temp = join(temp, constitutionSupplier);
+         temp = ByteSource.concat(temp, constitutionSupplier);
       }
       return temp;
    }
@@ -112,7 +107,7 @@ public class AWSS3ClientLiveTest extends S3ClientLiveTest {
          String key = "constitution.txt";
          String uploadId = getApi().initiateMultipartUpload(containerName,
                   ObjectMetadataBuilder.create().key(key).contentMD5(oneHundredOneConstitutionsMD5).build());
-         byte[] buffer = toByteArray(oneHundredOneConstitutions);
+         byte[] buffer = oneHundredOneConstitutions.read();
          assertEquals(oneHundredOneConstitutionsLength, (long) buffer.length);
 
          Payload part1 = newByteArrayPayload(buffer);
@@ -154,7 +149,7 @@ public class AWSS3ClientLiveTest extends S3ClientLiveTest {
    public void testMultipartChunkedFileStream() throws IOException, InterruptedException {
       
       File file = new File("target/const.txt");
-      Files.copy(oneHundredOneConstitutions, file);
+      oneHundredOneConstitutions.copyTo(Files.asByteSink(file));
       String containerName = getContainerName();
       
       try {

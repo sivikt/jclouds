@@ -16,16 +16,21 @@
  */
 package org.jclouds.compute.options;
 
+import com.google.common.collect.ImmutableSet;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.util.Set;
+
 import static org.jclouds.compute.options.TemplateOptions.Builder.authorizePublicKey;
 import static org.jclouds.compute.options.TemplateOptions.Builder.blockOnPort;
 import static org.jclouds.compute.options.TemplateOptions.Builder.blockUntilRunning;
 import static org.jclouds.compute.options.TemplateOptions.Builder.inboundPorts;
 import static org.jclouds.compute.options.TemplateOptions.Builder.installPrivateKey;
+import static org.jclouds.compute.options.TemplateOptions.Builder.networks;
+import static org.jclouds.compute.options.TemplateOptions.Builder.nodeNames;
 import static org.testng.Assert.assertEquals;
-
-import java.io.IOException;
-
-import org.testng.annotations.Test;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests possible uses of TemplateOptions and TemplateOptions.Builder.*
@@ -183,5 +188,19 @@ public class TemplateOptionsTest {
    public void testblockUntilRunningStatic() {
       TemplateOptions options = blockUntilRunning(false);
       assertEquals(options.shouldBlockUntilRunning(), false);
+   }
+
+   @Test
+   public void testNodeNames() {
+      Set<String> nodeNames = ImmutableSet.of("first-node", "second-node");
+      TemplateOptions options = nodeNames(nodeNames);
+      assertTrue(options.getNodeNames().containsAll(nodeNames));
+   }
+
+   @Test
+   public void testNetworks() {
+      Set<String> networks = ImmutableSet.of("first-network", "second-network");
+      TemplateOptions options = networks(networks);
+      assertTrue(options.getNetworks().containsAll(networks));
    }
 }

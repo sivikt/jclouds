@@ -14,21 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.io;
+package org.jclouds.openstack.v2_0.config;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import org.jclouds.openstack.keystone.v2_0.functions.EndpointToSupplierURI;
+import org.jclouds.openstack.keystone.v2_0.functions.InternalURL;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Singleton;
 
 /**
- * @author Adrian Cole
+ * Guice module to configure JClouds in order to use the internal urls to
+ * communicate with the services.
+ * 
+ * @author Ignacio Mulas
+ * 
  */
-public interface WriteTo {
-
-   /**
-    * Writes the payload content to the output stream.
-    * 
-    * @throws IOException
-    */
-   void writeTo(OutputStream outstream) throws IOException;
-
+@Singleton
+public class InternalUrlModule extends AbstractModule {
+   @Override
+   protected void configure() {
+      bind(EndpointToSupplierURI.class).to(InternalURL.class);
+   }
 }

@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 
 import org.jclouds.compute.options.TemplateOptions;
-import org.jclouds.glesys.domain.ServerSpec;
 
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.net.InetAddresses;
@@ -209,6 +208,22 @@ public class GleSYSTemplateOptions extends TemplateOptions implements Cloneable 
          GleSYSTemplateOptions options = new GleSYSTemplateOptions();
          return GleSYSTemplateOptions.class.cast(options.userMetadata(key, value));
       }
+
+      /**
+       * @see TemplateOptions#nodeNames(Iterable)
+       */
+      public static GleSYSTemplateOptions nodeNames(Iterable<String> nodeNames) {
+         GleSYSTemplateOptions options = new GleSYSTemplateOptions();
+         return GleSYSTemplateOptions.class.cast(options.nodeNames(nodeNames));
+      }
+
+      /**
+       * @see TemplateOptions#networks(Iterable)
+       */
+      public static GleSYSTemplateOptions networks(Iterable<String> networks) {
+         GleSYSTemplateOptions options = new GleSYSTemplateOptions();
+         return GleSYSTemplateOptions.class.cast(options.networks(networks));
+      }
    }
 
    // methods that only facilitate returning the correct object type
@@ -259,6 +274,22 @@ public class GleSYSTemplateOptions extends TemplateOptions implements Cloneable 
    @Override
    public GleSYSTemplateOptions userMetadata(String key, String value) {
       return GleSYSTemplateOptions.class.cast(super.userMetadata(key, value));
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public GleSYSTemplateOptions nodeNames(Iterable<String> nodeNames) {
+      return GleSYSTemplateOptions.class.cast(super.nodeNames(nodeNames));
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public GleSYSTemplateOptions networks(Iterable<String> networks) {
+      return GleSYSTemplateOptions.class.cast(super.networks(networks));
    }
 
    @Override

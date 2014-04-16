@@ -16,7 +16,7 @@
  */
 package org.jclouds.io.payloads;
 
-import static com.google.common.io.Closeables.closeQuietly;
+import static org.jclouds.util.Closeables2.closeQuietly;
 
 import java.io.InputStream;
 
@@ -33,7 +33,7 @@ public class InputStreamPayload extends BasePayload<InputStream> {
     * {@inheritDoc}
     */
    @Override
-   public InputStream getInput() {
+   public InputStream openStream() {
       return content;
    }
 

@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.apache.jclouds</groupId>
     <artifactId>jclouds-project</artifactId>        
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
     <relativePath>../project/pom.xml</relativePath>
   </parent>
   <artifactId>jclouds-all</artifactId>
@@ -66,6 +66,16 @@
     <dependency>
       <groupId>org.apache.jclouds.provider</groupId>
       <artifactId>rackspace-clouddns-uk</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds.provider</groupId>
+      <artifactId>rackspace-clouddatabases-us</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.jclouds.provider</groupId>
+      <artifactId>rackspace-clouddatabases-uk</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

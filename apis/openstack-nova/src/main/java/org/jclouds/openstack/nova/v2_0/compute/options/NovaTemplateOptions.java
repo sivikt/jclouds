@@ -27,8 +27,7 @@ import java.util.Set;
 
 import org.jclouds.compute.options.TemplateOptions;
 import org.jclouds.domain.LoginCredentials;
-import org.jclouds.openstack.nova.v2_0.NovaApi;
-import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
+import org.jclouds.openstack.nova.v2_0.domain.Network;
 import org.jclouds.scriptbuilder.domain.Statement;
 
 import com.google.common.base.Objects;
@@ -71,11 +70,14 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          eTo.generateKeyPair(shouldGenerateKeyPair());
          eTo.keyPairName(getKeyPairName());
          if (getUserData() != null) {
-             eTo.userData(getUserData());
+            eTo.userData(getUserData());
          }
          if (getDiskConfig() != null) {
             eTo.diskConfig(getDiskConfig());
-        }
+         }
+
+         eTo.configDrive(getConfigDrive());
+         eTo.novaNetworks(getNovaNetworks());
       }
    }
 
@@ -85,6 +87,8 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    protected String keyPairName;
    protected byte[] userData;
    protected String diskConfig;
+   protected boolean configDrive;
+   protected Set<Network> novaNetworks;
 
    @Override
    public boolean equals(Object o) {
@@ -98,12 +102,14 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
             && equal(this.generateKeyPair, that.generateKeyPair)
             && equal(this.keyPairName, that.keyPairName)
             && Arrays.equals(this.userData, that.userData)
-            && equal(this.diskConfig, that.diskConfig);
+            && equal(this.diskConfig, that.diskConfig)
+            && equal(this.configDrive, that.configDrive)
+            && equal(this.novaNetworks, that.novaNetworks);
    }
 
    @Override
    public int hashCode() {
-      return Objects.hashCode(super.hashCode(), autoAssignFloatingIp, securityGroupNames, generateKeyPair, keyPairName, userData, diskConfig);
+      return Objects.hashCode(super.hashCode(), autoAssignFloatingIp, securityGroupNames, generateKeyPair, keyPairName, userData, diskConfig, configDrive, novaNetworks);
    }
 
    @Override
@@ -118,6 +124,8 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       toString.add("keyPairName", keyPairName);
       toString.add("userData", userData);
       toString.add("diskConfig", diskConfig);
+      toString.add("configDrive", configDrive);
+      toString.add("novaNetworks", novaNetworks);
       return toString;
    }
 
@@ -184,7 +192,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    public String getKeyPairName() {
       return keyPairName;
    }
-   
+
    /**
     * <h3>Note</h3>
     *
@@ -196,7 +204,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    public boolean shouldGenerateKeyPair() {
       return generateKeyPair;
    }
-   
+
    /**
     * if unset, generate a default group prefixed with {@link jclouds#} according
     * to {@link #getInboundPorts()}
@@ -208,15 +216,29 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    }
 
    public byte[] getUserData() {
-       return userData;
-    }
+      return userData;
+   }
 
    /**
     * @see CreateServerOptions#getDiskConfig()
     */
    public String getDiskConfig() {
-       return diskConfig;
-    }
+      return diskConfig;
+   }
+
+   /**
+    * @see CreateServerOptions#getConfigDrive()
+    */
+   public boolean getConfigDrive() {
+      return configDrive;
+   }
+
+   /**
+    * @see CreateServerOptions#getNetworks()
+    */
+   public Set<Network> getNovaNetworks() {
+      return novaNetworks;
+   }
 
    public static class Builder {
 
@@ -240,7 +262,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       public static NovaTemplateOptions keyPairName(String keyPairName) {
          return new NovaTemplateOptions().keyPairName(keyPairName);
       }
-      
+
       /**
        * @see org.jclouds.openstack.nova.v2_0.options.CreateServerOptions#getSecurityGroupNames
        */
@@ -300,6 +322,22 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
       }
 
       /**
+       * @see TemplateOptions#nodeNames(Iterable)
+       */
+      public static NovaTemplateOptions nodeNames(Iterable<String> nodeNames) {
+         NovaTemplateOptions options = new NovaTemplateOptions();
+         return NovaTemplateOptions.class.cast(options.nodeNames(nodeNames));
+      }
+
+      /**
+       * @see TemplateOptions#networks(Iterable)
+       */
+      public static NovaTemplateOptions networks(Iterable<String> networks) {
+         NovaTemplateOptions options = new NovaTemplateOptions();
+         return NovaTemplateOptions.class.cast(options.networks(networks));
+      }
+
+      /**
        * @see TemplateOptions#overrideLoginUser
        */
       public static NovaTemplateOptions overrideLoginUser(String user) {
@@ -338,7 +376,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return options.overrideLoginCredentials(credentials);
       }
-      
+
       /**
        * @see TemplateOptions#blockUntilRunning
        */
@@ -346,7 +384,7 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return options.blockUntilRunning(blockUntilRunning);
       }
-      
+
       /**
        * @see NovaTemplateOptions#userData
        */
@@ -354,13 +392,29 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return NovaTemplateOptions.class.cast(options.userData(userData));
       }
-      
+
       /**
        * @see org.jclouds.openstack.nova.v2_0.options.CreateServerOptions#getDiskConfig()
        */
       public static NovaTemplateOptions diskConfig(String diskConfig) {
          NovaTemplateOptions options = new NovaTemplateOptions();
          return NovaTemplateOptions.class.cast(options.diskConfig(diskConfig));
+      }
+
+      /**
+       * @see org.jclouds.openstack.nova.v2_0.options.CreateServerOptions#getConfigDrive()
+       */
+      public static NovaTemplateOptions configDrive(boolean configDrive) {
+         NovaTemplateOptions options = new NovaTemplateOptions();
+         return NovaTemplateOptions.class.cast(options.configDrive(configDrive));
+      }
+
+      /**
+       * @see org.jclouds.openstack.nova.v2_0.options.CreateServerOptions#getNetworks()
+       */
+      public static NovaTemplateOptions novaNetworks(Set<Network> novaNetworks) {
+         NovaTemplateOptions options = new NovaTemplateOptions();
+         return NovaTemplateOptions.class.cast(options.novaNetworks(novaNetworks));
       }
    }
 
@@ -495,14 +549,40 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public NovaTemplateOptions nodeNames(Iterable<String> nodeNames) {
+      return NovaTemplateOptions.class.cast(super.nodeNames(nodeNames));
+   }
+
+   /**
+    * <br>Ensures NovaTemplateOptions can work with networks specified as Strings.
+    * Also provides for compatibility with the abstraction layer.
+    */
+   @Override
+   public NovaTemplateOptions networks(Iterable<String> networks) {
+      return NovaTemplateOptions.class.cast(super.networks(networks));
+   }
+
+   /**
+    * <br>Ensures NovaTemplateOptions can work with networks specified as Strings.
+    * Also provides for compatibility with the abstraction layer.
+    */
+   @Override
+   public NovaTemplateOptions networks(String... networks) {
+      return NovaTemplateOptions.class.cast(super.networks(networks));
+   }
+
+   /**
     * User data as bytes (not base64-encoded)
     */
    public NovaTemplateOptions userData(byte[] userData) {
-       // This limit may not be needed for nova
-       checkArgument(checkNotNull(userData, "userData").length <= 16 * 1024,
-               "userData cannot be larger than 16kb");
-       this.userData = userData;
-       return this;
+      // This limit may not be needed for nova
+      checkArgument(checkNotNull(userData, "userData").length <= 16 * 1024,
+            "userData cannot be larger than 16kb");
+      this.userData = userData;
+      return this;
    }
 
    /**
@@ -511,5 +591,29 @@ public class NovaTemplateOptions extends TemplateOptions implements Cloneable {
    public NovaTemplateOptions diskConfig(String diskConfig) {
       this.diskConfig = diskConfig;
       return this;
-  }
+   }
+
+   /**
+    * OpenStack can be configured to write metadata to a special configuration drive that will be 
+    * attached to the instance when it boots. The instance can retrieve any information that would 
+    * normally be available through the metadata service by mounting this disk and reading files from it.
+    * To enable the config drive, set this parameter to "true".
+    * This has to be enabled for user data cases.
+    * @see CreateServerOptions#getConfigDrive()
+    */
+   public NovaTemplateOptions configDrive(boolean configDrive) {
+      this.configDrive = configDrive;
+      return this;
+   }
+
+   /**
+    * @param novaNetworks The list of network declarations.
+    * Nova-specific network declarations allow for specifying network UUIDs, port UUIDs, and fixed IPs.
+    * Unline {@link #networks(Iterable)} this supports setting additional network parameters and not just network UUIDs.
+    * @see CreateServerOptions#getNetworks()
+    */
+   public NovaTemplateOptions novaNetworks(Set<Network> novaNetworks) {
+      this.novaNetworks = novaNetworks;
+      return this;
+   }
 }

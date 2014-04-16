@@ -24,7 +24,6 @@ import org.jclouds.aws.domain.AWSError;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.http.HttpCommand;
 import org.jclouds.http.HttpResponse;
-import org.jclouds.http.HttpRetryHandler;
 import org.jclouds.http.annotation.ServerError;
 import org.jclouds.http.handlers.BackoffLimitedRetryHandler;
 
@@ -51,7 +50,8 @@ public class AWSServerErrorRetryHandler extends BackoffLimitedRetryHandler {
 
    @Override
    public boolean shouldRetryRequest(HttpCommand command, HttpResponse response) {
-      if (response.getStatusCode() == 503) {
+      switch (response.getStatusCode()) {
+      case 503:  // Service Unavailable
          // Content can be null in the case of HEAD requests
          if (response.getPayload() != null) {
             closeClientButKeepContentStream(response);
@@ -60,6 +60,9 @@ public class AWSServerErrorRetryHandler extends BackoffLimitedRetryHandler {
                return shouldRetryRequestOnError(command, response, error);
             }
          }
+         break;
+      case 504:  // Gateway Timeout
+         return super.shouldRetryRequest(command, response);
       }
       return false;
    }

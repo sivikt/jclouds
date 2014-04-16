@@ -34,12 +34,12 @@ import org.jclouds.cloudservers.domain.Server;
 import org.jclouds.cloudservers.options.ListOptions;
 import org.jclouds.compute.ComputeServiceAdapter;
 import org.jclouds.compute.domain.Template;
+import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 
 /**
  * defines the connection between the {@link CloudServersClient} implementation and the jclouds
@@ -59,6 +59,7 @@ public class CloudServersComputeServiceAdapter implements ComputeServiceAdapter<
    @Override
    public NodeAndInitialCredentials<Server> createNodeWithGroupEncodedIntoName(String group, String name,
             Template template) {
+      template.getOptions().userMetadata(ComputeServiceConstants.NODE_GROUP_KEY, group);
       Server server = client
                .createServer(name, Integer.parseInt(template.getImage().getProviderId()), Integer.parseInt(template
                         .getHardware().getProviderId()), withMetadata(metadataAndTagsAsCommaDelimitedValue(template.getOptions())));
